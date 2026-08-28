@@ -1,0 +1,46 @@
+import { notFound } from 'next/navigation'
+import { prisma } from '@/lib/db'
+import { requireSpmsAuth } from '@/lib/spms-auth'
+import { ProjectForm } from '../../project-form'
+
+export const dynamic = 'force-dynamic'
+
+export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const session = await requireSpmsAuth()
+  const isAdmin = session.role === 'ADMIN'
+
+  const project = await prisma.project.findUnique({ where: { id } })
+  if (!project) notFound()
+  if (!isAdmin && project.supervisorId !== session.staffId) notFound()
+
+  const [departments, academicYears, staff, programmes] = await Promise.all([
+    prisma.department.findMany({ orderBy: { name: 'asc' } }),
+    prisma.academicYear.findMany({ orderBy: { year: 'desc' } }),
+    prisma.staff.findMany({
+      where: { staffType: 'LECTURER' },
+      select: { id: true, name: true, departmentId: true },
+      orderBy: { name: 'asc' },
+    }),
+    prisma.programme.findMany({
+      where: {
+        published: true,
+        ...(isAdmin ? {} : { departmentId: session.departmentId }),
+      },
+      select: { id: true, name: true },
+      orderBy: { name: 'asc' },
+    }),
+  ])
+
+  return (
+    <ProjectForm
+      project={project}
+      departments={departments}
+      academicYears={academicYears}
+      staff={staff}
+      programmes={programmes}
+      isAdmin={isAdmin}
+      currentUserId={session.staffId}
+    />
+  )
+}
