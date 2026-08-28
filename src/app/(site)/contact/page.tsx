@@ -3,6 +3,8 @@ import { PageHero } from '@/components/site/page-hero'
 import { ContactForm } from '@/components/site/contact-form'
 import { getSiteSections } from '@/lib/site-content'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ContactPage() {
   const sections = await getSiteSections()
   const { contact } = sections

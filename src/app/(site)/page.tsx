@@ -11,6 +11,8 @@ import { getSiteSections } from '@/lib/site-content'
 import { truncate, formatDate } from '@/lib/utils'
 import { getDepartmentIcon } from '@/lib/department-icons'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const [departments, featuredPosts, programmes, sections] = await Promise.all([
     getDepartments(),

@@ -15,6 +15,8 @@ const categoryMeta: Record<
   EVENT: { label: 'Event', icon: <CalendarBlank size={16} /> },
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewsPage({
   searchParams,
 }: PageProps<'/news'>) {

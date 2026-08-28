@@ -4,6 +4,8 @@ import { GraduationCap, Users } from '@phosphor-icons/react/dist/ssr'
 import { PageHero } from '@/components/site/page-hero'
 import { getDepartment } from '@/lib/data'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DepartmentPage({
   params,
 }: PageProps<'/departments/[slug]'>) {

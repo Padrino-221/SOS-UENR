@@ -4,6 +4,8 @@ import { ArrowLeft, UserCircle } from '@phosphor-icons/react/dist/ssr'
 import { getPost } from '@/lib/data'
 import { formatDate } from '@/lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewsDetailPage({
   params,
 }: PageProps<'/news/[slug]'>) {

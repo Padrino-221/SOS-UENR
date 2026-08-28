@@ -10,6 +10,8 @@ import { getDepartments } from '@/lib/data'
 import { getDepartmentIcon } from '@/lib/department-icons'
 import { getSiteSections } from '@/lib/site-content'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AboutPage() {
   const [departments, sections] = await Promise.all([
     getDepartments(),

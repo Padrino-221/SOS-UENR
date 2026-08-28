@@ -10,6 +10,8 @@ import {
 import { PageHero } from '@/components/site/page-hero'
 import { getProgramme } from '@/lib/data'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ProgrammeDetailPage({
   params,
 }: PageProps<'/programmes/[slug]'>) {

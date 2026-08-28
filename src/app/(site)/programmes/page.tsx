@@ -13,6 +13,8 @@ const levelTabs: { key: string; label: string; value: ProgrammeLevel | null }[] 
   { key: 'postgraduate', label: 'Postgraduate', value: 'POSTGRADUATE' },
 ]
 
+export const dynamic = 'force-dynamic'
+
 export default async function ProgrammesPage({
   searchParams,
 }: PageProps<'/programmes'>) {

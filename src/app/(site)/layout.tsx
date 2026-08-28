@@ -5,6 +5,8 @@ import { ScrollToTop } from '@/components/site/scroll-to-top'
 import { ScrollToTopButton } from '@/components/site/scroll-to-top-button'
 import { getSiteSections } from '@/lib/site-content'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SiteLayout({
   children,
 }: {
