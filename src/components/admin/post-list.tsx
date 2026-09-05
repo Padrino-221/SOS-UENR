@@ -44,7 +44,7 @@ export function PostList({ posts }: { posts: PostRow[] }) {
   const columns: Column<PostRow>[] = [
     { key: 'title', header: 'Title', render: (p) => <span className="font-medium text-ink-900">{p.title}</span> },
     { key: 'category', header: 'Category', render: (p) => <span className="capitalize">{p.category.replace('_', ' ').toLowerCase()}</span> },
-    { key: 'date', header: 'Date', render: (p) => formatDate(p.publishedAt ?? new Date()) },
+    { key: 'date', header: 'Date', render: (p) => formatDate(p.publishedAt) },
     {
       key: 'published',
       header: 'Status',
