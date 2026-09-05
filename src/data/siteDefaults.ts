@@ -7,6 +7,7 @@ export type SiteSectionKey =
   | 'news'
   | 'staff'
   | 'leadership'
+  | 'studentLeadership'
   | 'contact'
   | 'projects'
   | 'footer'
@@ -150,6 +151,11 @@ export interface SiteNavigation {
   }[]
 }
 
+export interface SiteStudentLeadership {
+  heroTitle: string
+  heroSubtitle: string
+}
+
 export interface SiteSections {
   branding: SiteBranding
   hero: SiteHero
@@ -159,6 +165,7 @@ export interface SiteSections {
   news: SiteNews
   staff: SiteStaff
   leadership: SiteLeadership
+  studentLeadership: SiteStudentLeadership
   contact: SiteContact
   projects: SiteProjects
   footer: SiteFooter
@@ -287,6 +294,12 @@ export const siteDefaults: SiteSections = {
       'Our faculty and lecturers across all departments.',
   },
 
+  studentLeadership: {
+    heroTitle: 'Student Leadership',
+    heroSubtitle:
+      'Meet the student executives of the School of Sciences — filter by academic year to view previous tenures.',
+  },
+
   leadership: {
     heroTitle: 'Leadership & Administration',
     heroSubtitle:
@@ -366,6 +379,7 @@ export const siteDefaults: SiteSections = {
           { label: 'Overview', href: '/about' },
           { label: 'Our Departments', href: '/about#departments' },
           { label: 'Leadership', href: '/leadership' },
+          { label: 'Student Leadership', href: '/student-leadership' },
           { label: 'Staff', href: '/staff' },
         ],
       },

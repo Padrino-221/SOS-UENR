@@ -1,13 +1,12 @@
 import { PageHero } from '@/components/site/page-hero'
 import { prisma } from '@/lib/db'
 import { StaffCard } from '@/components/site/staff-card'
-import { ExecutivesSection } from '@/components/site/executives-section'
 import { getSiteSections } from '@/lib/site-content'
 
 export const dynamic = 'force-dynamic'
 
 export default async function LeadershipPage() {
-  const [staff, sections, executives, academicYears] = await Promise.all([
+  const [staff, sections] = await Promise.all([
     prisma.staff.findMany({
       where: {
         showOnPublic: true,
@@ -22,12 +21,6 @@ export default async function LeadershipPage() {
       orderBy: [{ ordering: 'asc' }, { name: 'asc' }],
     }),
     getSiteSections(),
-    prisma.staff.findMany({
-      where: { isExecutive: true },
-      include: { department: true, executiveYear: true },
-      orderBy: [{ ordering: 'asc' }, { name: 'asc' }],
-    }),
-    prisma.academicYear.findMany({ orderBy: { year: 'desc' } }),
   ])
 
   const { leadership } = sections
@@ -101,8 +94,6 @@ export default async function LeadershipPage() {
           )}
         </div>
       </section>
-
-      <ExecutivesSection executives={executives} academicYears={academicYears} />
     </>
   )
 }

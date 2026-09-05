@@ -40,6 +40,8 @@ export function PreviewClient({
 }) {
   const [sections, setSections] = useState<SiteSections>(liveSections)
   const [isPreview, setIsPreview] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     try {
@@ -105,11 +107,19 @@ export function PreviewClient({
   const footer = (sections as any).footer || liveSections.footer
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className={`sticky top-0 z-50 px-4 py-2.5 flex items-center justify-between gap-4 text-sm ${isPreview ? 'bg-amber-400 text-ink-900' : 'bg-amber-50 border-b border-amber-200 text-amber-800'}`}>
-        <span className="font-bold">{isPreview ? 'Preview Mode — showing unsaved builder changes (not live)' : 'No preview data — showing live site. Open Site Builder → Preview to see your edits.'}</span>
-        <Link href={isPreview ? '/admin/site-builder' : '/'} className="rounded-lg bg-ink-900 text-white px-3 py-1.5 text-xs font-bold hover:bg-ink-800 inline-flex items-center gap-1.5">
-          {isPreview ? 'Back to Builder' : 'Back to Live Site'}
+    <div className="min-h-screen bg-white" suppressHydrationWarning>
+      <div
+        suppressHydrationWarning
+        className={`sticky top-0 z-50 px-4 py-2.5 flex items-center justify-between gap-4 text-sm ${mounted && isPreview ? 'bg-amber-400 text-ink-900' : 'bg-amber-50 border-b border-amber-200 text-amber-800'}`}
+      >
+        <span suppressHydrationWarning className="font-bold">
+          {mounted && isPreview ? 'Preview Mode — showing unsaved builder changes (not live)' : 'No preview data — showing live site. Open Site Builder → Preview to see your edits.'}
+        </span>
+        <Link
+          href={mounted && isPreview ? '/admin/site-builder' : '/'}
+          className="rounded-lg bg-ink-900 text-white px-3 py-1.5 text-xs font-bold hover:bg-ink-800 inline-flex items-center gap-1.5"
+        >
+          {mounted && isPreview ? 'Back to Builder' : 'Back to Live Site'}
         </Link>
       </div>
       <PublicShell>

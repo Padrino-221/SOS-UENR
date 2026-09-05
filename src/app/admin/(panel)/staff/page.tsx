@@ -4,17 +4,15 @@ import { StaffList } from '@/components/admin/staff-list'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminStaffPage() {
-  const [raw, departments, academicYears] = await Promise.all([
-    prisma.staff.findMany({
-      include: { department: true },
-      orderBy: [{ ordering: 'asc' }, { name: 'asc' }],
-    }),
-    prisma.department.findMany({
-      orderBy: { ordering: 'asc' },
-      select: { id: true, name: true },
-    }),
-    prisma.academicYear.findMany({ orderBy: { year: 'desc' } }),
-  ])
+  const raw = await prisma.staff.findMany({
+    include: { department: true },
+    orderBy: [{ ordering: 'asc' }, { name: 'asc' }],
+  })
+
+  const departments = await prisma.department.findMany({
+    orderBy: { ordering: 'asc' },
+    select: { id: true, name: true },
+  })
 
   const staff = raw.map((s) => ({
     id: s.id,
@@ -29,11 +27,9 @@ export default async function AdminStaffPage() {
     photoUrl: s.photoUrl,
     ordering: s.ordering,
     showOnPublic: s.showOnPublic,
-    isExecutive: (s as unknown as { isExecutive?: boolean }).isExecutive ?? false,
-    executiveYearId: (s as unknown as { executiveYearId?: string | null }).executiveYearId ?? null,
     departmentId: s.departmentId,
     department: s.department,
   }))
 
-  return <StaffList staff={staff} departments={departments} academicYears={academicYears} />
+  return <StaffList staff={staff} departments={departments} />
 }

@@ -33,6 +33,7 @@ export async function saveSiteSection(
   revalidatePath('/staff')
   revalidatePath('/contact')
   revalidatePath('/projects')
+  revalidatePath('/student-leadership')
 
   return { success: true }
 }

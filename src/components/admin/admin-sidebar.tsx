@@ -10,6 +10,7 @@ import {
   Newspaper,
   Buildings,
   Users,
+  Student,
   Envelope,
   Gear,
   SignOut,
@@ -28,6 +29,7 @@ const nav = [
   { href: '/admin/departments', label: 'Departments', icon: Buildings },
   { href: '/admin/posts', label: 'News & Events', icon: Newspaper },
   { href: '/admin/staff', label: 'Staff', icon: Users },
+  { href: '/admin/student-leadership', label: 'Student Leadership', icon: Student },
   { href: '/admin/messages', label: 'Messages', icon: Envelope },
   { href: '/admin/site-builder', label: 'Site Builder', icon: Gear },
 ]

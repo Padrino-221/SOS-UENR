@@ -61,7 +61,7 @@ export function SiteFooter({ footer, logo }: { footer: SiteFooterType; logo: str
 
       <div className="border-t border-white/10">
         <div className="container-premium py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
-          <p>© {new Date().getFullYear()} {footer.copyright}</p>
+          <p suppressHydrationWarning>© {new Date().getFullYear()} {footer.copyright}</p>
           <p className="flex items-center gap-2"><span className="h-1 w-1 rounded-full bg-gold-400" /> {footer.bottomTagline}</p>
         </div>
       </div>

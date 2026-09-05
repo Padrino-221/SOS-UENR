@@ -184,8 +184,8 @@ export async function upsertStaff(formData: FormData) {
   const photoUrl = String(formData.get('photoUrl') ?? '').trim() || null
   const showOnPublic = String(formData.get('showOnPublic') ?? '') === 'on'
   const spmsAccess = String(formData.get('spmsAccess') ?? '') === 'on'
-  const isExecutive = String(formData.get('isExecutive') ?? '') === 'on'
-  const executiveYearId = String(formData.get('executiveYearId') ?? '') || null
+
+
   const ordering = Number(formData.get('ordering') ?? 0) || 0
 
   // Check if spmsAccess is changing (for email notification)
@@ -213,8 +213,6 @@ export async function upsertStaff(formData: FormData) {
     photoUrl,
     showOnPublic,
     spmsAccess,
-    isExecutive,
-    executiveYearId,
     ordering,
   }
 

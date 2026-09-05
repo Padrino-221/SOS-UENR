@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Field, Toggle, SelectField as Select } from '@/components/admin/fields'
 import { SubmitButton } from '@/components/admin/submit-button'
 import { ImageUpload } from '@/components/ui'
@@ -8,16 +7,13 @@ import { upsertStaff } from '@/actions/content'
 import type { Staff } from '@prisma/client'
 
 type DepartmentOption = { id: string; name: string }
-type YearOption = { id: string; year: string }
 
 export function StaffForm({
   staff,
   departments,
-  academicYears = [],
 }: {
   staff?: Staff | null
   departments: DepartmentOption[]
-  academicYears?: YearOption[]
 }) {
   return (
     <form
@@ -92,26 +88,6 @@ export function StaffForm({
         defaultChecked={staff?.spmsAccess ?? false}
         hint="Allow this staff member to log in to the Student Project Management System"
       />
-
-      <Toggle
-        label="Executive"
-        name="isExecutive"
-        defaultChecked={(staff as unknown as { isExecutive?: boolean })?.isExecutive ?? false}
-        hint="Show under Executives on Leadership page — can be filtered by academic year"
-      />
-
-      {academicYears.length > 0 && (
-        <Select
-          label="Executive Year"
-          name="executiveYearId"
-          defaultValue={(staff as unknown as { executiveYearId?: string | null })?.executiveYearId ?? ''}
-          options={[
-            { value: '', label: 'No year (current)' },
-            ...academicYears.map((y) => ({ value: y.id, label: y.year })),
-          ]}
-          hint="Academic year for filtering executives (past vs current)"
-        />
-      )}
 
       <div>
         <SubmitButton label={staff ? 'Update staff' : 'Create staff'} />

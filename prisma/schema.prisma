@@ -49,6 +49,7 @@ model Department {
   programmes  Programme[]
   staff       Staff[]
   projects    Project[]
+  studentExecutives StudentExecutive[]
   @@map("departments")
 }
 
@@ -199,7 +200,27 @@ model AcademicYear {
 
   projects  Project[]
   executives Staff[] @relation("StaffExecutiveYear")
+  studentExecutives StudentExecutive[]
   @@map("academic_years")
+}
+
+model StudentExecutive {
+  id             String       @id @default(cuid())
+  name           String
+  position       String // e.g. President, Secretary
+  photoUrl       String?
+  ordering       Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  @@index([academicYearId])
+  @@map("student_executives")
 }
 
 model Project {

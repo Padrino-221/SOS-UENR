@@ -67,6 +67,8 @@ export function ProjectForm({
   const [uploadError, setUploadError] = useState('')
   const [autoFilled, setAutoFilled] = useState<string[]>([])
   const [isDragging, setIsDragging] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   // --- Draft persistence (new projects only) ---
   const draftKey = `spms:draft:new:${currentUserId}`
@@ -425,8 +427,8 @@ export function ProjectForm({
           <h1 className="text-2xl font-bold text-ink-900">{project ? 'Edit Project' : 'New Project'}</h1>
           <p className="mt-1 text-sm text-ink-500">{project ? 'Update project details' : 'Upload a new student project in 4 steps'}</p>
         </div>
-        {!project && lastSavedAt && !showDraftBanner && (
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1 text-xs text-ink-500">
+        {mounted && !project && lastSavedAt && !showDraftBanner && (
+          <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1 text-xs text-ink-500" suppressHydrationWarning>
             <span className="inline-flex items-center gap-1.5"><ClockCounterClockwise size={12} weight="duotone" /> Autosaved {new Date(lastSavedAt).toLocaleTimeString()}</span>
             <button type="button" onClick={clearDraft} className="ml-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-ink-600 hover:bg-ink-100">Clear</button>
           </span>
@@ -434,7 +436,7 @@ export function ProjectForm({
       </div>
 
       {/* Draft banner */}
-      {!project && showDraftBanner && draftMeta && (
+      {mounted && !project && showDraftBanner && draftMeta && (
         <div className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white">

@@ -40,6 +40,8 @@ export function SectionForm({ sectionKey, data, onChange }: Props) {
       return <StaffForm data={data as SiteSections['staff']} set={set} />
     case 'leadership':
       return <LeadershipForm data={data as SiteSections['leadership']} set={set} />
+    case 'studentLeadership':
+      return <StudentLeadershipForm data={data as SiteSections['studentLeadership']} set={set} />
     case 'contact':
       return <ContactForm data={data as SiteSections['contact']} set={set} />
     case 'projects':
@@ -225,6 +227,18 @@ function StaffForm({ data, set }: { data: SiteSections['staff']; set: (k: string
   return (
     <div className="space-y-6">
       <SectionHeader title="Staff Page" description="Page hero content for academic staff" />
+      <FieldGroup title="Hero">
+        <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
+        <TextArea label="Subtitle" value={data.heroSubtitle} onChange={(v) => set('heroSubtitle', v)} rows={2} />
+      </FieldGroup>
+    </div>
+  )
+}
+
+function StudentLeadershipForm({ data, set }: { data: SiteSections['studentLeadership']; set: (k: string, v: unknown) => void }) {
+  return (
+    <div className="space-y-6">
+      <SectionHeader title="Student Leadership Page" description="Page hero content for student leadership" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
         <TextArea label="Subtitle" value={data.heroSubtitle} onChange={(v) => set('heroSubtitle', v)} rows={2} />

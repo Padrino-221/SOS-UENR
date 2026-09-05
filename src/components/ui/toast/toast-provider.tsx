@@ -48,8 +48,16 @@ const iconColors: Record<ToastType, string> = {
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
   const counter = useRef(0)
+  const lastToast = useRef<{ type: ToastType; message: string; time: number } | null>(null)
 
   const toast = useCallback((type: ToastType, message: string) => {
+    // Ignore an identical toast fired within the same instant (e.g. duplicate
+    // mount/effect runs) so the same message never stacks twice.
+    const now = Date.now()
+    const prev = lastToast.current
+    if (prev && prev.type === type && prev.message === message && now - prev.time < 700) return
+    lastToast.current = { type, message, time: now }
+
     const id = String(++counter.current)
     setToasts((prev) => [...prev, { id, type, message }])
     setTimeout(() => {

@@ -17,6 +17,7 @@ const SECTIONS: { group: string; items: { key: SiteSectionKey; label: string }[]
       { key: 'programmes', label: 'Programmes' },
       { key: 'news', label: 'News & Events' },
       { key: 'leadership', label: 'Leadership' },
+      { key: 'studentLeadership', label: 'Student Leadership' },
       { key: 'staff', label: 'Staff' },
       { key: 'contact', label: 'Contact' },
       { key: 'projects', label: 'Projects' },
