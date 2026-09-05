@@ -9,7 +9,7 @@ export function DepartmentForm({ department }: { department?: Department | null 
   return (
     <form
       action={upsertDepartment}
-      className="grid max-w-3xl gap-6 rounded-2xl border border-ink-100 bg-white p-6"
+      className="grid max-w-3xl gap-6 rounded-lg border border-ink-100 bg-white p-6"
     >
       {department && <input type="hidden" name="id" value={department.id} />}
 

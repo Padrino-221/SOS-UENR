@@ -40,19 +40,20 @@ export default async function StaffPage({
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Staff' }]}
       />
 
-      <section className="py-16">
+      <section className="py-16 bg-white">
         <div className="container-page">
-          <DepartmentFilter
-            departments={departments}
-            active={department ?? ''}
-          />
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <span className="kicker justify-center">Our People</span>
+            <h2 className="mt-3 text-3xl md:text-4xl font-serif text-ink-900">Academic Staff</h2>
+            <p className="mt-3 text-ink-600 leading-relaxed">Meet the dedicated lecturers driving teaching and research across the School of Sciences.</p>
+          </div>
+
+          <DepartmentFilter departments={departments} active={department ?? ''} />
 
           {allStaff.length === 0 ? (
-            <p className="text-ink-700">
-              No staff found for this department. Please check back soon.
-            </p>
+            <p className="text-ink-700 text-center py-12">No staff found for this department. Please check back soon.</p>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               {allStaff.map((m) => (
                 <StaffCard
                   key={m.id}

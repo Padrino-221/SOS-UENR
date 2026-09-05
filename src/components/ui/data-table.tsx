@@ -87,7 +87,7 @@ export function DataTable<T extends { id: string }>({
                         disabled={page === 1}
                         className="inline-flex items-center gap-1 rounded-lg border border-ink-200 px-2.5 py-1.5 font-medium text-ink-600 transition hover:border-brand-300 hover:text-brand-700 disabled:opacity-40 disabled:pointer-events-none"
                       >
-                        <CaretLeft size={12} /> Prev
+                        <CaretLeft size={12} weight="duotone" /> Prev
                       </button>
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                         <button
@@ -108,7 +108,7 @@ export function DataTable<T extends { id: string }>({
                         disabled={page === totalPages}
                         className="inline-flex items-center gap-1 rounded-lg border border-ink-200 px-2.5 py-1.5 font-medium text-ink-600 transition hover:border-brand-300 hover:text-brand-700 disabled:opacity-40 disabled:pointer-events-none"
                       >
-                        Next <CaretRight size={12} />
+                        Next <CaretRight size={12} weight="duotone" />
                       </button>
                     </div>
                   </div>

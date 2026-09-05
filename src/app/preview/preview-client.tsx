@@ -1,30 +1,68 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import {
-  GraduationCap,
-  Buildings,
-  Newspaper,
-  ArrowRight,
-} from '@phosphor-icons/react/dist/ssr'
-import { getDepartments, getProgrammes, getFeaturedPosts } from '@/lib/data'
-import { getSiteSections } from '@/lib/site-content'
-import { truncate, formatDate } from '@/lib/utils'
+import { ArrowRight, GraduationCap, Buildings, Newspaper } from '@phosphor-icons/react'
+import { siteDefaults, type SiteSections } from '@/data/siteDefaults'
+import { SiteHeader } from '@/components/site/site-header'
+import { SiteFooter } from '@/components/site/site-footer'
+import { PublicShell } from '@/components/site/public-shell'
 import { getDepartmentIcon } from '@/lib/department-icons'
+import { truncate, formatDate } from '@/lib/utils'
 
-export const dynamic = 'force-dynamic'
+function deepMerge(defaults: any, saved: any): any {
+  if (!saved || typeof saved !== 'object') return defaults
+  if (!defaults || typeof defaults !== 'object') return saved
+  const result: any = { ...defaults }
+  for (const key of Object.keys(saved)) {
+    const v = saved[key]
+    const d = defaults[key]
+    if (v !== null && v !== undefined && typeof v === 'object' && !Array.isArray(v) && typeof d === 'object' && d !== null && !Array.isArray(d)) {
+      result[key] = deepMerge(d, v)
+    } else if (v !== undefined) {
+      result[key] = v
+    }
+  }
+  return result
+}
 
-export default async function HomePage() {
-  const [departments, featuredPosts, programmes, sections] = await Promise.all([
-    getDepartments(),
-    getFeaturedPosts(3),
-    getProgrammes(),
-    getSiteSections(),
-  ])
+export function PreviewClient({
+  liveDepartments,
+  liveFeaturedPosts,
+  liveProgrammes,
+  liveSections,
+}: {
+  liveDepartments: Awaited<ReturnType<typeof import('@/lib/data').getDepartments>>
+  liveFeaturedPosts: Awaited<ReturnType<typeof import('@/lib/data').getFeaturedPosts>>
+  liveProgrammes: Awaited<ReturnType<typeof import('@/lib/data').getProgrammes>>
+  liveSections: SiteSections
+}) {
+  const [sections, setSections] = useState<SiteSections>(liveSections)
+  const [isPreview, setIsPreview] = useState(false)
 
-  const degreeCount = programmes.filter((p) => p.level === 'DEGREE').length
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('site-builder-preview')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        setSections(deepMerge(siteDefaults, parsed))
+        setIsPreview(true)
+        return
+      }
+      const m = document.cookie.match(/(?:^|; )site-builder-preview=([^;]*)/)
+      if (m) {
+        const parsed = JSON.parse(decodeURIComponent(m[1]))
+        setSections(deepMerge(siteDefaults, parsed))
+        setIsPreview(true)
+      }
+    } catch {}
+  }, [])
+
   const { hero, home, about } = sections
-  const featuredDepts = departments.slice(0, 3)
-  const featuredProgs = programmes.slice(0, 6)
+  const degreeCount = liveProgrammes.filter((p: any) => p.level === 'DEGREE').length
+  const featuredDepts = liveDepartments.slice(0, 3)
+  const featuredProgs = liveProgrammes.slice(0, 6)
 
   const heroData = {
     badge: hero?.badge || 'University of Energy and Natural Resources',
@@ -55,7 +93,6 @@ export default async function HomePage() {
     progLink: (home as any)?.progLink || '/programmes',
     newsEyebrow: (home as any)?.newsEyebrow || 'News & Events',
     newsHeading: (home as any)?.newsHeading || 'Latest stories',
-    newsLink: (home as any)?.newsLink || '/news',
     newsEmpty: (home as any)?.newsEmpty || 'No stories yet.',
     ctaHeading: (home as any)?.ctaHeading || 'Ready to begin your scientific journey?',
     ctaBody: (home as any)?.ctaBody || 'Join innovators building sustainable solutions for Ghana and Africa.',
@@ -63,9 +100,21 @@ export default async function HomePage() {
     ctaSecondary: (home as any)?.ctaSecondary || { label: 'Contact Us', href: '/contact' },
   }
 
+  const branding = (sections as any).branding || liveSections.branding
+  const navigation = (sections as any).navigation || liveSections.navigation
+  const footer = (sections as any).footer || liveSections.footer
+
   return (
-    <>
-      {/* HERO — clean split, like news card style */}
+    <div className="min-h-screen bg-white">
+      <div className={`sticky top-0 z-50 px-4 py-2.5 flex items-center justify-between gap-4 text-sm ${isPreview ? 'bg-amber-400 text-ink-900' : 'bg-amber-50 border-b border-amber-200 text-amber-800'}`}>
+        <span className="font-bold">{isPreview ? 'Preview Mode — showing unsaved builder changes (not live)' : 'No preview data — showing live site. Open Site Builder → Preview to see your edits.'}</span>
+        <Link href={isPreview ? '/admin/site-builder' : '/'} className="rounded-lg bg-ink-900 text-white px-3 py-1.5 text-xs font-bold hover:bg-ink-800 inline-flex items-center gap-1.5">
+          {isPreview ? 'Back to Builder' : 'Back to Live Site'}
+        </Link>
+      </div>
+      <PublicShell>
+        <SiteHeader navigation={navigation} logo={branding.logo} />
+        <main>
       <section className="bg-ink-50">
         <div className="container-premium py-12 sm:py-16">
           <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
@@ -95,7 +144,7 @@ export default async function HomePage() {
                     <p className="text-xl font-serif text-brand-700">{degreeCount}+</p>
                     <p className="text-xs uppercase tracking-widest text-ink-500">Programmes</p>
                   </div>
-                  {heroData.stats.slice(0, 2).map((s, i) => (
+                  {heroData.stats.slice(0, 2).map((s: any, i: number) => (
                     <div key={i} className="p-4 text-center">
                       <p className="text-xl font-serif text-ink-900">{s.value}</p>
                       <p className="text-xs uppercase tracking-widest text-ink-500">{s.label}</p>
@@ -108,7 +157,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* WHO WE ARE — dark ImpactBand */}
       <section className="section-padding bg-brand-950 relative overflow-hidden">
         <div className="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-gold-400/10 blur-3xl pointer-events-none" />
         <div className="container-premium relative">
@@ -116,20 +164,20 @@ export default async function HomePage() {
             <span className="kicker !text-gold-300 !before:bg-gold-400">{homeData.aboutEyebrow}</span>
             <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-white leading-tight text-balance">{homeData.aboutHeading}</h2>
             <p className="mt-4 text-white/70 leading-relaxed">{homeData.aboutBody}</p>
-            <Link href={homeData.aboutLink} className="mt-6 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gold-300 hover:gap-3 transition-all">
+            <Link href={homeData.aboutLink} className="mt-6 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gold-300">
               Read our story <ArrowRight size={14} weight="duotone" className="text-gold-300" />
             </Link>
           </div>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
-            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center backdrop-blur-sm">
+            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center">
               <p className="text-3xl font-serif text-gold-300">{homeData.aboutYear}</p>
               <p className="text-xs uppercase tracking-widest text-white/60 mt-2">Established</p>
             </div>
-            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center backdrop-blur-sm">
+            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center">
               <p className="text-3xl font-serif text-gold-300">{homeData.aboutStat1Value}</p>
               <p className="text-xs uppercase tracking-widest text-white/60 mt-2">{homeData.aboutStat1Label}</p>
             </div>
-            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center backdrop-blur-sm">
+            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center">
               <p className="text-3xl font-serif text-gold-300">{homeData.aboutStat2Value}</p>
               <p className="text-xs uppercase tracking-widest text-white/60 mt-2">{homeData.aboutStat2Label}</p>
             </div>
@@ -137,7 +185,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* DEPARTMENTS — clean grid like news */}
       <section className="section-padding bg-ink-50">
         <div className="container-premium">
           <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
@@ -145,70 +192,61 @@ export default async function HomePage() {
               <span className="kicker">{homeData.deptEyebrow}</span>
               <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-ink-900">{homeData.deptHeading}</h2>
             </div>
-            <Link href={homeData.deptLink} className="hidden sm:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-700">All departments <ArrowRight size={14} weight="duotone" /></Link>
+            <Link href={homeData.deptLink} className="hidden sm:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-700">
+              All departments <ArrowRight size={14} weight="duotone" />
+            </Link>
           </div>
           <div className="grid gap-8 lg:grid-cols-3">
-            {featuredDepts.map((dept) => {
+            {featuredDepts.map((dept: any) => {
               const Icon = getDepartmentIcon(dept.slug)
               return (
-                <Link key={dept.id} href={`/departments/${dept.slug}`} className="card-premium p-7 group flex flex-col h-full">
+                <div key={dept.id} className="card-premium p-7">
                   <span className="w-12 h-12 rounded-lg bg-brand-50 text-brand-700 grid place-items-center">
                     <Icon size={22} weight="duotone" />
                   </span>
-                  <h3 className="mt-5 text-xl font-serif text-ink-900 group-hover:text-brand-700">{dept.name}</h3>
-                  <p className="mt-2 text-sm text-ink-600 line-clamp-3 flex-1">{truncate(dept.summary, 120)}</p>
-                  <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700">{dept._count.programmes} programmes <ArrowRight size={12} weight="duotone" /></span>
-                </Link>
+                  <h3 className="mt-5 text-xl font-serif text-ink-900">{dept.name}</h3>
+                  <p className="mt-2 text-sm text-ink-600 line-clamp-3">{truncate(dept.summary, 120)}</p>
+                </div>
               )
             })}
           </div>
         </div>
       </section>
 
-      {/* PROGRAMMES — clean uniform grid like news */}
       <section className="section-padding bg-white">
         <div className="container-premium">
           <div className="max-w-3xl mb-10">
             <span className="kicker">{homeData.progEyebrow}</span>
             <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-ink-900 text-balance">{homeData.progHeading}</h2>
-            <p className="mt-3 text-ink-600">Choose from diploma, undergraduate and postgraduate pathways — each built with industry, research and innovation at its core.</p>
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProgs.map((p) => (
-              <Link key={p.id} href={`/programmes/${p.slug}`} className="card-premium p-7 group flex flex-col h-full">
+            {featuredProgs.map((p: any) => (
+              <div key={p.id} className="card-premium p-7">
                 <span className="text-xs font-bold uppercase tracking-widest text-brand-700">{p.level.toLowerCase()}</span>
-                <h3 className="mt-3 text-lg font-serif text-ink-900 group-hover:text-brand-700 leading-tight flex-1">{p.name}</h3>
-                {p.department && <p className="mt-2 text-xs text-ink-500">{p.department.name}</p>}
-                <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-700">Explore <ArrowRight size={12} weight="duotone" /></span>
-              </Link>
-            ))}
-          </div>
-          <div className="mt-10 flex justify-center"><Link href={homeData.progLink} className="btn-secondary">View all programmes <ArrowRight size={16} weight="duotone" /></Link></div>
-        </div>
-      </section>
-
-      {/* WHAT WE STAND FOR — ImpactBand dark (Yedent reference) */}
-      <section className="section-padding bg-brand-950 relative overflow-hidden">
-        <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-gold-400/10 blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-brand-700/20 blur-3xl pointer-events-none" />
-        <div className="container-premium relative">
-          <div className="max-w-3xl mb-10">
-            <span className="kicker !text-gold-300 !before:bg-gold-400">What we stand for</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-white leading-tight">Values that guide discovery</h2>
-            <p className="mt-3 text-white/70 leading-relaxed">Principles that turn knowledge into impact — from lab to community.</p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {about.values.slice(0, 4).map((v) => (
-              <div key={v.title} className="rounded-xl bg-white/5 border border-white/10 p-6 backdrop-blur-sm hover:bg-white/10 hover:border-gold-400/30 transition">
-                <h4 className="font-serif text-white">{v.title}</h4>
-                <p className="mt-2 text-sm text-white/70 leading-relaxed">{v.description}</p>
+                <h3 className="mt-3 text-lg font-serif text-ink-900 leading-tight">{p.name}</h3>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* NEWS — keep as liked (gap-10, h-56, p-7) */}
+      <section className="section-padding bg-brand-950 relative overflow-hidden">
+        <div className="container-premium relative">
+          <div className="max-w-3xl mb-10">
+            <span className="kicker !text-gold-300 !before:bg-gold-400">What we stand for</span>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-white leading-tight">Values that guide discovery</h2>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {about.values.slice(0, 4).map((v: any) => (
+              <div key={v.title} className="rounded-xl bg-white/5 border border-white/10 p-6">
+                <h4 className="font-serif text-white">{v.title}</h4>
+                <p className="mt-2 text-sm text-white/70">{v.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section-padding bg-white">
         <div className="container-premium">
           <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
@@ -216,44 +254,25 @@ export default async function HomePage() {
               <span className="kicker">{homeData.newsEyebrow}</span>
               <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-ink-900">{homeData.newsHeading}</h2>
             </div>
-            <Link href={homeData.newsLink} className="hidden sm:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-700">All stories <ArrowRight size={14} weight="duotone" /></Link>
           </div>
           <div className="grid gap-8 lg:gap-10 lg:grid-cols-3">
-            {featuredPosts.length === 0 ? (
-              <p className="text-ink-600">{homeData.newsEmpty}</p>
-            ) : (
-              featuredPosts.map((post) => (
-                <Link key={post.id} href={`/news/${post.slug}`} className="card-premium overflow-hidden group flex flex-col h-full">
-                  <div className="h-56 bg-gradient-to-br from-brand-100 to-brand-300 grid place-items-center">
-                    <Newspaper size={40} weight="duotone" className="text-brand-700" />
-                  </div>
-                  <div className="p-7 flex-1 flex flex-col">
-                    <span className="text-xs font-bold uppercase tracking-widest text-brand-700">{post.category.toLowerCase().replace('_',' ')} • {formatDate(post.publishedAt)}</span>
-                    <h3 className="mt-3 font-serif text-ink-900 group-hover:text-brand-700 line-clamp-2 leading-relaxed">{post.title}</h3>
-                    <p className="mt-3 text-sm text-ink-600 line-clamp-3 flex-1 leading-7">{truncate(post.excerpt, 100)}</p>
-                  </div>
-                </Link>
-              ))
-            )}
+            {liveFeaturedPosts.map((post: any) => (
+              <div key={post.id} className="card-premium overflow-hidden">
+                <div className="h-56 bg-gradient-to-br from-brand-100 to-brand-300 grid place-items-center">
+                  <Newspaper size={40} weight="duotone" className="text-brand-700" />
+                </div>
+                <div className="p-7">
+                  <h3 className="font-serif text-ink-900 line-clamp-2 leading-relaxed">{post.title}</h3>
+                  <p className="mt-3 text-sm text-ink-600 line-clamp-3 leading-7">{truncate(post.excerpt, 100)}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
-
-      {/* CTA */}
-      <section className="py-10">
-        <div className="container-premium">
-          <div className="rounded-xl bg-brand-700 p-8 sm:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="max-w-xl">
-              <h2 className="text-2xl sm:text-3xl font-serif text-white leading-tight">{homeData.ctaHeading}</h2>
-              <p className="mt-3 text-white/80 leading-relaxed">{homeData.ctaBody}</p>
-            </div>
-            <div className="flex flex-wrap gap-3 shrink-0">
-              <Link href={homeData.ctaPrimary.href} className="bg-white text-brand-700 hover:bg-gold-400 rounded-lg px-7 py-3.5 text-sm font-bold uppercase tracking-widest inline-flex items-center gap-2 transition">{homeData.ctaPrimary.label} <ArrowRight size={14} weight="duotone" /></Link>
-              <Link href={homeData.ctaSecondary.href} className="border border-white/30 text-white hover:bg-white hover:text-brand-700 rounded-lg px-7 py-3.5 text-sm font-bold uppercase tracking-widest inline-flex items-center gap-2 transition">{homeData.ctaSecondary.label}</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+        </main>
+        <SiteFooter footer={footer} logo={branding.logo} />
+      </PublicShell>
+    </div>
   )
 }

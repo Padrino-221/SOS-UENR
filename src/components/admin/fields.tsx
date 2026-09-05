@@ -78,12 +78,14 @@ export function SelectField({
   options,
   defaultValue,
   required,
+  hint,
 }: {
   label: string
   name: string
   options: { value: string; label: string }[]
   defaultValue?: string
   required?: boolean
+  hint?: string
 }) {
   return (
     <Select
@@ -92,6 +94,7 @@ export function SelectField({
       options={options}
       defaultValue={defaultValue}
       required={required}
+      hint={hint}
     />
   )
 }

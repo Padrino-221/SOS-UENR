@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
 import { requireSpmsAuth } from '@/lib/spms-auth'
 import { prisma } from '@/lib/db'
-import { SpmsSidebar } from '@/components/spms/sidebar'
 import { ToastProvider } from '@/components/ui'
 import { PasswordGuard } from '@/components/spms/password-guard'
+import { SpmsPanelShell } from '@/components/spms/spms-panel-shell'
 
 export default async function SpmsLayout({
   children,
@@ -12,7 +12,6 @@ export default async function SpmsLayout({
 }) {
   const session = await requireSpmsAuth()
 
-  // Fetch fresh staff data to check password status
   const staff = await prisma.staff.findUnique({
     where: { id: session.staffId },
     select: { spmsPasswordChanged: true },
@@ -23,12 +22,7 @@ export default async function SpmsLayout({
   return (
     <PasswordGuard spmsPasswordChanged={spmsPasswordChanged}>
       <ToastProvider>
-        <div className="flex min-h-screen bg-ink-50">
-          <SpmsSidebar session={session} />
-          <div className="flex min-w-0 flex-1 flex-col">
-            <main className="flex-1 p-6 lg:p-8">{children}</main>
-          </div>
-        </div>
+        <SpmsPanelShell session={session}>{children}</SpmsPanelShell>
       </ToastProvider>
     </PasswordGuard>
   )

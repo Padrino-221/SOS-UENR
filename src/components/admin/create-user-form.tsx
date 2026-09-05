@@ -13,7 +13,7 @@ export function CreateUserForm() {
   return (
     <form
       action={formAction}
-      className="max-w-xl space-y-4 rounded-2xl border border-ink-100 bg-white p-6"
+      className="max-w-xl space-y-4 rounded-lg border border-ink-100 bg-white p-6"
     >
       <h3 className="font-bold">Create a user</h3>
       <div className="grid gap-4 sm:grid-cols-2">

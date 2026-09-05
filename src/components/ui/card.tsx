@@ -6,6 +6,9 @@ export interface CardProps {
   padding?: 'none' | 'sm' | 'md' | 'lg'
 }
 
+/**
+ * Yedent Card — white, border ink-100, rounded-lg (12px), subtle hover lift.
+ */
 const paddingStyles = {
   none: '',
   sm: 'p-4',
@@ -17,7 +20,7 @@ export function Card({ children, className, padding = 'md' }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-2xl border border-ink-100 bg-white',
+        'rounded-lg border border-ink-100 bg-white',
         paddingStyles[padding],
         className,
       )}

@@ -112,7 +112,7 @@ export function YearProjectsList({ projects }: YearProjectsListProps) {
                           : 'text-ink-300 pointer-events-none',
                       )}
                     >
-                      <GithubLogo size={15} />
+                      <GithubLogo size={15} weight="duotone" />
                     </a>
                   </Tooltip>
                   <Tooltip content="View on website">
@@ -122,7 +122,7 @@ export function YearProjectsList({ projects }: YearProjectsListProps) {
                       rel="noopener noreferrer"
                       className="rounded-lg p-1.5 text-ink-500 transition hover:bg-brand-50 hover:text-brand-700"
                     >
-                      <Globe size={15} />
+                      <Globe size={15} weight="duotone" />
                     </a>
                   </Tooltip>
                   <Tooltip content="Download PDF">
@@ -137,7 +137,7 @@ export function YearProjectsList({ projects }: YearProjectsListProps) {
                           : 'text-ink-300 pointer-events-none',
                       )}
                     >
-                      <DownloadSimple size={15} />
+                      <DownloadSimple size={15} weight="duotone" />
                     </a>
                   </Tooltip>
                 </div>

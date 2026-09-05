@@ -11,71 +11,57 @@ export default async function ContactPage() {
 
   return (
     <>
-      <PageHero
-        title={contact.heroTitle}
-        subtitle={contact.heroSubtitle}
-        crumbs={[{ label: 'Home', href: '/' }, { label: 'Contact' }]}
-      />
+      <PageHero title={contact.heroTitle} subtitle={contact.heroSubtitle} crumbs={[{ label: 'Home', href: '/' }, { label: 'Contact' }]} />
 
-      <section className="py-16">
-        <div className="container-page grid gap-12 lg:grid-cols-5">
+      <section className="section-padding bg-white">
+        <div className="container-premium grid gap-8 lg:grid-cols-5">
           <div className="space-y-6 lg:col-span-2">
-            <div className="rounded-2xl border border-ink-100 bg-ink-50 p-6">
-              <h2 className="text-lg font-bold">{contact.cardHeading}</h2>
-              <ul className="mt-5 space-y-4 text-sm text-ink-700">
-                <li className="flex items-start gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-700 text-white">
-                    <MapPin size={18} />
-                  </span>
+            <div className="card-premium p-7">
+              <h2 className="font-serif text-xl text-ink-900">{contact.cardHeading}</h2>
+              <ul className="mt-6 space-y-5 text-sm">
+                <li className="flex gap-4">
+                  <span className="h-10 w-10 shrink-0 grid place-items-center rounded-lg bg-brand-700 text-white"><MapPin size={18} weight="duotone" /></span>
                   <div>
                     <p className="font-semibold text-ink-900">Address</p>
-                    <p>{contact.address}</p>
+                    <p className="mt-1 leading-relaxed text-ink-600">{contact.address}</p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-700 text-white">
-                    <Phone size={18} />
-                  </span>
+                <li className="flex gap-4">
+                  <span className="h-10 w-10 shrink-0 grid place-items-center rounded-lg bg-brand-700 text-white"><Phone size={18} weight="duotone" /></span>
                   <div>
                     <p className="font-semibold text-ink-900">Phone</p>
-                    <p>{contact.phone}</p>
+                    <p className="mt-1 text-ink-600">{contact.phone}</p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-700 text-white">
-                    <Envelope size={18} />
-                  </span>
+                <li className="flex gap-4">
+                  <span className="h-10 w-10 shrink-0 grid place-items-center rounded-lg bg-brand-700 text-white"><Envelope size={18} weight="duotone" /></span>
                   <div>
                     <p className="font-semibold text-ink-900">Email</p>
-                    <p>{contact.email}</p>
+                    <p className="mt-1 text-ink-600">{contact.email}</p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-700 text-white">
-                    <Clock size={18} />
-                  </span>
+                <li className="flex gap-4">
+                  <span className="h-10 w-10 shrink-0 grid place-items-center rounded-lg bg-brand-700 text-white"><Clock size={18} weight="duotone" /></span>
                   <div>
                     <p className="font-semibold text-ink-900">Office hours</p>
-                    <p>{contact.officeHours}</p>
+                    <p className="mt-1 text-ink-600">{contact.officeHours}</p>
                   </div>
                 </li>
               </ul>
             </div>
-
-            <div className="h-64 overflow-hidden rounded-2xl border border-ink-100 bg-ink-100">
-              <iframe
-                title="UENR Sunyani location"
-                src={contact.mapEmbed}
-                className="h-full w-full"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+            <div className="overflow-hidden rounded-xl border border-ink-100 h-72">
+              <iframe title="UENR Sunyani location" src={contact.mapEmbed} className="h-full w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
             </div>
           </div>
 
           <div className="lg:col-span-3">
-            <h2 className="mb-6 text-2xl font-bold">{contact.formHeading}</h2>
-            <ContactForm />
+            <div className="card-premium p-7 sm:p-8">
+              <h2 className="font-serif text-2xl text-ink-900">{contact.formHeading}</h2>
+              <p className="mt-2 text-sm text-ink-600">We'd love to hear from you — send a message and we'll respond promptly.</p>
+              <div className="mt-6">
+                <ContactForm />
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -45,7 +45,7 @@ export function ArrayItems({
           onClick={add}
           className="inline-flex items-center gap-1 rounded-lg bg-brand-50 px-2 py-1 text-[11px] font-bold text-brand-700 hover:bg-brand-100"
         >
-          <Plus size={12} /> Add
+          <Plus size={12} weight="duotone" /> Add
         </button>
       </div>
       <div className="space-y-3">
@@ -70,7 +70,7 @@ export function ArrayItems({
               onClick={() => remove(i)}
               className="mt-1 rounded-lg p-1.5 text-ink-400 hover:bg-red-50 hover:text-red-600"
             >
-              <Trash size={14} />
+              <Trash size={14} weight="duotone" />
             </button>
           </div>
         ))}

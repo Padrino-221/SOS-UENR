@@ -104,7 +104,7 @@ export function RecordsList({ records, academicYears, isAdmin }: RecordsListProp
               render: (r) => (
                 <Link href={r.academicYearId ? `/spms/records/${r.academicYearId}` : '#'}>
                   <Button variant="outline" className="gap-1.5" disabled={!r.academicYearId}>
-                    View <ArrowRight size={14} />
+                    View <ArrowRight size={14} weight="duotone" />
                   </Button>
                 </Link>
               ),

@@ -9,7 +9,7 @@ export function ResearchForm({ area }: { area?: ResearchArea | null }) {
   return (
     <form
       action={upsertResearch}
-      className="grid max-w-3xl gap-6 rounded-2xl border border-ink-100 bg-white p-6"
+      className="grid max-w-3xl gap-6 rounded-lg border border-ink-100 bg-white p-6"
     >
       {area && <input type="hidden" name="id" value={area.id} />}
 

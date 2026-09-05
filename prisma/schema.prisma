@@ -133,11 +133,14 @@ model Staff {
   passwordHash        String?
   ordering   Int      @default(0)
   showOnPublic Boolean @default(true)
+  isExecutive Boolean @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   departmentId String?
   department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  executiveYearId String?
+  executiveYear   AcademicYear? @relation("StaffExecutiveYear", fields: [executiveYearId], references: [id], onDelete: SetNull)
   projects     Project[]
   @@map("staff")
 }
@@ -195,6 +198,7 @@ model AcademicYear {
   createdAt DateTime @default(now())
 
   projects  Project[]
+  executives Staff[] @relation("StaffExecutiveYear")
   @@map("academic_years")
 }
 

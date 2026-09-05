@@ -1,5 +1,30 @@
 import Link from 'next/link'
-import { Envelope, Phone } from '@phosphor-icons/react/dist/ssr'
+import { ArrowRight } from '@phosphor-icons/react/dist/ssr'
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+}
+
+function Portrait({ src, alt, name }: { src: string | null; alt: string; name: string }) {
+  return (
+    <div className="relative shrink-0 aspect-[4/3] md:aspect-auto md:w-[38%] overflow-hidden bg-brand-50">
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover object-top" />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="font-serif text-3xl text-brand-300">{initials(name)}</span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface StaffCardProps {
   id: string
@@ -12,57 +37,18 @@ interface StaffCardProps {
   department?: { name: string } | null
 }
 
-export function StaffCard({ id, name, title, email, phone, roles, photoUrl, department }: StaffCardProps) {
-  const initials = name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
-
+export function StaffCard({ id, name, title, roles, photoUrl, department }: StaffCardProps) {
+  const position = title || roles || department?.name || 'Faculty'
   return (
-    <Link
-      href={`/staff/${id}`}
-      className="group rounded-2xl border border-ink-100 bg-white p-6 transition hover:-translate-y-0.5 hover:border-brand-300"
-    >
-      <div className="flex items-center gap-4">
-        {photoUrl ? (
-          <img
-            src={photoUrl}
-            alt={name}
-            className="h-14 w-14 shrink-0 rounded-full object-cover"
-          />
-        ) : (
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700">
-            <span className="text-lg font-bold">{initials}</span>
-          </span>
-        )}
-        <div>
-          <h3 className="font-bold text-ink-900 group-hover:text-brand-700">{name}</h3>
-          <p className="text-sm text-ink-700">{title}</p>
-        </div>
-      </div>
-      {roles && (
-        <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-brand-700">
-          {roles}
-        </p>
-      )}
-      {department && (
-        <p className="mt-1 text-xs text-ink-500">{department.name}</p>
-      )}
-      <div className="mt-3 space-y-1 text-sm text-ink-700">
-        {email && (
-          <p className="flex items-center gap-2">
-            <Envelope size={14} className="shrink-0" />
-            {email}
-          </p>
-        )}
-        {phone && (
-          <p className="flex items-center gap-2">
-            <Phone size={14} className="shrink-0" />
-            {phone}
-          </p>
-        )}
+    <Link href={`/staff/${id}`} className="card-premium overflow-hidden group flex flex-col md:flex-row">
+      <Portrait src={photoUrl ?? null} alt={name} name={name} />
+      <div className="flex-1 p-7 md:p-8 flex flex-col justify-center items-start">
+        <h3 className="text-xl md:text-2xl font-serif text-ink-900 mb-1.5 group-hover:text-brand-700 transition-colors">{name}</h3>
+        <p className="text-brand-700 text-[11px] font-bold uppercase tracking-[0.18em] mb-4">{position}</p>
+        {department && <p className="text-ink-500 text-xs mb-3">{department.name}</p>}
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-500 group-hover:text-brand-700 transition-colors">
+          View profile <ArrowRight size={14} weight="duotone" className="transition-transform group-hover:translate-x-1" />
+        </span>
       </div>
     </Link>
   )

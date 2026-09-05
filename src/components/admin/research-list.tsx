@@ -43,7 +43,7 @@ export function ResearchList({ areas }: { areas: ResearchRow[] }) {
             className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-system-300 hover:bg-system-50 hover:text-system-700"
             aria-label="Edit"
           >
-            <PencilSimple size={16} />
+            <PencilSimple size={16} weight="duotone" />
           </button>
           <form action={deleteResearch}>
             <input type="hidden" name="id" value={a.id} />

@@ -1,11 +1,18 @@
 import type { Metadata } from 'next'
-import { Radio_Canada_Big } from 'next/font/google'
+import { Space_Grotesk, Sora } from 'next/font/google'
 import './globals.css'
 
-const radioCanada = Radio_Canada_Big({
+const space = Space_Grotesk({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-radio-canada',
+  variable: '--font-space',
+  display: 'swap',
+})
+
+const sora = Sora({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sora',
   display: 'swap',
 })
 
@@ -36,7 +43,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={radioCanada.variable}>
+    <html lang="en" className={`${space.variable} ${sora.variable}`}>
       <body>{children}</body>
     </html>
   )

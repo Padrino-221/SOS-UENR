@@ -95,7 +95,7 @@ export function SiteBuilder({
             onClick={() => setCollapsed(!collapsed)}
             className="rounded-lg p-1.5 text-ink-500 hover:bg-ink-100"
           >
-            {collapsed ? <CaretRight size={16} /> : <CaretLeft size={16} />}
+            {collapsed ? <CaretRight size={16} weight="duotone" /> : <CaretLeft size={16} weight="duotone" />}
           </button>
         </div>
 
@@ -145,26 +145,33 @@ export function SiteBuilder({
             )}
           </div>
           <div className="flex items-center gap-2">
-            <a
-              href="/"
-              target="_blank"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-ink-200 px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:text-brand-700"
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  const v = JSON.stringify(sections)
+                  localStorage.setItem('site-builder-preview', v)
+                  document.cookie = `site-builder-preview=${encodeURIComponent(v)}; path=/; max-age=600`
+                } catch {}
+                window.open('/preview', '_blank')
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:text-brand-700"
             >
-              <Eye size={14} /> Preview
-            </a>
+              <Eye size={14} weight="duotone" /> Preview
+            </button>
             <button
               onClick={handleSave}
               disabled={saving || !dirty}
               className="inline-flex items-center gap-1.5 rounded-xl bg-brand-700 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-800 disabled:opacity-50"
             >
-              <FloppyDisk size={14} />
+              <FloppyDisk size={14} weight="duotone" />
               {saving ? 'Saving…' : 'Save'}
             </button>
             <button
               onClick={onClose}
               className="rounded-xl p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
             >
-              <X size={18} />
+              <X size={18} weight="duotone" />
             </button>
           </div>
         </div>

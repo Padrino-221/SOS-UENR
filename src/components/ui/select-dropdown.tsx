@@ -98,8 +98,7 @@ export function SelectDropdown({
             className={cn(
               'shrink-0 text-ink-400 transition-transform',
               open && 'rotate-180',
-            )}
-          />
+            )} weight="duotone" />
         </button>
 
         {open && (
@@ -133,7 +132,7 @@ export function SelectDropdown({
                     >
                       <span className="truncate">{option.label}</span>
                       {option.value === value && (
-                        <Check size={14} className="shrink-0 text-system-600" />
+                        <Check size={14} className="shrink-0 text-system-600" weight="duotone" />
                       )}
                     </button>
                   </li>

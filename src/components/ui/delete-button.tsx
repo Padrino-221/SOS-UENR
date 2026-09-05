@@ -26,7 +26,7 @@ export function DeleteButton({ className, onClick, disabled }: DeleteButtonProps
         className,
       )}
     >
-      <Trash size={14} weight="bold" />
+      <Trash size={14} weight="duotone" />
       Delete
     </button>
   )

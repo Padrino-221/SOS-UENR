@@ -71,7 +71,7 @@ export function ModalHeader({
         onClick={onClose}
         className="rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700"
       >
-        <X size={18} />
+        <X size={18} weight="duotone" />
       </button>
     </div>
   )

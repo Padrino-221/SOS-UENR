@@ -70,7 +70,7 @@ export function ImageUpload({ name, label, defaultValue = '', hint, className }:
             onClick={handleClear}
             className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
           >
-            <X size={12} />
+            <X size={12} weight="duotone" />
           </button>
         </div>
       ) : (
@@ -80,7 +80,7 @@ export function ImageUpload({ name, label, defaultValue = '', hint, className }:
             uploading && 'pointer-events-none opacity-60',
           )}
         >
-          <Upload size={24} className="text-ink-400" />
+          <Upload size={24} className="text-ink-400" weight="duotone" />
           <span className="text-xs font-medium text-ink-600">
             {uploading ? 'Uploading…' : 'Click to upload'}
           </span>

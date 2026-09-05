@@ -17,7 +17,7 @@ export function ForgotPasswordForm() {
       <div className="w-full max-w-sm text-center">
         <div className="mb-4 flex justify-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-green-50">
-            <CheckCircle size={28} className="text-green-600" />
+            <CheckCircle size={28} className="text-green-600" weight="duotone" />
           </span>
         </div>
         <h2 className="text-xl font-bold text-ink-900">Check your email</h2>
@@ -28,7 +28,7 @@ export function ForgotPasswordForm() {
           href="/admin/login"
           className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700"
         >
-          <ArrowLeft size={14} /> Back to sign in
+          <ArrowLeft size={14} weight="duotone" /> Back to sign in
         </Link>
       </div>
     )
@@ -69,7 +69,7 @@ export function ForgotPasswordForm() {
 
       <p className="text-center text-sm text-ink-500">
         <Link href="/admin/login" className="inline-flex items-center gap-1 font-semibold text-brand-600 hover:text-brand-700">
-          <ArrowLeft size={14} /> Back to sign in
+          <ArrowLeft size={14} weight="duotone" /> Back to sign in
         </Link>
       </p>
     </form>

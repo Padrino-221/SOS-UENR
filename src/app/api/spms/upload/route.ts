@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { uploadToCloudinary } from '@/lib/cloudinary'
+import { extractPdfText, parseProjectDetails } from '@/lib/pdf'
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData()
@@ -17,6 +18,14 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
+    let fields: ReturnType<typeof parseProjectDetails> = {}
+    try {
+      const text = await extractPdfText(buffer)
+      if (text) fields = parseProjectDetails(text, file.name)
+    } catch (extractError) {
+      console.error('[SPMS Upload] PDF extraction error:', extractError)
+    }
+
     const url = await uploadToCloudinary(buffer, {
       folder: 'spms-documents',
       resource_type: 'raw',
@@ -26,6 +35,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       url,
       name: file.name,
+      fields,
     })
   } catch (error) {
     console.error('[SPMS Upload] Cloudinary error:', error)

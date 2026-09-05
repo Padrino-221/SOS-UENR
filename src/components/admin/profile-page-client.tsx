@@ -34,7 +34,7 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-xl font-bold text-brand-700">
-                <User size={28} />
+                <User size={28} weight="duotone" />
               </span>
               <div>
                 <h2 className="text-lg font-bold text-ink-900">{user.name}</h2>
@@ -47,21 +47,21 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
             <div className="space-y-3 border-t border-ink-100 pt-4">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-ink-500">
-                  <Envelope size={14} className="shrink-0" />
+                  <Envelope size={14} className="shrink-0" weight="duotone" />
                   Email
                 </div>
                 <span className="font-medium text-ink-900">{user.email}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-ink-500">
-                  <Shield size={14} className="shrink-0" />
+                  <Shield size={14} className="shrink-0" weight="duotone" />
                   Role
                 </div>
                 <span className="font-medium text-ink-900">{user.role}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-ink-500">
-                  <Calendar size={14} className="shrink-0" />
+                  <Calendar size={14} className="shrink-0" weight="duotone" />
                   Joined
                 </div>
                 <span className="font-medium text-ink-900">{user.createdAt}</span>
@@ -90,7 +90,7 @@ function NameForm({ name }: { name: string }) {
   return (
     <Card>
       <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-ink-900">
-        <User size={18} /> Change Name
+        <User size={18} weight="duotone" /> Change Name
       </h3>
       <form action={formAction} className="space-y-4">
         <Input
@@ -104,7 +104,7 @@ function NameForm({ name }: { name: string }) {
         )}
         <div className="flex justify-end">
           <Button type="submit" disabled={pending}>
-            <FloppyDisk size={16} />
+            <FloppyDisk size={16} weight="duotone" />
             {pending ? 'Saving…' : 'Save name'}
           </Button>
         </div>
@@ -129,7 +129,7 @@ function PasswordForm() {
   return (
     <Card>
       <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-ink-900">
-        <Lock size={18} /> Change Password
+        <Lock size={18} weight="duotone" /> Change Password
       </h3>
       <form action={formAction} className="space-y-4">
         <Input
@@ -155,7 +155,7 @@ function PasswordForm() {
         )}
         <div className="flex justify-end">
           <Button type="submit" disabled={pending}>
-            <Lock size={16} />
+            <Lock size={16} weight="duotone" />
             {pending ? 'Changing…' : 'Change password'}
           </Button>
         </div>

@@ -2,9 +2,7 @@
 
 import Link from 'next/link'
 import {
-  Download,
   FileText,
-  GitBranch,
   GraduationCap,
   Target,
 } from '@phosphor-icons/react'
@@ -130,41 +128,7 @@ export function ProjectDetail({ project }: { project: Project }) {
               </dl>
             </div>
 
-            {/* Document download */}
-            {project.documentUrl && (
-              <a
-                href={project.documentUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-5 transition hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gold-500 text-white">
-                  <Download size={20} />
-                </span>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-ink-500">Project Document</p>
-                  <p className="font-bold text-ink-900">{project.documentName ?? 'Download PDF'}</p>
-                </div>
-              </a>
-            )}
 
-            {/* GitHub link */}
-            {project.githubLink && (
-              <a
-                href={project.githubLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-5 transition hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-brand-700 text-white">
-                  <GitBranch size={20} />
-                </span>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-ink-500">Source Code</p>
-                  <p className="font-bold text-ink-900">View on GitHub</p>
-                </div>
-              </a>
-            )}
 
             {/* Supervisor */}
             {project.supervisor && (

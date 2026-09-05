@@ -36,7 +36,7 @@ export function Tooltip({ content, children, className }: TooltipProps) {
       {show && createPortal(
         <div
           className={cn(
-            'pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-ink-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg',
+            'pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-ink-900 px-2.5 py-1.5 text-xs font-medium text-white',
             className,
           )}
           style={{ top: pos.top, left: pos.left }}

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getSession } from '@/lib/auth'
 import { LoginForm } from '@/components/admin/login-form'
+import { CaretLeft } from '@phosphor-icons/react/dist/ssr'
 
 export default async function AdminLoginPage() {
   const session = await getSession()
@@ -11,65 +12,38 @@ export default async function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ink-50 p-6">
-      <div className="flex w-full max-w-3xl overflow-hidden rounded-3xl border border-ink-200 bg-white">
-        {/* Left - Form */}
-        <div className="flex w-full flex-col justify-between p-8 lg:w-[45%] lg:p-10">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/SCHOOL OF SCIENCES LOGO OFFICIAL NEW.jpg.jpeg"
-              alt="Logo"
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-lg object-cover"
-            />
-            <span className="text-sm font-bold text-ink-900">School of Sciences</span>
-          </Link>
-
-          <div className="my-auto py-10">
-            <LoginForm />
+    <div className="min-h-screen bg-brand-950 flex items-center justify-center px-4 py-10 relative overflow-hidden">
+      {/* Yedent dotted pattern — adapted to school gold on brand-950 */}
+      <div
+        className="absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage: 'radial-gradient(rgba(200,176,90,1) 1.4px, transparent 1.4px)',
+          backgroundSize: '22px 22px',
+        }}
+      />
+      <div className="relative w-full max-w-md">
+        <div className="bg-white rounded-xl border border-ink-100 p-8">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-14 h-14 rounded-full bg-white border border-ink-100 overflow-hidden flex items-center justify-center mb-4">
+              <Image
+                src="/SCHOOL OF SCIENCES LOGO OFFICIAL NEW.jpg.jpeg"
+                alt="School of Sciences"
+                width={56}
+                height={56}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <h1 className="text-2xl font-bold text-ink-900">School CMS</h1>
+            <p className="text-ink-500 text-sm mt-1">Sign in to manage your website content</p>
           </div>
+
+          <LoginForm />
         </div>
 
-        {/* Right - Branding */}
-        <div className="hidden w-[55%] bg-brand-700 p-10 lg:flex lg:flex-col lg:justify-between relative overflow-hidden">
-          {/* Decorative curves */}
-          <div className="absolute inset-0">
-            <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-brand-600/40" />
-            <div className="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-brand-800/50" />
-            <div className="absolute bottom-1/3 left-10 h-64 w-64 rounded-full bg-brand-500/20" />
-          </div>
-
-          <div className="relative z-10">
-            <h1 className="text-3xl font-extrabold leading-tight text-white">
-              Manage Your<br />Website Content
-            </h1>
-            <p className="mt-2 text-lg font-medium text-white/70">
-              All in one place
-            </p>
-          </div>
-
-          <div className="relative z-10 rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/40">What you can manage</p>
-            <div className="mt-3 grid grid-cols-2 gap-3 text-sm text-white/70">
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                Programmes
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                Departments
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                News & Events
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                Staff Directory
-              </div>
-            </div>
-          </div>
+        <div className="text-center mt-6">
+          <Link href="/" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm transition">
+            <CaretLeft size={14} weight="duotone" /> Back to the website
+          </Link>
         </div>
       </div>
     </div>

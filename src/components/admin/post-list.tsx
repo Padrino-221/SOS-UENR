@@ -65,7 +65,7 @@ export function PostList({ posts }: { posts: PostRow[] }) {
             className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
             aria-label="Edit"
           >
-            <PencilSimple size={16} />
+            <PencilSimple size={16} weight="duotone" />
           </button>
           <DeleteButton onClick={() => handleDelete(p.id)} disabled={pending} />
         </div>

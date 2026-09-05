@@ -41,7 +41,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
             tabIndex={-1}
           >
-            {visible ? <EyeSlash size={16} /> : <Eye size={16} />}
+            {visible ? <EyeSlash size={16} weight="duotone" /> : <Eye size={16} weight="duotone" />}
           </button>
         </div>
         {error && <p className="mt-0.5 text-[11px] text-red-600">{error}</p>}

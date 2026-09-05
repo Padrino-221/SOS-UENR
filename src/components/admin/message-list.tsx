@@ -34,7 +34,7 @@ export function MessageList({ messages }: { messages: Message[] }) {
       <ToastListener />
       {messages.length === 0 ? (
         <EmptyState
-          icon={<Envelope size={28} />}
+          icon={<Envelope size={28} weight="duotone" />}
           title="No messages yet"
           description="Messages from the contact form will appear here."
         />

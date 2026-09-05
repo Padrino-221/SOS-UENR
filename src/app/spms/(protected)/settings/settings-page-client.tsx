@@ -86,7 +86,7 @@ export function SettingsPageClient({ years }: { years: AcademicYear[] }) {
                       type="submit"
                       className="rounded-lg p-1.5 text-ink-400 hover:bg-red-50 hover:text-red-600"
                     >
-                      <Trash size={14} />
+                      <Trash size={14} weight="duotone" />
                     </button>
                   </form>
                 </div>

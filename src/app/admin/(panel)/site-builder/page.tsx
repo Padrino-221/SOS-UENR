@@ -35,7 +35,7 @@ export default function SiteBuilderPage() {
     <div className="flex flex-col items-center justify-center py-24">
       <div className="rounded-3xl border border-ink-100 bg-white p-12 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50">
-          <Gear size={28} className="text-brand-700" />
+          <Gear size={28} className="text-brand-700" weight="duotone" />
         </div>
         <h1 className="mb-2 text-xl font-extrabold text-ink-900">Site Builder</h1>
         <p className="mb-6 max-w-md text-sm text-ink-500">
@@ -47,7 +47,7 @@ export default function SiteBuilderPage() {
           disabled={loading}
           className="inline-flex items-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-sm font-bold text-white hover:bg-brand-800 disabled:opacity-50"
         >
-          <Gear size={16} />
+          <Gear size={16} weight="duotone" />
           {loading ? 'Loading…' : 'Open Site Builder'}
         </button>
         {error && (

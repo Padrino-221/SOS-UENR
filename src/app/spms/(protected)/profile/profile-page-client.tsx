@@ -100,7 +100,7 @@ function ProfileForm({ staff }: { staff: Staff }) {
             </div>
           )}
           <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-ink-200 bg-ink-50 px-4 py-2.5 text-sm text-ink-600 transition hover:border-brand-300 hover:bg-brand-50">
-            <UploadSimple size={16} />
+            <UploadSimple size={16} weight="duotone" />
             {uploading ? 'Uploading…' : 'Choose Photo'}
             <input
               type="file"

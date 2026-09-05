@@ -15,30 +15,28 @@ export default async function NewsDetailPage({
   if (!post) notFound()
 
   return (
-    <article className="py-16">
-      <div className="container-page max-w-3xl">
-        <Link
-          href="/news"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:underline"
-        >
-          <ArrowLeft size={16} /> Back to news
+    <article className="section-padding bg-white">
+      <div className="container-premium max-w-3xl">
+        <Link href="/news" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:text-brand-800">
+          <ArrowLeft size={16} weight="duotone" /> Back to news
         </Link>
 
-        <div className="mt-6">
-          <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase text-brand-700">
+        <div className="mt-8">
+          <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-700">
             {post.category.toLowerCase().replace('_', ' ')}
           </span>
-          <h1 className="mt-4 text-3xl font-bold sm:text-4xl">{post.title}</h1>
-          <div className="mt-4 flex items-center gap-4 text-sm text-ink-700">
+          <h1 className="mt-4 text-3xl sm:text-4xl font-serif text-ink-900 leading-tight">{post.title}</h1>
+          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-ink-500">
             <span className="inline-flex items-center gap-1.5">
-              <UserCircle size={18} />
+              <UserCircle size={18} weight="duotone" className="text-brand-700" />
               {post.author?.name ?? 'School of Sciences'}
             </span>
+            <span className="h-1 w-1 rounded-full bg-ink-300" />
             <span>{formatDate(post.publishedAt)}</span>
           </div>
         </div>
 
-        <div className="mt-8 whitespace-pre-line leading-relaxed text-ink-700">
+        <div className="mt-8 card-premium p-8 whitespace-pre-line leading-relaxed text-ink-700">
           {post.content || post.excerpt}
         </div>
       </div>

@@ -12,6 +12,7 @@ import { ToastListener } from '@/components/admin/toast-listener'
 import type { Staff } from '@prisma/client'
 
 type DepartmentOption = { id: string; name: string }
+type YearOption = { id: string; year: string }
 
 interface StaffRow {
   id: string
@@ -26,6 +27,8 @@ interface StaffRow {
   photoUrl: string | null
   ordering: number
   showOnPublic: boolean
+  isExecutive: boolean
+  executiveYearId: string | null
   departmentId: string | null
   department: { name: string } | null
 }
@@ -33,9 +36,11 @@ interface StaffRow {
 export function StaffList({
   staff,
   departments,
+  academicYears,
 }: {
   staff: StaffRow[]
   departments: DepartmentOption[]
+  academicYears: YearOption[]
 }) {
   const [editId, setEditId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
@@ -63,6 +68,13 @@ export function StaffList({
         <Badge variant={s.staffType === 'REGISTRAR' ? 'info' : s.staffType === 'ADMINISTRATOR' ? 'warning' : 'default'}>
           {s.staffType === 'REGISTRAR' ? 'Registrar' : s.staffType === 'ADMINISTRATOR' ? 'Administrator' : 'Lecturer'}
         </Badge>
+      ),
+    },
+    {
+      key: 'isExecutive',
+      header: 'Executive',
+      render: (s) => (
+        <Badge variant={s.isExecutive ? 'info' : 'default'}>{s.isExecutive ? 'Yes' : '—'}</Badge>
       ),
     },
     {
@@ -94,7 +106,7 @@ export function StaffList({
             className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
             aria-label="Edit"
           >
-            <PencilSimple size={16} />
+            <PencilSimple size={16} weight="duotone" />
           </button>
           <DeleteButton onClick={() => handleDelete(s.id)} disabled={pending} />
         </div>
@@ -126,7 +138,7 @@ export function StaffList({
         onClose={() => setCreateOpen(false)}
         title="New Staff"
       >
-        <StaffForm departments={departments} />
+        <StaffForm departments={departments} academicYears={academicYears} />
       </FormModal>
 
       <FormModal
@@ -138,6 +150,7 @@ export function StaffList({
           <StaffForm
             staff={editStaff as unknown as Staff}
             departments={departments}
+            academicYears={academicYears}
           />
         )}
       </FormModal>

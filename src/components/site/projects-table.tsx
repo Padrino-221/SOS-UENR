@@ -3,7 +3,7 @@
 import { useState, useMemo, Fragment } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { CaretRight, Download, FileText, MagnifyingGlass } from '@phosphor-icons/react'
+import { CaretRight, FileText, MagnifyingGlass } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 const DEGREE_LABELS: Record<string, string> = {
@@ -177,24 +177,13 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
                               <div className="space-y-3">
                                 <Detail label="Degree" value={DEGREE_LABELS[project.degreeLevel] ?? project.degreeLevel} />
                                 {project.department && <Detail label="Department" value={project.department.name} />}
-                                <div className="flex flex-wrap gap-2 pt-2">
+                                <div className="pt-2">
                                   <Link
                                     href={`/projects/${project.slug}`}
                                     className="inline-flex items-center gap-1.5 rounded-xl bg-brand-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-brand-800"
                                   >
-                                    <FileText size={14} /> View Details
+                                    <FileText size={14} weight="duotone" /> View Details
                                   </Link>
-                                  {project.documentUrl && (
-                                    <a
-                                      href={project.documentUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1.5 rounded-xl border border-ink-200 bg-white px-3 py-1.5 text-xs font-bold text-ink-700 transition hover:border-brand-300 hover:text-brand-700"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <Download size={14} /> {project.documentName || 'Download PDF'}
-                                    </a>
-                                  )}
                                 </div>
                               </div>
                             </div>

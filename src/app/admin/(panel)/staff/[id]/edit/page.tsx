@@ -8,9 +8,10 @@ export default async function EditStaffPage({
   params,
 }: PageProps<'/admin/staff/[id]/edit'>) {
   const { id } = await params
-  const [staff, departments] = await Promise.all([
+  const [staff, departments, academicYears] = await Promise.all([
     prisma.staff.findUnique({ where: { id } }),
     prisma.department.findMany({ orderBy: { name: 'asc' } }),
+    prisma.academicYear.findMany({ orderBy: { year: 'desc' } }),
   ])
 
   if (!staff) notFound()
@@ -21,7 +22,7 @@ export default async function EditStaffPage({
         <h2 className="text-2xl font-bold">Edit staff</h2>
         <p className="mt-1 text-sm text-ink-700">{staff.name}</p>
       </div>
-      <StaffForm staff={staff} departments={departments} />
+      <StaffForm staff={staff} departments={departments} academicYears={academicYears} />
     </div>
   )
 }

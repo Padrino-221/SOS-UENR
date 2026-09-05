@@ -1,6 +1,33 @@
 @import "tailwindcss";
 
 @theme {
+  --font-sans: var(--font-sora), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-narrow: var(--font-sora), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Yedent admin palette — kept for reference; admin redesign keeps School palette (brand/gold/ink) as primary --- */
+  --color-dark: #233f2e;
+  --color-dark-50: #3a5c49;
+  --color-dark-100: #4a6d59;
+  --color-dark-200: #1a2f23;
+  --color-lime: #afe67f;
+  --color-lime-50: #f4fbed;
+  --color-lime-100: #e8f6da;
+  --color-lime-200: #d2eeb6;
+  --color-lime-300: #bce692;
+  --color-lime-400: #b9e88d;
+  --color-lime-500: #afe67f;
+  --color-lime-600: #8ccf5a;
+  --color-lime-700: #6ba83c;
+  --color-lime-800: #4f7d2c;
+  --color-lime-900: #374f1f;
+  --color-cream: #fffdf7;
+  --color-cream-50: #fffefb;
+  --color-cream-100: #fffdf7;
+  --color-cream-200: #faf6ec;
+
   --color-brand-50: #f0f4fb;
   --color-brand-100: #d8e4f5;
   --color-brand-200: #b1c9eb;
@@ -38,6 +65,10 @@
   --color-ink-50: #f6f7f9;
   --color-ink-100: #eceef2;
   --color-ink-200: #d5dae2;
+  --color-ink-300: #bfc5cf;
+  --color-ink-400: #9aa1ad;
+  --color-ink-500: #78808e;
+  --color-ink-600: #565e6b;
   --color-ink-700: #39404c;
   --color-ink-800: #262b34;
   --color-ink-900: #171b21;
@@ -47,20 +78,145 @@
 @layer base {
   * {
     border-color: var(--color-ink-100);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-brand-300) transparent;
   }
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+  body, header, nav, button, input, a {
+    font-family: var(--font-sora), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   body {
-    @apply bg-white text-ink-800 antialiased;
-    font-family: var(--font-radio-canada), ui-sans-serif, system-ui, -apple-system,
-      "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    @apply bg-white text-ink-800 antialiased overflow-x-hidden;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.65;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply text-ink-900 font-semibold;
+    @apply text-ink-900;
+    font-family: var(--font-space), sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+  }
+  ::selection {
+    background-color: var(--color-gold-400);
+    color: var(--color-brand-900);
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink-50);
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    border: 2px solid var(--color-ink-50);
+    background: var(--color-brand-600);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-700);
+  }
+}
+
+@layer components {
+  .kicker {
+    @apply inline-flex items-center gap-2.5 px-0 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em];
+    font-family: var(--font-sora), sans-serif;
+    color: var(--color-brand-600);
+  }
+  .kicker-light {
+    @apply inline-flex items-center gap-2.5 px-0 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em];
+    font-family: var(--font-sora), sans-serif;
+    color: var(--color-gold-300);
+  }
+  .bracket-label {
+    @apply font-narrow text-[11px] font-bold uppercase tracking-[0.16em] text-ink-500;
+  }
+  .card-hover {
+    @apply transition duration-300 ease-out hover:-translate-y-1 hover:border-brand-400;
+  }
+  .card-premium {
+    @apply bg-white border border-ink-100;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+  .card-premium:hover {
+    border-color: var(--color-brand-200);
+    transform: translateY(-2px);
+  }
+  .pill-tag {
+    @apply inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.12em] border border-brand-200 bg-brand-50 text-brand-700;
+    font-family: var(--font-sora), sans-serif;
+    border-radius: 5px;
+  }
+  .pill-tag:hover {
+    @apply border-brand-600 bg-brand-600 text-white;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
+    font-family: var(--font-sora), sans-serif;
+    background: var(--color-brand-700);
+    color: #fff;
+    border-radius: 5px;
+  }
+  .btn-primary:hover {
+    background: var(--color-brand-800);
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
+    font-family: var(--font-sora), sans-serif;
+    border: 1.5px solid var(--color-ink-900);
+    color: var(--color-ink-900);
+    background: #fff;
+    border-radius: 5px;
+  }
+  .btn-secondary:hover {
+    background: var(--color-ink-900);
+    color: #fff;
+    border-color: var(--color-ink-900);
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
+    font-family: var(--font-sora), sans-serif;
+    background: var(--color-gold-500);
+    color: #fff;
+    border-radius: 5px;
+  }
+  .btn-gold:hover {
+    background: var(--color-gold-600);
+  }
+  .btn-lime {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
+    font-family: var(--font-sora), sans-serif;
+    background: var(--color-gold-500);
+    color: #fff;
+    border-radius: 5px;
+  }
+  .btn-white {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
+    font-family: var(--font-sora), sans-serif;
+    background: #fff;
+    color: var(--color-ink-900);
+    border-radius: 5px;
+  }
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+  .container-premium {
+    @apply max-w-[1280px] mx-auto px-5 sm:px-6 lg:px-8;
   }
 }
 
 .container-page {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
 }
+
+.font-serif { font-family: var(--font-space), sans-serif; }
+.font-display { font-family: var(--font-space), sans-serif; }
+.font-body { font-family: var(--font-sora), sans-serif; }
+.text-balance { text-wrap: balance; }

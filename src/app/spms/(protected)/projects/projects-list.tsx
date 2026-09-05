@@ -90,7 +90,7 @@ export function ProjectsList({
         )}
         <Link href="/spms/projects/new">
           <Button>
-            <Plus size={16} className="mr-1.5" /> New Project
+            <Plus size={16} className="mr-1.5" weight="duotone" /> New Project
           </Button>
         </Link>
       </div>
@@ -152,14 +152,14 @@ export function ProjectsList({
                     className="rounded-lg p-1.5 text-ink-500 hover:bg-brand-50 hover:text-brand-700"
                     title="Edit"
                   >
-                    <PencilSimple size={15} />
+                    <PencilSimple size={15} weight="duotone" />
                   </Link>
                   <button
                     onClick={() => setDeleteTarget(p)}
                     className="rounded-lg p-1.5 text-ink-500 hover:bg-red-50 hover:text-red-600"
                     title="Delete"
                   >
-                    <Trash size={15} />
+                    <Trash size={15} weight="duotone" />
                   </button>
                 </div>
               ),
