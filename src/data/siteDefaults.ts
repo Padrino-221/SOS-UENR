@@ -385,6 +385,7 @@ export const siteDefaults: SiteSections = {
       },
       { label: 'Programmes', href: '/programmes' },
       { label: 'Projects', href: '/projects' },
+      { label: 'Resources', href: '/resources' },
       { label: 'News & Events', href: '/news' },
       { label: 'Contact', href: '/contact' },
     ],

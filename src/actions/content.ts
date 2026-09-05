@@ -298,6 +298,52 @@ export async function deleteResearch(formData: FormData) {
   revalidatePath('/research')
 }
 
+// ---------- Resources ----------
+
+export async function upsertResource(formData: FormData) {
+  await guard()
+  const id = String(formData.get('id') ?? '')
+  const title = String(formData.get('title') ?? '').trim()
+  const description = String(formData.get('description') ?? '').trim()
+  const fileUrl = String(formData.get('fileUrl') ?? '').trim()
+  const fileName = String(formData.get('fileName') ?? '').trim() || null
+  const category = String(formData.get('category') ?? 'HANDBOOK') as 'HANDBOOK' | 'STUDENT_LIST' | 'OTHER'
+  const academicYearId = String(formData.get('academicYearId') ?? '') || null
+
+  if (!title || !fileUrl) {
+    redirect('/admin/resources?toast=' + encodeURIComponent('Title and file are required.'))
+  }
+
+  const data = {
+    title,
+    description,
+    fileUrl,
+    fileName,
+    category,
+    academicYearId,
+  }
+
+  if (id) {
+    await prisma.resource.update({ where: { id }, data })
+  } else {
+    await prisma.resource.create({ data })
+  }
+
+  revalidatePath('/admin/resources')
+  revalidatePath('/resources')
+  redirect('/admin/resources?toast=' + encodeURIComponent(id ? 'Resource updated.' : 'Resource created.'))
+}
+
+export async function deleteResource(formData: FormData) {
+  await guard()
+  const id = String(formData.get('id') ?? '')
+  if (id) {
+    await prisma.resource.delete({ where: { id } })
+  }
+  revalidatePath('/admin/resources')
+  revalidatePath('/resources')
+}
+
 // ---------- User management ----------
 
 type UserFormState = { error: string; success: boolean }
