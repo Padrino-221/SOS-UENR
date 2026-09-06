@@ -13,22 +13,33 @@ function fileExt(url: string, name?: string | null) {
 export default async function ResourcesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>
+  searchParams: Promise<{ category?: string; year?: string }>
 }) {
-  const { category } = await searchParams
+  const { category, year: yearParam } = await searchParams
   const validCats = ['HANDBOOK', 'STUDENT_LIST', 'OTHER']
   const filter = category && validCats.includes(category.toUpperCase()) ? category.toUpperCase() : null
 
-  const [resources, counts] = await Promise.all([
+  const [resources, counts, yearCounts] = await Promise.all([
     prisma.resource.findMany({
-      where: filter ? { category: filter as 'HANDBOOK' | 'STUDENT_LIST' | 'OTHER' } : {},
+      where: {
+        ...(filter ? { category: filter as 'HANDBOOK' | 'STUDENT_LIST' | 'OTHER' } : {}),
+        ...(yearParam ? { academicYear: { is: { year: yearParam } } } : {}),
+      },
       include: { academicYear: { select: { year: true } } },
       orderBy: [{ category: 'asc' }, { createdAt: 'desc' }],
     }),
     prisma.resource.groupBy({ by: ['category'], _count: { _all: true } }),
+    prisma.resource.groupBy({ by: ['academicYearId'], _count: { _all: true } }),
   ])
 
   const countOf = (c: string) => counts.find((x) => x.category === c)?._count._all ?? 0
+
+  const academicYears = await prisma.academicYear.findMany({
+    where: { resources: { some: {} } },
+    orderBy: { year: 'desc' },
+  })
+
+  const yearCountOf = (id: string) => yearCounts.find((x) => x.academicYearId === id)?._count._all ?? 0
 
   const tabs = [
     { key: null, label: `All (${counts.reduce((s, c) => s + c._count._all, 0)})` },
@@ -36,6 +47,18 @@ export default async function ResourcesPage({
     { key: 'STUDENT_LIST', label: `Student Lists (${countOf('STUDENT_LIST')})` },
     { key: 'OTHER', label: `Other (${countOf('OTHER')})` },
   ]
+
+  const catHref = (key: string | null) => {
+    const base = key ? `/resources?category=${key}` : '/resources'
+    return yearParam ? `${base}${base.includes('?') ? '&' : '?'}year=${encodeURIComponent(yearParam)}` : base
+  }
+
+  const yearHref = (y: string) => {
+    const base = filter ? `/resources?category=${filter}&year=${encodeURIComponent(y)}` : `/resources?year=${encodeURIComponent(y)}`
+    return base
+  }
+
+  const allYearsHref = filter ? `/resources?category=${filter}` : '/resources'
 
   return (
     <>
@@ -53,11 +76,11 @@ export default async function ResourcesPage({
             <p className="mt-3 text-ink-600 leading-relaxed">Every document uploaded by administration — handbooks and student group lists download the same way.</p>
           </div>
 
-          <div className="mb-10 flex flex-wrap gap-3">
+          <div className="mb-4 flex flex-wrap gap-3">
             {tabs.map((t) => (
               <Link
                 key={t.key ?? 'all'}
-                href={t.key ? `/resources?category=${t.key}` : '/resources'}
+                href={catHref(t.key)}
                 className={`rounded-lg px-5 py-2.5 text-sm font-bold transition ${
                   filter === t.key
                     ? 'bg-brand-700 text-white'
@@ -65,6 +88,33 @@ export default async function ResourcesPage({
                 }`}
               >
                 {t.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mb-10 flex flex-wrap items-center gap-2 border-t border-ink-100 pt-4">
+            <span className="mr-1 text-xs font-bold uppercase tracking-widest text-ink-400">Year</span>
+            <Link
+              href={allYearsHref}
+              className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition ${
+                !yearParam
+                  ? 'bg-brand-700 text-white'
+                  : 'border border-ink-100 bg-white text-ink-700 hover:border-brand-200 hover:text-brand-700'
+              }`}
+            >
+              All years ({counts.reduce((s, c) => s + c._count._all, 0)})
+            </Link>
+            {academicYears.map((y) => (
+              <Link
+                key={y.id}
+                href={yearHref(y.year)}
+                className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition ${
+                  yearParam === y.year
+                    ? 'bg-brand-700 text-white'
+                    : 'border border-ink-100 bg-white text-ink-700 hover:border-brand-200 hover:text-brand-700'
+                }`}
+              >
+                {y.year} ({yearCountOf(y.id)})
               </Link>
             ))}
           </div>
