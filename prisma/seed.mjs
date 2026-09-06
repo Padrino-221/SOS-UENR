@@ -27,6 +27,7 @@ async function main() {
   // Only seed sample content if the DB is empty (fresh setup)
   if (existing > 0) {
     console.log('↷ Database already has content; skipping sample seed.')
+    await seedResources()
     return
   }
 
@@ -522,6 +523,86 @@ async function main() {
       { key: 'contact_email', value: 'info@sciences.uenr.edu.gh' },
       { key: 'contact_phone', value: '+233 (0) 00 000 0000' },
       { key: 'address', value: 'P.O. Box 214, Sunyani, Ghana' },
+    ],
+  })
+
+  // Academic years
+  const y2324 = await prisma.academicYear.create({ data: { year: '2023/2024' } })
+  const y2425 = await prisma.academicYear.create({ data: { year: '2024/2025', active: true } })
+  const y2526 = await prisma.academicYear.create({ data: { year: '2025/2026' } })
+
+  // Resources — handbooks & student lists (sample PDF placeholder)
+  await seedResources()
+
+  console.log('✓ Sample content seeded successfully.')
+}
+
+async function seedResources() {
+  const resourceCount = await prisma.resource.count()
+  if (resourceCount > 0) {
+    console.log('↷ Resources already seeded; skipping.')
+    return
+  }
+
+  const y2324 = await prisma.academicYear.findUnique({ where: { year: '2023/2024' } })
+  const y2425 = await prisma.academicYear.findUnique({ where: { year: '2024/2025' } })
+  const y2526 = await prisma.academicYear.findUnique({ where: { year: '2025/2026' } })
+
+  await prisma.resource.createMany({
+    data: [
+      {
+        title: 'Student Handbook 2024/2025',
+        description: 'Academic regulations, programmes, and campus life for the School of Sciences.',
+        fileUrl: '/sample-first-page.pdf',
+        fileName: 'Student_Handbook_2024-2025.pdf',
+        category: 'HANDBOOK',
+        academicYearId: y2425?.id ?? null,
+      },
+      {
+        title: 'Final Year Project Handbook',
+        description: 'Guidelines for topic selection, document formatting, and submission deadlines.',
+        fileUrl: '/sample-first-page.pdf',
+        fileName: 'Final_Year_Project_Handbook.pdf',
+        category: 'HANDBOOK',
+      },
+      {
+        title: 'Examination Regulations',
+        description: 'Assessment, grading, and academic integrity policies.',
+        fileUrl: '/sample-first-page.pdf',
+        fileName: 'Examination_Regulations.pdf',
+        category: 'HANDBOOK',
+      },
+      {
+        title: 'Final Year Project Student Group List — 2024/2025',
+        description: 'Groups and supervisors for all final year project students, 2024/2025 session.',
+        fileUrl: '/sample-first-page.pdf',
+        fileName: 'FYP_Group_List_2024-2025.pdf',
+        category: 'STUDENT_LIST',
+        academicYearId: y2425?.id ?? null,
+      },
+      {
+        title: 'Final Year Project Student Group List — 2023/2024',
+        description: 'Groups and supervisors for all final year project students, 2023/2024 session.',
+        fileUrl: '/sample-first-page.pdf',
+        fileName: 'FYP_Group_List_2023-2024.pdf',
+        category: 'STUDENT_LIST',
+        academicYearId: y2324?.id ?? null,
+      },
+      {
+        title: 'Final Year Project Student Group List — 2025/2026',
+        description: 'Groups and supervisors for all final year project students, 2025/2026 session.',
+        fileUrl: '/sample-first-page.pdf',
+        fileName: 'FYP_Group_List_2025-2026.pdf',
+        category: 'STUDENT_LIST',
+        academicYearId: y2526?.id ?? null,
+      },
+      {
+        title: 'Admission Requirements Brochure',
+        description: 'General admission requirements for undergraduate and postgraduate programmes.',
+        fileUrl: '/sample-first-page.pdf',
+        fileName: 'Admission_Requirements.pdf',
+        category: 'OTHER',
+      },
     ],
   })
 
