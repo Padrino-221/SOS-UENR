@@ -225,3 +225,65 @@ export async function extractPdfText(input: ArrayBuffer | Uint8Array): Promise<s
   const pages = Array.isArray(text) ? text : [text]
   return pages.slice(0, 3).join('\n').trim()
 }
+
+// Demo flow: scan the entire document page-by-page, accumulating the fields
+// the form needs, and stop as soon as all required fields are found.
+export const TARGETED_REQUIRED_FIELDS: (keyof ExtractedProjectDetails)[] = [
+  'title',
+  'studentName',
+  'programme',
+  'degreeLevel',
+  'academicYear',
+  'abstract',
+  'objective',
+  'githubLink',
+]
+
+export interface TargetedExtractionResult {
+  fields: ExtractedProjectDetails
+  pagesScanned: number
+  totalPages: number
+  stoppedEarly: boolean
+}
+
+function requiredFieldsComplete(fields: ExtractedProjectDetails): boolean {
+  return TARGETED_REQUIRED_FIELDS.every((f) => Boolean(fields[f]))
+}
+
+export async function extractTargetedFields(
+  input: ArrayBuffer | Uint8Array,
+  fileName = '',
+): Promise<TargetedExtractionResult> {
+  const data = new Uint8Array(input)
+  const proxy = await getDocumentProxy(data)
+  try {
+    const totalPages: number = proxy.numPages ?? 0
+    const { text } = await extractText(proxy, { mergePages: false })
+    const pages = Array.isArray(text) ? text : [text]
+
+    const accumulated: string[] = []
+    let fields: ExtractedProjectDetails = {}
+    let scanned = 0
+
+    for (const page of pages) {
+      accumulated.push(page)
+      scanned++
+      fields = parseProjectDetails(accumulated.join('\n'), fileName)
+      if (requiredFieldsComplete(fields) || scanned >= pages.length) break
+    }
+
+    return {
+      fields,
+      pagesScanned: scanned,
+      totalPages: pages.length || totalPages || 0,
+      stoppedEarly: scanned < pages.length,
+    }
+  } finally {
+    const loadingTask = (proxy as unknown as { loadingTask?: { destroy: () => Promise<void> | void } })
+      .loadingTask
+    if (loadingTask) {
+      const result = loadingTask.destroy()
+      if (result && typeof result.catch === 'function') result.catch(() => {})
+    }
+  }
+}

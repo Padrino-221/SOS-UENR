@@ -15,6 +15,7 @@ import {
   CaretDown,
   List,
   X,
+  Flask,
 } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { spmsLogout } from '@/app/spms/(protected)/actions'
@@ -27,6 +28,7 @@ const nav = [
 ]
 
 const adminNav = [
+  { href: '/spms/demo-flow', label: 'Demo Flow', icon: Flask },
   { href: '/spms/settings', label: 'Settings', icon: Gear },
 ]
 
