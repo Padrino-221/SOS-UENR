@@ -128,7 +128,7 @@ export function SiteHeader({
           <nav className="container-page flex flex-col gap-1 py-3">
             {navigation.items.flatMap((item) => [
               <Link
-                key={item.href}
+                key={`nav-${item.href}-${item.label}`}
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className="rounded-md px-3 py-2 text-sm font-medium text-ink-800 hover:bg-brand-50"
@@ -137,7 +137,7 @@ export function SiteHeader({
               </Link>,
               ...(item.children ?? []).map((child) => (
                 <Link
-                  key={child.href}
+                  key={`nav-child-${item.href}-${child.href}-${child.label}`}
                   href={child.href}
                   onClick={() => setOpen(false)}
                   className="rounded-md px-6 py-2 text-sm text-ink-700 hover:bg-brand-50"
