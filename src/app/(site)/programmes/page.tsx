@@ -46,7 +46,7 @@ export default async function ProgrammesPage({
 
       <section className="section-padding bg-white">
         <div className="container-premium">
-          <div className="mb-10 flex flex-wrap gap-3">
+          <div className="mb-6 flex flex-wrap gap-3">
             {levelTabs.map((tab) => (
               <Link
                 key={tab.key}
@@ -61,6 +61,16 @@ export default async function ProgrammesPage({
                 {tab.label}
               </Link>
             ))}
+          </div>
+
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/60 p-5">
+            <div>
+              <p className="text-sm font-bold text-brand-800">Not sure where you fit?</p>
+              <p className="text-sm text-ink-600">Enter your WASSCE grades and get a friendly, private recommendation for the best programmes for you.</p>
+            </div>
+            <Link href="/programmes/eligibility-checker" className="shrink-0 inline-flex items-center gap-2 rounded-lg bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800 transition">
+              Check eligibility
+            </Link>
           </div>
 
           {programmes.length === 0 ? (

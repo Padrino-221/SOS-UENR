@@ -1,9 +1,17 @@
 import { v2 as cloudinary } from 'cloudinary'
 
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+const apiKey = process.env.CLOUDINARY_API_KEY
+const apiSecret = process.env.CLOUDINARY_API_SECRET
+
+if (!cloudName || !apiKey || !apiSecret) {
+  console.warn('[cloudinary] Missing CLOUDINARY_* env vars — uploads will fail')
+}
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret,
 })
 
 export { cloudinary }
@@ -21,6 +29,9 @@ export async function uploadToCloudinary(
     public_id?: string
   } = {},
 ): Promise<string> {
+  if (!cloudName || !apiKey || !apiSecret) {
+    throw new Error('Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET')
+  }
   const { folder = 'uploads', resource_type = 'image', format, public_id } = options
 
   return new Promise((resolve, reject) => {

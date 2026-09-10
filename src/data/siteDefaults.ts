@@ -383,7 +383,14 @@ export const siteDefaults: SiteSections = {
           { label: 'Staff', href: '/staff' },
         ],
       },
-      { label: 'Programmes', href: '/programmes' },
+      {
+        label: 'Programmes',
+        href: '/programmes',
+        children: [
+          { label: 'All Programmes', href: '/programmes' },
+          { label: 'Check Eligibility', href: '/programmes/eligibility-checker' },
+        ],
+      },
       { label: 'Projects', href: '/projects' },
       { label: 'Resources', href: '/resources' },
       { label: 'News & Events', href: '/news' },

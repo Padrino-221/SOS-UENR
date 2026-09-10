@@ -97,6 +97,18 @@ export function ProgrammeForm({
         rows={4}
         hint="One career option per line."
       />
+      <Field
+        label="Eligibility Rule (JSON, optional — for WASSCE checker)"
+        name="eligibilityRule"
+        defaultValue={
+          (programme as any)?.eligibilityRule
+            ? JSON.stringify((programme as any).eligibilityRule, null, 2)
+            : ""
+        }
+        textarea
+        rows={10}
+        hint='Structured rule for the checker. Empty = legacy text fallback. Example: {"level":"DEGREE","cores":["English Language","Mathematics","Integrated Science"],"coreAlternative":"Social Studies","minGrade":"C6","electiveCount":3,"electiveGroups":[{"any":1,"from":["Elective Mathematics"],"label":"Elective Mathematics"},{"any":2,"from":["Physics","Chemistry","Biology"]}]}'
+      />
 
       <div className="flex flex-wrap gap-6">
         <Toggle

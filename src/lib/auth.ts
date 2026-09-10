@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers'
-import { createHash, randomBytes } from 'crypto'
+import { createHmac, randomBytes, timingSafeEqual } from 'crypto'
 
 const SESSION_COOKIE = 'sos_session'
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7
@@ -12,7 +12,16 @@ export type SessionUser = {
 }
 
 function sign(value: string, secret: string) {
-  return createHash('sha256').update(`${value}.${secret}`).digest('hex')
+  return createHmac('sha256', secret).update(value).digest('hex')
+}
+
+function assertSecret() {
+  const secret = process.env.AUTH_SECRET
+  if (!secret || secret.length < 32) {
+    console.warn(
+      '[auth] AUTH_SECRET is missing or too short (<32 chars). Set a strong random value in production.',
+    )
+  }
 }
 
 function makeToken(user: SessionUser) {
@@ -32,8 +41,11 @@ function makeToken(user: SessionUser) {
 function verifyToken(token: string): SessionUser | null {
   try {
     const [base, sig] = token.split('.')
+    if (!base || !sig) return null
     const expected = sign(base, process.env.AUTH_SECRET || '')
-    if (!sig || sig !== expected) return null
+    const sigBuf = Buffer.from(sig, 'utf8')
+    const expBuf = Buffer.from(expected, 'utf8')
+    if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) return null
 
     const payload = JSON.parse(
       Buffer.from(base, 'base64url').toString('utf8'),
@@ -58,6 +70,7 @@ function verifyToken(token: string): SessionUser | null {
 }
 
 export async function createSession(user: SessionUser) {
+  assertSecret()
   const token = makeToken(user)
   const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE, token, {

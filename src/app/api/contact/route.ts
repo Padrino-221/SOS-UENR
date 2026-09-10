@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
+import { rateLimit, getClientKey } from '@/lib/rate-limit'
 
 const schema = z.object({
   name: z.string().min(1).max(200),
@@ -10,6 +11,12 @@ const schema = z.object({
 })
 
 export async function POST(request: Request) {
+  const ip = getClientKey(request)
+  const rl = rateLimit(`contact:${ip}`, { limit: 5, windowMs: 60 * 60 * 1000 })
+  if (!rl.allowed) {
+    return NextResponse.json({ error: 'Too many messages. Try again later.' }, { status: 429 })
+  }
+
   const body = await request.json().catch(() => null)
   const parsed = schema.safeParse(body)
 

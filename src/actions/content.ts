@@ -9,6 +9,70 @@ import { sendSpmsAccessEmail, sendSpmsAccessRevokedEmail } from '@/lib/email'
 import bcrypt from 'bcryptjs'
 import type { ProgrammeLevel } from '@prisma/client'
 import crypto from 'crypto'
+import { createHash } from 'crypto'
+import { z } from 'zod'
+
+function hashToken(token: string) {
+  return createHash('sha256').update(token).digest('hex')
+}
+
+// Zod schemas for validation
+const programmeSchema = z.object({
+  name: z.string().min(2).max(200),
+  slug: z.string().min(2).max(200).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  summary: z.string().min(10).max(500),
+  level: z.enum(['DIPLOMA', 'DEGREE', 'POSTGRADUATE']),
+})
+
+const eligibilityRuleSchema = z.object({
+  level: z.enum(['DIPLOMA', 'DEGREE', 'POSTGRADUATE']),
+  cores: z.array(z.string().min(1)).min(1),
+  coreAlternative: z.string().min(1).nullable().optional(),
+  minGrade: z.enum(['A1', 'B2', 'B3', 'C4', 'C5', 'C6', 'D7', 'E8', 'F9']),
+  electiveCount: z.number().int().min(0).max(4),
+  electiveGroups: z
+    .array(
+      z.object({
+        any: z.number().int().min(1).max(3),
+        from: z.array(z.string().min(1)).min(1),
+        label: z.string().optional(),
+      }),
+    )
+    .default([]),
+  requiresExam: z.boolean().optional(),
+  aggregateCutOff: z.number().int().nullable().optional(),
+  note: z.string().nullable().optional(),
+})
+
+const postSchema = z.object({
+  title: z.string().min(5).max(300),
+  slug: z.string().min(2).max(300).regex(/^[a-z0-9-]+$/),
+  category: z.enum(['NEWS', 'ANNOUNCEMENT', 'EVENT']),
+  excerpt: z.string().max(500),
+})
+
+const departmentSchema = z.object({
+  name: z.string().min(2).max(200),
+  slug: z.string().min(2).max(200).regex(/^[a-z0-9-]+$/),
+  summary: z.string().min(10).max(500),
+})
+
+const staffSchema = z.object({
+  name: z.string().min(2).max(200),
+  email: z.string().email().max(200).nullable().or(z.literal('')),
+  staffType: z.enum(['LECTURER', 'REGISTRAR', 'ADMINISTRATOR']),
+})
+
+const resourceSchema = z.object({
+  title: z.string().min(2).max(300),
+  fileUrl: z
+    .string()
+    .min(1, 'File URL is required')
+    .refine((v) => v.startsWith('/') || v.startsWith('http://') || v.startsWith('https://'), {
+      message: 'File URL must be a valid URL or path',
+    }),
+  category: z.enum(['HANDBOOK', 'STUDENT_LIST', 'OTHER']),
+})
 
 async function guard() {
   const session = await getSession()
@@ -37,6 +101,28 @@ export async function upsertProgramme(formData: FormData) {
   const careerPaths = unwrapList(String(formData.get('careerPaths') ?? ''))
   const departmentId = String(formData.get('departmentId') ?? '') || null
   const published = String(formData.get('published') ?? '') === 'on'
+  const rawRule = String(formData.get('eligibilityRule') ?? '').trim()
+  let eligibilityRule: import('@prisma/client').Prisma.InputJsonValue | null = null
+  if (rawRule) {
+    try {
+      const parsedJson = JSON.parse(rawRule)
+      const ruleParsed = eligibilityRuleSchema.safeParse(parsedJson)
+      if (!ruleParsed.success) {
+        redirect('/admin/programmes?toast=' + encodeURIComponent('Eligibility Rule: ' + ruleParsed.error.issues[0].message))
+      }
+      eligibilityRule = ruleParsed.data as unknown as import('@prisma/client').Prisma.InputJsonValue
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        redirect('/admin/programmes?toast=' + encodeURIComponent('Eligibility Rule: Invalid JSON — ' + e.message))
+      }
+      throw e
+    }
+  }
+
+  const parsed = programmeSchema.safeParse({ name, slug, summary, level })
+  if (!parsed.success) {
+    redirect('/admin/programmes?toast=' + encodeURIComponent(parsed.error.issues[0].message))
+  }
 
   const data = {
     slug,
@@ -51,12 +137,13 @@ export async function upsertProgramme(formData: FormData) {
     careerPaths,
     departmentId,
     published,
+    eligibilityRule,
   }
 
   if (id) {
-    await prisma.programme.update({ where: { id }, data })
+    await prisma.programme.update({ where: { id }, data: data as any })
   } else {
-    await prisma.programme.create({ data })
+    await prisma.programme.create({ data: data as any })
   }
 
   revalidatePath('/admin/programmes')
@@ -90,6 +177,11 @@ export async function upsertPost(formData: FormData) {
   const coverImage = String(formData.get('coverImage') ?? '').trim() || null
   const featured = String(formData.get('featured') ?? '') === 'on'
   const published = String(formData.get('published') ?? '') === 'on'
+
+  const parsed = postSchema.safeParse({ title, slug, category, excerpt })
+  if (!parsed.success) {
+    redirect('/admin/posts?toast=' + encodeURIComponent(parsed.error.issues[0].message))
+  }
 
   const data = {
     slug,
@@ -137,6 +229,11 @@ export async function upsertDepartment(formData: FormData) {
   const summary = String(formData.get('summary') ?? '').trim()
   const description = String(formData.get('description') ?? '').trim()
   const ordering = Number(formData.get('ordering') ?? 0) || 0
+
+  const parsed = departmentSchema.safeParse({ name, slug, summary })
+  if (!parsed.success) {
+    redirect('/admin/departments?toast=' + encodeURIComponent(parsed.error.issues[0].message))
+  }
 
   const data = {
     slug,
@@ -188,6 +285,14 @@ export async function upsertStaff(formData: FormData) {
 
   const ordering = Number(formData.get('ordering') ?? 0) || 0
 
+  const staffParsed = staffSchema.safeParse({ name, email: email || null, staffType })
+  if (!staffParsed.success) {
+    redirect('/admin/staff?toast=' + encodeURIComponent(staffParsed.error.issues[0].message))
+  }
+  if (email && !z.string().email().safeParse(email).success) {
+    redirect('/admin/staff?toast=' + encodeURIComponent('Invalid email address.'))
+  }
+
   // Check if spmsAccess is changing (for email notification)
   let prevSpmsAccess = false
   let prevEmail: string | null = null
@@ -218,14 +323,15 @@ export async function upsertStaff(formData: FormData) {
 
   // If SPMS access is being granted and staff has an email, generate reset token
   if (spmsAccess && !prevSpmsAccess && email) {
-    const token = crypto.randomUUID()
+    const rawToken = crypto.randomUUID()
+    const hashed = hashToken(rawToken)
     const expiry = new Date(Date.now() + 48 * 60 * 60 * 1000) // 48 hours
-    data.spmsResetToken = token
+    data.spmsResetToken = hashed
     data.spmsResetExpiry = expiry
     data.spmsPasswordChanged = false
 
-    // Send email (non-blocking)
-    sendSpmsAccessEmail({ name, email, token }).catch((err) => {
+    // Send email with raw token (hashed version stored in DB)
+    sendSpmsAccessEmail({ name, email, token: rawToken }).catch((err) => {
       console.error('[SPMS] Failed to send access email:', err)
     })
   }
@@ -310,8 +416,9 @@ export async function upsertResource(formData: FormData) {
   const category = String(formData.get('category') ?? 'HANDBOOK') as 'HANDBOOK' | 'STUDENT_LIST' | 'OTHER'
   const academicYearId = String(formData.get('academicYearId') ?? '') || null
 
-  if (!title || !fileUrl) {
-    redirect('/admin/resources?toast=' + encodeURIComponent('Title and file are required.'))
+  const parsed = resourceSchema.safeParse({ title, fileUrl, category })
+  if (!parsed.success) {
+    redirect('/admin/resources?toast=' + encodeURIComponent(parsed.error.issues[0].message))
   }
 
   const data = {

@@ -2,10 +2,17 @@ import { Resend } from 'resend'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'School of Sciences <noreply@sciences.uenr.edu.gh>'
+
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY
+  if (!key) {
+    console.warn('[email] RESEND_API_KEY is not set — emails will not be sent')
+    return null
+  }
+  return new Resend(key)
+}
 
 const DARK = '#0f172a'
 const MUTED = '#64748b'
@@ -14,12 +21,17 @@ const PAGE_BG = '#f1f5f9'
 const BORDER = '#e2e8f0'
 const FONT = "'Radio Canada Big',Arial,Helvetica,sans-serif"
 
-function loadPng(name: string): string {
-  const buf = readFileSync(join(process.cwd(), 'public', 'email-images', `${name}.png`))
-  return `data:image/png;base64,${buf.toString('base64')}`
+function loadPng(name: string): string | null {
+  try {
+    const buf = readFileSync(join(process.cwd(), 'public', 'email-images', `${name}.png`))
+    return `data:image/png;base64,${buf.toString('base64')}`
+  } catch (err) {
+    console.warn(`[email] Missing image public/email-images/${name}.png`, err)
+    return null
+  }
 }
 
-let _images: Record<string, string> | null = null
+let _images: Record<string, string | null> | null = null
 function getImages() {
   if (!_images) {
     _images = {
@@ -34,9 +46,12 @@ function getImages() {
 }
 
 function emailTemplate({ heroImg, body }: {
-  heroImg: string
+  heroImg: string | null
   body: string
 }) {
+  const heroSection = heroImg
+    ? `<tr><td style="padding:0;font-family:${FONT};"><img src="${heroImg}" alt="" width="560" style="display:block;width:100%;height:auto;border:0;font-family:${FONT};" /></td></tr>`
+    : ''
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,12 +70,7 @@ function emailTemplate({ heroImg, body }: {
       <td align="center" style="font-family:${FONT};">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-card" style="width:100%;max-width:560px;background:${SURFACE};border-radius:16px;overflow:hidden;border:1px solid ${BORDER};font-family:${FONT};">
 
-          <!-- Hero Image -->
-          <tr>
-            <td style="padding:0;font-family:${FONT};">
-              <img src="${heroImg}" alt="" width="560" style="display:block;width:100%;height:auto;border:0;font-family:${FONT};" />
-            </td>
-          </tr>
+          ${heroSection}
 
           <!-- Body -->
           <tr>
@@ -95,6 +105,10 @@ export async function sendSpmsAccessEmail({
   token: string
 }) {
   const url = `${SITE_URL}/spms/set-password?token=${token}`
+  const btnImg = getImages().btnSetPassword
+  const ctaHtml = btnImg
+    ? `<a href="${url}" style="display:inline-block;font-family:${FONT};"><img src="${btnImg}" alt="Set Your Password" width="240" style="display:block;border:0;font-family:${FONT};" /></a>`
+    : `<a href="${url}" style="display:inline-block;padding:12px 28px;background:#0D2063;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;font-family:${FONT};">Set Your Password</a>`
 
   const body = `
     <p style="margin:0 0 14px;font-size:16px;line-height:1.7;color:${DARK};font-family:${FONT};">Hi ${name},</p>
@@ -122,11 +136,11 @@ export async function sendSpmsAccessEmail({
       </tr>
     </table>
 
-    <!-- CTA Button Image -->
+    <!-- CTA Button -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0;font-family:${FONT};">
       <tr>
         <td style="font-family:${FONT};">
-          <a href="${url}" style="display:inline-block;font-family:${FONT};"><img src="${getImages().btnSetPassword}" alt="Set Your Password" width="240" style="display:block;border:0;font-family:${FONT};" /></a>
+          ${ctaHtml}
         </td>
       </tr>
     </table>
@@ -134,7 +148,9 @@ export async function sendSpmsAccessEmail({
     <p style="margin:22px 0 0;font-size:13px;line-height:1.6;color:${MUTED};font-family:${FONT};">This link expires in 48 hours. If you did not expect this email, you can safely ignore it.</p>
   `
 
-  await resend.emails.send({
+  const client = getResend()
+  if (!client) return
+  await client.emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: 'SPMS Access \u2014 Set Your Password',
@@ -158,7 +174,9 @@ export async function sendSpmsAccessRevokedEmail({
     <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:${MUTED};font-family:${FONT};">If you believe this was a mistake, please contact your administrator.</p>
   `
 
-  await resend.emails.send({
+  const client = getResend()
+  if (!client) return
+  await client.emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: 'SPMS Access Removed',

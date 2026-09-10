@@ -15,6 +15,15 @@ import type { DegreeLevel } from '@prisma/client'
 
 // ---------- Auth ----------
 
+import { createHash } from 'crypto'
+import { rateLimit } from '@/lib/rate-limit'
+
+const SPMS_DUMMY_HASH = '$2b$10$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
+function hashToken(token: string) {
+  return createHash('sha256').update(token).digest('hex')
+}
+
 export async function spmsLogin(prev: unknown, formData: FormData) {
   const email = String(formData.get('email') ?? '').trim().toLowerCase()
   const password = String(formData.get('password') ?? '')
@@ -23,23 +32,26 @@ export async function spmsLogin(prev: unknown, formData: FormData) {
     return { error: 'Email and password are required.' }
   }
 
+  const rl = rateLimit(`spms:login:${email}`, { limit: 5, windowMs: 15 * 60 * 1000 })
+  if (!rl.allowed) {
+    const retrySec = Math.ceil((rl.resetAt - Date.now()) / 1000)
+    return { error: `Too many attempts. Try again in ${retrySec}s.` }
+  }
+
   const staff = await prisma.staff.findFirst({
     where: { email, spmsAccess: true },
   })
 
   if (!staff) {
+    await bcrypt.compare(password, SPMS_DUMMY_HASH).catch(() => null)
     return { error: 'Invalid credentials.' }
   }
 
-  // Check password: try bcrypt hash first, fall back to default scheme
-  let valid = false
-  if (staff.passwordHash) {
-    valid = await bcrypt.compare(password, staff.passwordHash)
-  } else {
-    // Default scheme: email prefix + "123"
-    const defaultPassword = email.split('@')[0] + '123'
-    valid = password === defaultPassword
+  if (!staff.passwordHash) {
+    return { error: 'No password set. Please use the link sent to your email to set your password.' }
   }
+
+  const valid = await bcrypt.compare(password, staff.passwordHash)
 
   if (!valid) {
     return { error: 'Invalid credentials.' }
@@ -80,16 +92,30 @@ export async function setSpmsPassword(prev: unknown, formData: FormData) {
     return { error: 'Passwords do not match.' }
   }
 
-  if (newPassword.length < 6) {
-    return { error: 'Password must be at least 6 characters.' }
+  if (newPassword.length < 8) {
+    return { error: 'Password must be at least 8 characters.' }
   }
 
-  const staff = await prisma.staff.findFirst({
-    where: {
-      spmsResetToken: token,
-      spmsAccess: true,
-    },
-  })
+  const rl = rateLimit(`spms:set-password:${token}`, { limit: 5, windowMs: 15 * 60 * 1000 })
+  if (!rl.allowed) {
+    return { error: 'Too many attempts. Try again later.' }
+  }
+
+  const hashed = hashToken(token)
+  // Support both hashed and legacy raw tokens during migration
+  const staff =
+    (await prisma.staff.findFirst({
+      where: {
+        spmsResetToken: hashed,
+        spmsAccess: true,
+      },
+    })) ??
+    (await prisma.staff.findFirst({
+      where: {
+        spmsResetToken: token,
+        spmsAccess: true,
+      },
+    }))
 
   if (!staff) return { error: 'Invalid or expired link.' }
   if (!staff.spmsResetExpiry || staff.spmsResetExpiry < new Date()) {
@@ -123,8 +149,8 @@ export async function changeSpmsPassword(prev: unknown, formData: FormData) {
     return { error: 'Passwords do not match.' }
   }
 
-  if (newPassword.length < 6) {
-    return { error: 'Password must be at least 6 characters.' }
+  if (newPassword.length < 8) {
+    return { error: 'Password must be at least 8 characters.' }
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 10)

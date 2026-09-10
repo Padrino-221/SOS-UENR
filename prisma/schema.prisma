@@ -73,6 +73,8 @@ model Programme {
 
   departmentId String?
   department   Department?   @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  eligibilityRule Json? // structured WASSCE eligibility (cores, electives, cut-off). Null = legacy text fallback.
   @@map("programmes")
 }
 
