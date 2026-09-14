@@ -27,6 +27,7 @@ export interface SiteHero {
   primaryCta: { label: string; href: string }
   secondaryCta: { label: string; href: string }
   image: string
+  images?: string[]
   stats: { value: string; label: string }[]
 }
 
@@ -188,6 +189,7 @@ export const siteDefaults: SiteSections = {
     primaryCta: { label: 'Explore Programmes', href: '/programmes' },
     secondaryCta: { label: 'Learn About Us', href: '/about' },
     image: '/JOEY SHOT IT_2.jpg',
+    images: ['/JOEY SHOT IT_2.jpg'],
     stats: [
       { value: '4,000+', label: 'Students' },
       { value: '80+', label: 'Qualified Lecturers' },

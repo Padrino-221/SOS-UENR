@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import {
   GraduationCap,
   Buildings,
@@ -10,6 +9,7 @@ import { getDepartments, getProgrammes, getFeaturedPosts } from '@/lib/data'
 import { getSiteSections } from '@/lib/site-content'
 import { truncate, formatDate } from '@/lib/utils'
 import { getDepartmentIcon } from '@/lib/department-icons'
+import { HeroImageCarousel } from '@/components/site/hero-image-carousel'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,6 +26,9 @@ export default async function HomePage() {
   const featuredDepts = departments.slice(0, 3)
   const featuredProgs = programmes.slice(0, 6)
 
+  const allHeroImages = (hero as any)?.images as string[] | undefined
+  const fallbackImage = hero?.image || '/JOEY SHOT IT_2.jpg'
+  const heroImages = allHeroImages && allHeroImages.length > 0 ? allHeroImages.filter(Boolean) : [fallbackImage]
   const heroData = {
     badge: hero?.badge || 'University of Energy and Natural Resources',
     title: hero?.title || 'School of Sciences —',
@@ -34,7 +37,8 @@ export default async function HomePage() {
     description: hero?.description || 'Transformational and value-based education in physical and biological sciences.',
     primaryCta: hero?.primaryCta || { label: 'Explore Programmes', href: '/programmes' },
     secondaryCta: hero?.secondaryCta || { label: 'Learn About Us', href: '/about' },
-    image: hero?.image || '/JOEY SHOT IT_2.jpg',
+    image: fallbackImage,
+    images: heroImages,
     stats: hero?.stats || [{ value: '4,000+', label: 'Students' }, { value: '80+', label: 'Lecturers' }, { value: '3,000+', label: 'Graduates' }],
   }
   const homeData = {
@@ -87,9 +91,7 @@ export default async function HomePage() {
             </div>
             <div className="lg:col-span-5">
               <div className="relative overflow-hidden rounded-xl border border-ink-100 bg-white">
-                <div className="relative h-80 sm:h-96">
-                  <Image src={heroData.image} alt="School of Sciences" fill className="object-cover" priority />
-                </div>
+                <HeroImageCarousel images={heroData.images} fallback={heroData.image} />
                 <div className="grid grid-cols-3 divide-x divide-ink-100 border-t border-ink-100">
                   <div className="p-4 text-center">
                     <p className="text-xl font-serif text-brand-700">{degreeCount}+</p>

@@ -304,7 +304,7 @@ export function EligibilityChecker({ programmes }: Props) {
           ) : mode === "specific" ? (
             <>
               {specificProgramme && specificResult ? (
-                <div className={`overflow-hidden rounded-xl border-2 bg-white shadow-sm ${specificResult.tier==="ELIGIBLE" ? "border-emerald-500" : specificResult.tier==="ALMOST" ? "border-amber-400" : "border-ink-200"}`}>
+                <div className={`overflow-hidden rounded-xl border-2 bg-white ${specificResult.tier==="ELIGIBLE" ? "border-emerald-500" : specificResult.tier==="ALMOST" ? "border-amber-400" : "border-ink-200"}`}>
                   <div className={`px-5 py-3 flex items-center gap-2 text-white ${specificResult.tier==="ELIGIBLE" ? "bg-emerald-600" : specificResult.tier==="ALMOST" ? "bg-amber-500" : "bg-ink-700"}`}>
                     <span className="h-7 w-7 grid place-items-center rounded-full bg-white/15">
                       {specificResult.tier==="ELIGIBLE" ? <CheckCircle size={14} weight="duotone" /> : specificResult.tier==="ALMOST" ? <WarningCircle size={14} weight="duotone" /> : <Info size={14} weight="duotone" />}
@@ -376,7 +376,7 @@ export function EligibilityChecker({ programmes }: Props) {
               )}
 
               {topRecommendation && (
-                <div className="mb-8 overflow-hidden rounded-xl border-2 border-brand-700 bg-white shadow-sm">
+                <div className="mb-8 overflow-hidden rounded-xl border-2 border-brand-700 bg-white">
                   <div className="bg-brand-700 px-5 py-3 flex items-center gap-2 text-white">
                     <span className="h-7 w-7 grid place-items-center rounded-full bg-white/15"><Trophy size={14} weight="duotone" /></span>
                     <p className="text-xs font-bold uppercase tracking-[0.14em]">Top recommendation</p>

@@ -10,6 +10,7 @@ import { SiteFooter } from '@/components/site/site-footer'
 import { PublicShell } from '@/components/site/public-shell'
 import { getDepartmentIcon } from '@/lib/department-icons'
 import { truncate, formatDate } from '@/lib/utils'
+import { HeroImageCarousel } from '@/components/site/hero-image-carousel'
 
 function deepMerge(defaults: any, saved: any): any {
   if (!saved || typeof saved !== 'object') return defaults
@@ -66,6 +67,9 @@ export function PreviewClient({
   const featuredDepts = liveDepartments.slice(0, 3)
   const featuredProgs = liveProgrammes.slice(0, 6)
 
+  const _heroImages = (hero as any)?.images as string[] | undefined
+  const _fallbackImage = hero?.image || '/JOEY SHOT IT_2.jpg'
+  const _heroImageList = _heroImages && _heroImages.length > 0 ? _heroImages.filter(Boolean) : [_fallbackImage]
   const heroData = {
     badge: hero?.badge || 'University of Energy and Natural Resources',
     title: hero?.title || 'School of Sciences —',
@@ -74,7 +78,8 @@ export function PreviewClient({
     description: hero?.description || 'Transformational and value-based education in physical and biological sciences.',
     primaryCta: hero?.primaryCta || { label: 'Explore Programmes', href: '/programmes' },
     secondaryCta: hero?.secondaryCta || { label: 'Learn About Us', href: '/about' },
-    image: hero?.image || '/JOEY SHOT IT_2.jpg',
+    image: _fallbackImage,
+    images: _heroImageList,
     stats: hero?.stats || [{ value: '4,000+', label: 'Students' }, { value: '80+', label: 'Lecturers' }, { value: '3,000+', label: 'Graduates' }],
   }
   const homeData = {
@@ -146,9 +151,7 @@ export function PreviewClient({
             </div>
             <div className="lg:col-span-5">
               <div className="relative overflow-hidden rounded-xl border border-ink-100 bg-white">
-                <div className="relative h-80 sm:h-96">
-                  <Image src={heroData.image} alt="School of Sciences" fill className="object-cover" priority />
-                </div>
+                <HeroImageCarousel images={heroData.images} fallback={heroData.image} />
                 <div className="grid grid-cols-3 divide-x divide-ink-100 border-t border-ink-100">
                   <div className="p-4 text-center">
                     <p className="text-xl font-serif text-brand-700">{degreeCount}+</p>

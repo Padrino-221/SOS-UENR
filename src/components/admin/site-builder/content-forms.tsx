@@ -1,7 +1,7 @@
 'use client'
 
 import type { SiteSectionKey, SiteSections } from '@/data/siteDefaults'
-import { TextInput, TextArea, FieldGroup, ImageField } from './form-fields'
+import { TextInput, TextArea, FieldGroup, ImageField, MultiImageField } from './form-fields'
 import { ArrayItems } from './array-items'
 import { Plus, Trash } from '@phosphor-icons/react'
 
@@ -78,8 +78,14 @@ function HeroForm({ data, set, setNested }: { data: SiteSections['hero']; set: (
         <TextInput label="Subtitle (after highlight)" value={data.subtitle} onChange={(v) => set('subtitle', v)} hint="Use \n for line break" />
         <TextArea label="Description" value={data.description} onChange={(v) => set('description', v)} rows={3} />
       </FieldGroup>
-      <FieldGroup title="Image">
-        <ImageField label="Hero Image" value={data.image} onChange={(v) => set('image', v)} hint="Upload a hero banner image" />
+      <FieldGroup title="Images">
+        <ImageField label="Fallback image" value={data.image} onChange={(v) => set('image', v)} hint="Used if carousel is empty — also first slide fallback" />
+        <MultiImageField
+          label="Carousel images — hero image only"
+          value={(data as unknown as { images?: string[] }).images ?? (data.image ? [data.image] : [])}
+          onChange={(v) => set('images', v)}
+          hint="Add multiple images — only the image area cross-fades every 5s (no indicators). Text/stats stay static. Pause on hover."
+        />
       </FieldGroup>
       <FieldGroup title="Buttons">
         <TextInput label="Primary CTA Label" value={data.primaryCta.label} onChange={(v) => setNested('primaryCta', 'label', v)} />
