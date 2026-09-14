@@ -321,42 +321,56 @@ export async function upsertStaff(formData: FormData) {
     ordering,
   }
 
-  // If SPMS access is being granted and staff has an email, generate reset token
-  if (spmsAccess && !prevSpmsAccess && email) {
-    const rawToken = crypto.randomUUID()
-    const hashed = hashToken(rawToken)
-    const expiry = new Date(Date.now() + 48 * 60 * 60 * 1000) // 48 hours
-    data.spmsResetToken = hashed
-    data.spmsResetExpiry = expiry
-    data.spmsPasswordChanged = false
+  const grantingAccess = spmsAccess && !prevSpmsAccess && !!email
+  const revokingAccess = !spmsAccess && prevSpmsAccess && !!prevEmail
 
-    // Send email with raw token (hashed version stored in DB)
-    sendSpmsAccessEmail({ name, email, token: rawToken }).catch((err) => {
-      console.error('[SPMS] Failed to send access email:', err)
-    })
+  // Generate a reset token when access is being granted (stored hashed)
+  let rawToken: string | null = null
+  if (grantingAccess) {
+    rawToken = crypto.randomUUID()
+    data.spmsResetToken = hashToken(rawToken)
+    data.spmsResetExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000) // 48 hours
+    data.spmsPasswordChanged = false
   }
 
-  // If SPMS access is being revoked, clear token and notify
-  if (!spmsAccess && prevSpmsAccess && prevEmail) {
+  // Revoke token when access is removed
+  if (revokingAccess) {
     data.spmsResetToken = null
     data.spmsResetExpiry = null
     data.spmsPasswordChanged = false
-
-    sendSpmsAccessRevokedEmail({ name: prevName, email: prevEmail }).catch((err) => {
-      console.error('[SPMS] Failed to send revoked email:', err)
-    })
   }
 
+  // Persist the staff member first so the token/state is saved before emailing
   if (id) {
     await prisma.staff.update({ where: { id }, data: data as any })
   } else {
     await prisma.staff.create({ data: data as any })
   }
 
+  // Send onboarding / revocation email and surface the outcome to the admin
+  let emailNote = ''
+  if (grantingAccess && rawToken && email) {
+    try {
+      await sendSpmsAccessEmail({ name, email, token: rawToken })
+      emailNote = ' Onboarding email sent.'
+    } catch (err) {
+      console.error('[SPMS] Failed to send access email:', err)
+      emailNote = ` Onboarding email failed: ${(err as Error).message}`
+    }
+  } else if (revokingAccess && prevEmail) {
+    try {
+      await sendSpmsAccessRevokedEmail({ name: prevName, email: prevEmail })
+      emailNote = ' Access-revoked email sent.'
+    } catch (err) {
+      console.error('[SPMS] Failed to send revoked email:', err)
+      emailNote = ` Access-revoked email failed: ${(err as Error).message}`
+    }
+  }
+
   revalidatePath('/admin/staff')
   revalidatePath('/staff')
   revalidatePath('/leadership')
-  redirect('/admin/staff?toast=' + encodeURIComponent(id ? 'Staff updated.' : 'Staff created.'))
+  redirect('/admin/staff?toast=' + encodeURIComponent((id ? 'Staff updated.' : 'Staff created.') + emailNote))
 }
 
 export async function deleteStaff(formData: FormData) {

@@ -1,17 +1,37 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
+import type { Transporter } from 'nodemailer'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'School of Sciences <noreply@sciences.uenr.edu.gh>'
+const FROM_EMAIL =
+  process.env.SMTP_FROM || process.env.SMTP_USER || 'School of Sciences <sosuenr@gmail.com>'
 
-function getResend(): Resend | null {
-  const key = process.env.RESEND_API_KEY
-  if (!key) {
-    console.warn('[email] RESEND_API_KEY is not set — emails will not be sent')
+let _transporter: Transporter | null = null
+
+function getTransporter(): Transporter | null {
+  if (_transporter) return _transporter
+
+  const host = process.env.SMTP_HOST
+  if (!host) {
+    console.warn('[email] SMTP_HOST is not set — emails will not be sent')
     return null
   }
-  return new Resend(key)
+
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
+  if (!user || !pass) {
+    console.warn('[email] SMTP_USER/SMTP_PASS are missing — emails will not be sent')
+    return null
+  }
+
+  _transporter = nodemailer.createTransport({
+    host,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: { user, pass },
+  })
+  return _transporter
 }
 
 const DARK = '#0f172a'
@@ -148,9 +168,9 @@ export async function sendSpmsAccessEmail({
     <p style="margin:22px 0 0;font-size:13px;line-height:1.6;color:${MUTED};font-family:${FONT};">This link expires in 48 hours. If you did not expect this email, you can safely ignore it.</p>
   `
 
-  const client = getResend()
-  if (!client) return
-  await client.emails.send({
+  const transporter = getTransporter()
+  if (!transporter) throw new Error('Email service not configured (SMTP_* env vars missing)')
+  await transporter.sendMail({
     from: FROM_EMAIL,
     to: email,
     subject: 'SPMS Access \u2014 Set Your Password',
@@ -174,9 +194,9 @@ export async function sendSpmsAccessRevokedEmail({
     <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:${MUTED};font-family:${FONT};">If you believe this was a mistake, please contact your administrator.</p>
   `
 
-  const client = getResend()
-  if (!client) return
-  await client.emails.send({
+  const transporter = getTransporter()
+  if (!transporter) throw new Error('Email service not configured (SMTP_* env vars missing)')
+  await transporter.sendMail({
     from: FROM_EMAIL,
     to: email,
     subject: 'SPMS Access Removed',
