@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { ArrowLeft } from '@phosphor-icons/react/dist/ssr'
 import { getStaffMember } from '@/lib/data'
 import { getSiteSections } from '@/lib/site-content'
+import { StaffProjectsTable } from '@/components/site/staff-projects-table'
 
 export const dynamic = 'force-dynamic'
 
@@ -79,34 +80,7 @@ export default async function StaffDetailPage({ params }: { params: Promise<{ id
         <section className="py-12 bg-white">
           <div className="container-page">
             <h2 className="text-2xl font-serif text-ink-900 mb-6">Supervised Projects</h2>
-            <div className="overflow-hidden rounded-xl border border-ink-100 bg-white">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="bg-brand-950 text-white text-left">
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest"> #</th>
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest">Project Topic</th>
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest">Programme</th>
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest">Year</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-ink-100">
-                    {member.projects.map((project, idx) => (
-                      <tr key={project.id} className="hover:bg-ink-50/50">
-                        <td className="px-4 py-3 text-ink-500">{idx + 1}</td>
-                        <td className="max-w-xs px-4 py-3">
-                          <Link href={`/projects/${project.slug}`} className="font-medium text-ink-900 hover:text-brand-700 line-clamp-1">
-                            {project.title}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-3 text-ink-600">{project.programme || '—'}</td>
-                        <td className="px-4 py-3 text-ink-600">{project.academicYear?.year || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <StaffProjectsTable projects={member.projects} />
           </div>
         </section>
       )}
