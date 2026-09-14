@@ -18,10 +18,7 @@ export default async function NewProjectPage() {
       orderBy: { name: 'asc' },
     }),
     prisma.programme.findMany({
-      where: {
-        published: true,
-        ...(isAdmin ? {} : { departmentId: session.departmentId }),
-      },
+      where: { published: true },
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     }),

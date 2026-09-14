@@ -23,10 +23,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
       orderBy: { name: 'asc' },
     }),
     prisma.programme.findMany({
-      where: {
-        published: true,
-        ...(isAdmin ? {} : { departmentId: session.departmentId }),
-      },
+      where: { published: true },
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     }),
