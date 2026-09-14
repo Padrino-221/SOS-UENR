@@ -5,6 +5,31 @@ import { getSession } from '@/lib/auth'
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024 // 10 MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
 
+async function compressImage(buffer: Buffer, mimeType: string): Promise<{ buf: Buffer; format: string }> {
+  if (mimeType === 'image/svg+xml' || mimeType === 'image/gif') {
+    return { buf: buffer, format: mimeType === 'image/gif' ? 'gif' : 'svg' }
+  }
+
+  // Dynamic import to avoid type issues with sharp in isolatedModules mode
+  const sharp = (await import('sharp')).default
+  const image = sharp(buffer)
+  const metadata = await image.metadata()
+
+  const maxWidth = 1600
+  const resizeOpts: { width?: number; withoutEnlargement: boolean } = { withoutEnlargement: true }
+  if (metadata.width && metadata.width > maxWidth) {
+    resizeOpts.width = maxWidth
+  }
+
+  if (mimeType === 'image/webp') {
+    const buf = await image.resize(resizeOpts).webp({ quality: 80 }).toBuffer()
+    return { buf, format: 'webp' }
+  }
+
+  const buf = await image.resize(resizeOpts).jpeg({ quality: 80, mozjpeg: true }).toBuffer()
+  return { buf, format: 'jpg' }
+}
+
 export async function POST(request: NextRequest) {
   const session = await getSession()
   if (!session) {
@@ -28,13 +53,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
+    const originalBuffer = Buffer.from(bytes)
 
-    const ext = file.name.split('.').pop() ?? 'jpg'
-    const url = await uploadToCloudinary(buffer, {
+    const { buf: compressedBuffer, format } = await compressImage(originalBuffer, file.type)
+
+    const url = await uploadToCloudinary(compressedBuffer, {
       folder: 'site-uploads',
       resource_type: 'image',
-      format: ext,
+      format,
     })
 
     return NextResponse.json({ url })
