@@ -3,7 +3,13 @@ import type { Transporter } from 'nodemailer'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+// Base URL for links inside emails. Explicitly avoid localhost so the
+// SPMS set-password link always points at the deployed site.
+const SITE_URL =
+  process.env.EMAIL_SITE_URL ||
+  (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+    ? process.env.NEXT_PUBLIC_SITE_URL
+    : 'https://sos-uenr.vercel.app')
 const FROM_EMAIL =
   process.env.SMTP_FROM || process.env.SMTP_USER || 'School of Sciences <sosuenr@gmail.com>'
 
