@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, GraduationCap, Buildings, Newspaper } from '@phosphor-icons/react'
+import { ArrowRight, Newspaper } from '@phosphor-icons/react'
 import { siteDefaults, type SiteSections } from '@/data/siteDefaults'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { PublicShell } from '@/components/site/public-shell'
 import { getDepartmentIcon } from '@/lib/department-icons'
-import { truncate, formatDate } from '@/lib/utils'
+import { truncate } from '@/lib/utils'
 import { HeroImageCarousel } from '@/components/site/hero-image-carousel'
 
 function deepMerge(defaults: any, saved: any): any {
@@ -63,11 +62,10 @@ export function PreviewClient({
   }, [])
 
   const { hero, home, about } = sections
-  const degreeCount = liveProgrammes.filter((p: any) => p.level === 'DEGREE').length
   const featuredDepts = liveDepartments.slice(0, 3)
   const featuredProgs = liveProgrammes.slice(0, 6)
 
-  const _heroImages = (hero as any)?.images as string[] | undefined
+  const _heroImages = hero?.images
   const _fallbackImage = hero?.image || '/JOEY SHOT IT_2.jpg'
   const _heroImageList = _heroImages && _heroImages.length > 0 ? _heroImages.filter(Boolean) : [_fallbackImage]
   const heroData = {
@@ -152,18 +150,6 @@ export function PreviewClient({
             <div className="lg:col-span-5">
               <div className="relative overflow-hidden rounded-xl border border-ink-100 bg-white">
                 <HeroImageCarousel images={heroData.images} fallback={heroData.image} />
-                <div className="grid grid-cols-3 divide-x divide-ink-100 border-t border-ink-100">
-                  <div className="p-4 text-center">
-                    <p className="text-xl font-serif text-brand-700">{degreeCount}+</p>
-                    <p className="text-xs uppercase tracking-widest text-ink-500">Programmes</p>
-                  </div>
-                  {heroData.stats.slice(0, 2).map((s: any, i: number) => (
-                    <div key={i} className="p-4 text-center">
-                      <p className="text-xl font-serif text-ink-900">{s.value}</p>
-                      <p className="text-xs uppercase tracking-widest text-ink-500">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </div>

@@ -1,10 +1,5 @@
 import Link from 'next/link'
-import {
-  GraduationCap,
-  Buildings,
-  Newspaper,
-  ArrowRight,
-} from '@phosphor-icons/react/dist/ssr'
+import { Newspaper, ArrowRight } from '@phosphor-icons/react/dist/ssr'
 import { getDepartments, getProgrammes, getFeaturedPosts } from '@/lib/data'
 import { getSiteSections } from '@/lib/site-content'
 import { truncate, formatDate } from '@/lib/utils'
@@ -21,12 +16,11 @@ export default async function HomePage() {
     getSiteSections(),
   ])
 
-  const degreeCount = programmes.filter((p) => p.level === 'DEGREE').length
   const { hero, home, about } = sections
   const featuredDepts = departments.slice(0, 3)
   const featuredProgs = programmes.slice(0, 6)
 
-  const allHeroImages = (hero as any)?.images as string[] | undefined
+  const allHeroImages = hero?.images
   const fallbackImage = hero?.image || '/JOEY SHOT IT_2.jpg'
   const heroImages = allHeroImages && allHeroImages.length > 0 ? allHeroImages.filter(Boolean) : [fallbackImage]
   const heroData = {
@@ -92,18 +86,6 @@ export default async function HomePage() {
             <div className="lg:col-span-5">
               <div className="relative overflow-hidden rounded-xl border border-ink-100 bg-white">
                 <HeroImageCarousel images={heroData.images} fallback={heroData.image} />
-                <div className="grid grid-cols-3 divide-x divide-ink-100 border-t border-ink-100">
-                  <div className="p-4 text-center">
-                    <p className="text-xl font-serif text-brand-700">{degreeCount}+</p>
-                    <p className="text-xs uppercase tracking-widest text-ink-500">Programmes</p>
-                  </div>
-                  {heroData.stats.slice(0, 2).map((s, i) => (
-                    <div key={i} className="p-4 text-center">
-                      <p className="text-xl font-serif text-ink-900">{s.value}</p>
-                      <p className="text-xs uppercase tracking-widest text-ink-500">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </div>

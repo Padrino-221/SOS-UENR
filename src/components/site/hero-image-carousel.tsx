@@ -10,28 +10,29 @@ interface Props {
   className?: string
 }
 
-export function HeroImageCarousel({ images, fallback = '/JOEY SHOT IT_2.jpg', intervalMs = 5000, className }: Props) {
+export function HeroImageCarousel({ images, fallback = '/JOEY SHOT IT_2.jpg', intervalMs = 8000, className }: Props) {
   const normalized = images && images.length > 0 ? images.filter(Boolean) : fallback ? [fallback] : []
   const count = normalized.length
   const [index, setIndex] = useState(0)
   const pausedRef = useRef(false)
-  const prefersReducedMotion = useRef(false)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      prefersReducedMotion.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    }
-  }, [])
 
   useEffect(() => {
     if (count <= 1) return
-    if (prefersReducedMotion.current) return
     const id = setInterval(() => {
       if (pausedRef.current) return
       setIndex((i) => (i + 1) % count)
     }, intervalMs)
     return () => clearInterval(id)
   }, [count, intervalMs])
+
+  // Pause only while the browser tab is hidden (saves work, never blocks viewing)
+  useEffect(() => {
+    const onVisibility = () => {
+      pausedRef.current = document.hidden
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
 
   if (count === 0) return null
   if (count === 1) {
@@ -43,13 +44,7 @@ export function HeroImageCarousel({ images, fallback = '/JOEY SHOT IT_2.jpg', in
   }
 
   return (
-    <div
-      className={className ?? 'relative h-80 sm:h-96'}
-      onMouseEnter={() => { pausedRef.current = true }}
-      onMouseLeave={() => { pausedRef.current = false }}
-      onFocus={() => { pausedRef.current = true }}
-      onBlur={() => { pausedRef.current = false }}
-    >
+    <div className={className ?? 'relative h-80 sm:h-96'}>
       {normalized.map((src, i) => (
         <Image
           key={`${src}-${i}`}
