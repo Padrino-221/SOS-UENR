@@ -121,9 +121,12 @@ export async function sendSpmsAccessEmail({
     <p style="margin:0 0 10px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">
       Your account has been successfully created for the <strong>Student Project Management System (SPMS)</strong>.
     </p>
-    <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">
-      Click the button below to set your password and activate your account.
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">
+      Kindly find your account details below:
     </p>
+
+    <p style="margin:0 0 6px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};"><strong>Username:</strong> ${email}</p>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">Click the button below to set your password and activate your account.</p>
 
     <!-- CTA Button -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 28px;font-family:${FONT};">
