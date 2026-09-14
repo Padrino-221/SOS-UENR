@@ -1,9 +1,14 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { createHash } from 'crypto'
 import { prisma } from '@/lib/db'
 import { getSpmsSession } from '@/lib/spms-auth'
 import { SetPasswordForm } from '@/components/spms/set-password-form'
+
+function hashToken(token: string) {
+  return createHash('sha256').update(token).digest('hex')
+}
 
 export default async function SetPasswordPage({
   searchParams,
@@ -38,10 +43,16 @@ export default async function SetPasswordPage({
     )
   }
 
-  const staff = await prisma.staff.findFirst({
-    where: { spmsResetToken: token, spmsAccess: true },
-    select: { id: true, name: true, email: true, spmsResetExpiry: true, spmsPasswordChanged: true },
-  })
+  const hashed = hashToken(token)
+  const staff =
+    (await prisma.staff.findFirst({
+      where: { spmsResetToken: hashed, spmsAccess: true },
+      select: { id: true, name: true, email: true, spmsResetExpiry: true, spmsPasswordChanged: true },
+    })) ??
+    (await prisma.staff.findFirst({
+      where: { spmsResetToken: token, spmsAccess: true },
+      select: { id: true, name: true, email: true, spmsResetExpiry: true, spmsPasswordChanged: true },
+    }))
 
   if (!staff || !staff.spmsResetExpiry || staff.spmsResetExpiry < new Date()) {
     return (
