@@ -52,9 +52,10 @@ export function ProjectForm({
   const [step, setStep] = useState(project ? 1 : 0)
   const [instructionsAccepted, setInstructionsAccepted] = useState(false)
 
+  const defaultProgramme = project?.programme ?? programmes.find((p) => p.id === currentProgrammeId)?.name ?? ''
   const [title, setTitle] = useState(project?.title ?? '')
   const [studentName, setStudentName] = useState(project?.studentName ?? '')
-  const [programme, setProgramme] = useState(project?.programme ?? '')
+  const [programme, setProgramme] = useState(defaultProgramme)
   const [degreeLevel, setDegreeLevel] = useState(project?.degreeLevel ?? 'BSc')
   const [academicYearId, setAcademicYearId] = useState(project?.academicYearId ?? '')
   const [departmentId, setDepartmentId] = useState(project?.departmentId ?? '')
