@@ -32,6 +32,7 @@ interface ProjectFormProps {
   programmes: { id: string; name: string }[]
   isAdmin: boolean
   currentUserId: string
+  currentProgrammeId?: string | null
 }
 
 const STEPS = ['Instructions', 'Document Upload', 'Project Details', 'Confirmation'] as const
@@ -44,6 +45,7 @@ export function ProjectForm({
   programmes,
   isAdmin,
   currentUserId,
+  currentProgrammeId,
 }: ProjectFormProps) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
@@ -69,6 +71,15 @@ export function ProjectForm({
   const [isDragging, setIsDragging] = useState(false)
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
+
+  // Sort programmes: lecturer's programme first, then alphabetical
+  const sortedProgrammes = [...programmes].sort((a, b) => {
+    if (currentProgrammeId) {
+      if (a.id === currentProgrammeId) return -1
+      if (b.id === currentProgrammeId) return 1
+    }
+    return a.name.localeCompare(b.name)
+  })
 
   // --- Draft persistence (new projects only) ---
   const draftKey = `spms:draft:new:${currentUserId}`
@@ -536,7 +547,7 @@ export function ProjectForm({
                 </li>
                 <li className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">3</span>
-                  <span className="pt-0.5 text-ink-700"><span className="font-semibold text-ink-900">PDF + GitHub:</span> Export your document as PDF; paste your GitHub repo link in Step 3.</span>
+                  <span className="pt-0.5 text-ink-700"><span className="font-semibold text-ink-900">PDF + GitHub:</span> Upload your document as PDF. Upload your project to GitHub and paste the repo link in Step 3.</span>
                 </li>
               </ul>
             </div>
@@ -661,7 +672,7 @@ export function ProjectForm({
                   value={programme}
                   onChange={(e) => setProgramme(e.target.value)}
                   required
-                  options={[{ value: '', label: 'Select programme' }, ...programmes.map((p) => ({ value: p.name, label: p.name }))]}
+                  options={[{ value: '', label: 'Select programme' }, ...sortedProgrammes.map((p) => ({ value: p.name, label: p.name }))]}
                 />
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Select
@@ -697,6 +708,7 @@ export function ProjectForm({
                       value={supervisorId}
                       onChange={(e) => setSupervisorId(e.target.value)}
                       required
+                      searchable
                       options={[{ value: '', label: 'Select supervisor' }, ...staff.map((s) => ({ value: s.id, label: s.name }))]}
                     />
                   </div>

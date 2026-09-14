@@ -32,12 +32,10 @@ export function DashboardClient({
   deptCount: number
   isAdmin: boolean
 }) {
-  const firstName = session.name.split(' ')[0]
-
   return (
     <div>
       <PageHeader
-        title={`Welcome back, ${firstName}`}
+        title={`Welcome back, ${session.name}`}
         description={department ? `${department.name} — Student Project Management` : 'Student Project Management System'}
         action={
           <Link

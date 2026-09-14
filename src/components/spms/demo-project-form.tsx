@@ -699,6 +699,7 @@ export function DemoProjectForm({
                     value={supervisorId}
                     onChange={(e) => setSupervisorId(e.target.value)}
                     required
+                    searchable
                     options={[{ value: '', label: 'Select supervisor' }, ...staff.map((s) => ({ value: s.id, label: s.name }))]}
                   />
                 </div>

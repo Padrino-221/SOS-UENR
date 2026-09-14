@@ -22,6 +22,7 @@ export interface SelectProps {
   disabled?: boolean
   required?: boolean
   className?: string
+  searchable?: boolean
 }
 
 export function Select({
@@ -37,6 +38,7 @@ export function Select({
   disabled,
   required,
   className,
+  searchable,
 }: SelectProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -115,7 +117,7 @@ export function Select({
 
         {open && (
           <div className="absolute z-50 mt-1 w-full rounded-xl border border-ink-200 bg-white shadow-lg">
-            {options.length > 6 && (
+            {(searchable || options.length > 6) && (
               <div className="border-b border-ink-100 p-2">
                 <input
                   ref={inputRef}

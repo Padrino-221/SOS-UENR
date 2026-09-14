@@ -1,7 +1,5 @@
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 // Base URL for links inside emails. Explicitly avoid localhost so the
 // SPMS set-password link always points at the deployed site.
@@ -40,80 +38,61 @@ function getTransporter(): Transporter | null {
   return _transporter
 }
 
-const DARK = '#0f172a'
-const MUTED = '#64748b'
+/* ------------------------------------------------------------------ */
+/*  Design tokens                                                      */
+/* ------------------------------------------------------------------ */
+const DARK = '#1a1a2e'
+const MUTED = '#6b7280'
 const SURFACE = '#ffffff'
-const PAGE_BG = '#f1f5f9'
-const BORDER = '#e2e8f0'
-const FONT = "'Radio Canada Big',Arial,Helvetica,sans-serif"
+const PAGE_BG = '#f3f4f6'
+const BORDER = '#e5e7eb'
+const ACCENT = '#2563eb'
+const FONT = "Arial, Helvetica, sans-serif"
 
-function loadPng(name: string): string | null {
-  try {
-    const buf = readFileSync(join(process.cwd(), 'public', 'email-images', `${name}.png`))
-    return `data:image/png;base64,${buf.toString('base64')}`
-  } catch (err) {
-    console.warn(`[email] Missing image public/email-images/${name}.png`, err)
-    return null
-  }
-}
-
-let _images: Record<string, string | null> | null = null
-function getImages() {
-  if (!_images) {
-    _images = {
-      heroSetPassword: loadPng('hero-set-password'),
-      heroWelcome: loadPng('hero-welcome'),
-      heroAccessRemoved: loadPng('hero-access-removed'),
-      btnSetPassword: loadPng('btn-set-password'),
-      btnWelcome: loadPng('btn-welcome'),
-    }
-  }
-  return _images
-}
-
-function emailTemplate({ heroImg, body }: {
-  heroImg: string | null
-  body: string
-}) {
-  const heroSection = heroImg
-    ? `<tr><td style="padding:0;font-family:${FONT};"><img src="${heroImg}" alt="" width="560" style="display:block;width:100%;height:auto;border:0;font-family:${FONT};" /></td></tr>`
-    : ''
+/* ------------------------------------------------------------------ */
+/*  Shared email wrapper — clean card, no accent bars, no hero image   */
+/* ------------------------------------------------------------------ */
+function emailTemplate({ body }: { body: string }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="light only" />
   <!--[if mso]>
   <style type="text/css">
-    body, table, td, p, h1, h2, h3 { font-family:Arial,Helvetica,sans-serif !important; }
+    body, table, td, p { font-family: Arial, Helvetica, sans-serif !important; }
   </style>
   <![endif]-->
 </head>
-<body style="margin:0;padding:0;background:${PAGE_BG};font-family:${FONT};color:${DARK};">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:${PAGE_BG};padding:24px 12px;font-family:${FONT};">
+<body style="margin:0;padding:0;background:${PAGE_BG};font-family:${FONT};">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+    style="background:${PAGE_BG};padding:40px 16px;font-family:${FONT};">
     <tr>
-      <td align="center" style="font-family:${FONT};">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-card" style="width:100%;max-width:560px;background:${SURFACE};border-radius:16px;overflow:hidden;border:1px solid ${BORDER};font-family:${FONT};">
-
-          ${heroSection}
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+          style="max-width:560px;background:${SURFACE};border-radius:12px;border:1px solid ${BORDER};overflow:hidden;font-family:${FONT};">
 
           <!-- Body -->
           <tr>
-            <td style="padding:30px 32px 26px;font-size:16px;line-height:1.7;color:${DARK};word-break:break-word;font-family:${FONT};">
+            <td style="padding:40px 36px 36px;font-family:${FONT};">
               ${body}
             </td>
           </tr>
 
-          <!-- Footer -->
+        </table>
+
+        <!-- Footer -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+          style="max-width:560px;font-family:${FONT};">
           <tr>
-            <td style="padding:0 32px 28px;font-family:${FONT};">
-              <div style="height:1px;background:${BORDER};margin-bottom:18px;font-family:${FONT};"></div>
-              <p style="margin:0;font-size:12px;line-height:1.6;color:${MUTED};font-family:${FONT};">School of Sciences &middot; University of Energy and Natural Resources, Sunyani, Ghana</p>
+            <td style="padding:20px 0 0;text-align:center;font-family:${FONT};">
+              <p style="margin:0;font-size:12px;line-height:1.6;color:${MUTED};font-family:${FONT};">
+                &copy; ${new Date().getFullYear()} School of Sciences &middot; University of Energy and Natural Resources, Sunyani
+              </p>
             </td>
           </tr>
-
         </table>
+
       </td>
     </tr>
   </table>
@@ -121,6 +100,9 @@ function emailTemplate({ heroImg, body }: {
 </html>`
 }
 
+/* ------------------------------------------------------------------ */
+/*  sendSpmsAccessEmail — onboarding / set-password                    */
+/* ------------------------------------------------------------------ */
 export async function sendSpmsAccessEmail({
   name,
   email,
@@ -131,47 +113,37 @@ export async function sendSpmsAccessEmail({
   token: string
 }) {
   const url = `${SITE_URL}/spms/set-password?token=${token}`
-  const btnImg = getImages().btnSetPassword
-  const ctaHtml = btnImg
-    ? `<a href="${url}" style="display:inline-block;font-family:${FONT};"><img src="${btnImg}" alt="Set Your Password" width="240" style="display:block;border:0;font-family:${FONT};" /></a>`
-    : `<a href="${url}" style="display:inline-block;padding:12px 28px;background:#0D2063;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;font-family:${FONT};">Set Your Password</a>`
+  const displayName = name.trim().toUpperCase()
 
   const body = `
-    <p style="margin:0 0 14px;font-size:16px;line-height:1.7;color:${DARK};font-family:${FONT};">Hi ${name},</p>
-    <p style="margin:0 0 20px;font-size:16px;line-height:1.7;color:${DARK};font-family:${FONT};">You've been granted access to the <strong>Student Project Management System</strong> (SPMS). Set your password below to activate your account.</p>
+    <p style="margin:0 0 20px;font-size:18px;font-weight:700;color:${DARK};font-family:${FONT};">Hello, ${displayName},</p>
 
-    <!-- Steps -->
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 24px;font-family:${FONT};">
-      <tr>
-        <td style="padding:8px 0;vertical-align:top;width:32px;font-family:${FONT};">
-          <span style="display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:#0D2063;color:#ffffff;font-size:11px;font-weight:700;font-family:${FONT};">1</span>
-        </td>
-        <td style="padding:8px 0 8px 10px;font-size:14px;color:${DARK};line-height:1.6;font-family:${FONT};">Click the button below to go to the password page</td>
-      </tr>
-      <tr>
-        <td style="padding:8px 0;vertical-align:top;width:32px;font-family:${FONT};">
-          <span style="display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:#0D2063;color:#ffffff;font-size:11px;font-weight:700;font-family:${FONT};">2</span>
-        </td>
-        <td style="padding:8px 0 8px 10px;font-size:14px;color:${DARK};line-height:1.6;font-family:${FONT};">Create a strong, memorable password</td>
-      </tr>
-      <tr>
-        <td style="padding:8px 0;vertical-align:top;width:32px;font-family:${FONT};">
-          <span style="display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:#0D2063;color:#ffffff;font-size:11px;font-weight:700;font-family:${FONT};">3</span>
-        </td>
-        <td style="padding:8px 0 8px 10px;font-size:14px;color:${DARK};line-height:1.6;font-family:${FONT};">Log in and start managing your projects</td>
-      </tr>
-    </table>
+    <p style="margin:0 0 10px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">
+      Your account has been successfully created for the <strong>Student Project Management System (SPMS)</strong>.
+    </p>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">
+      Click the button below to set your password and activate your account.
+    </p>
 
     <!-- CTA Button -->
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0;font-family:${FONT};">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 28px;font-family:${FONT};">
       <tr>
-        <td style="font-family:${FONT};">
-          ${ctaHtml}
+        <td align="center" bgcolor="${ACCENT}" style="border-radius:8px;font-family:${FONT};">
+          <a href="${url}" target="_blank"
+            style="display:inline-block;padding:13px 32px;font-family:${FONT};font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
+            Set Your Password
+          </a>
         </td>
       </tr>
     </table>
 
-    <p style="margin:22px 0 0;font-size:13px;line-height:1.6;color:${MUTED};font-family:${FONT};">This link expires in 48 hours. If you did not expect this email, you can safely ignore it.</p>
+    <p style="margin:0 0 24px;font-size:14px;line-height:1.7;color:${MUTED};font-family:${FONT};">
+      If you have any questions, feel free to contact our support team.
+    </p>
+
+    <p style="margin:0;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">Thank you,<br/>
+      <strong style="font-family:${FONT};">School of Sciences &mdash; Support Team</strong>
+    </p>
   `
 
   const transporter = getTransporter()
@@ -180,13 +152,13 @@ export async function sendSpmsAccessEmail({
     from: FROM_EMAIL,
     to: email,
     subject: 'SPMS Access \u2014 Set Your Password',
-    html: emailTemplate({
-      heroImg: getImages().heroSetPassword,
-      body,
-    }),
+    html: emailTemplate({ body }),
   })
 }
 
+/* ------------------------------------------------------------------ */
+/*  sendSpmsAccessRevokedEmail — access removed notification           */
+/* ------------------------------------------------------------------ */
 export async function sendSpmsAccessRevokedEmail({
   name,
   email,
@@ -194,10 +166,21 @@ export async function sendSpmsAccessRevokedEmail({
   name: string
   email: string
 }) {
+  const displayName = name.trim().toUpperCase()
+
   const body = `
-    <p style="margin:0 0 14px;font-size:16px;line-height:1.7;color:${DARK};font-family:${FONT};">Hi ${name},</p>
-    <p style="margin:0;font-size:16px;line-height:1.7;color:${DARK};font-family:${FONT};">Your access to the <strong>Student Project Management System</strong> (SPMS) has been removed. You will no longer be able to log in.</p>
-    <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:${MUTED};font-family:${FONT};">If you believe this was a mistake, please contact your administrator.</p>
+    <p style="margin:0 0 20px;font-size:18px;font-weight:700;color:${DARK};font-family:${FONT};">Hello, ${displayName},</p>
+
+    <p style="margin:0 0 10px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">
+      Your access to the <strong>Student Project Management System (SPMS)</strong> has been removed. You will no longer be able to log in.
+    </p>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:${MUTED};font-family:${FONT};">
+      If you believe this was a mistake, please contact your administrator.
+    </p>
+
+    <p style="margin:0;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">Thank you,<br/>
+      <strong style="font-family:${FONT};">School of Sciences &mdash; Support Team</strong>
+    </p>
   `
 
   const transporter = getTransporter()
@@ -206,9 +189,6 @@ export async function sendSpmsAccessRevokedEmail({
     from: FROM_EMAIL,
     to: email,
     subject: 'SPMS Access Removed',
-    html: emailTemplate({
-      heroImg: getImages().heroAccessRemoved,
-      body,
-    }),
+    html: emailTemplate({ body }),
   })
 }

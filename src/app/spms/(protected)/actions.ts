@@ -62,6 +62,7 @@ export async function spmsLogin(prev: unknown, formData: FormData) {
     email: staff.email ?? '',
     name: staff.name,
     departmentId: staff.departmentId,
+    programmeId: staff.programmeId,
   })
 
   // If password not yet set, redirect to change-password page

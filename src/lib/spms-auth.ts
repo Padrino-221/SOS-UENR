@@ -10,6 +10,7 @@ export interface SpmsSession {
   email: string
   name: string
   departmentId: string | null
+  programmeId: string | null
   role: 'LECTURER' | 'ADMIN'
 }
 
@@ -47,6 +48,7 @@ function verifySpmsToken(token: string): SpmsSession | null {
       email: payload.email,
       name: payload.name,
       departmentId: payload.departmentId,
+      programmeId: payload.programmeId,
       role: payload.role,
     }
   } catch {
@@ -59,12 +61,14 @@ export async function createSpmsSession(staff: {
   email: string
   name: string
   departmentId: string | null
+  programmeId: string | null
 }) {
   const session: SpmsSession = {
     staffId: staff.id,
     email: staff.email,
     name: staff.name,
     departmentId: staff.departmentId,
+    programmeId: staff.programmeId,
     role: staff.departmentId ? 'LECTURER' : 'ADMIN',
   }
 

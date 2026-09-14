@@ -35,6 +35,7 @@ export default async function NewProjectPage() {
       programmes={programmes}
       isAdmin={isAdmin}
       currentUserId={session.staffId}
+      currentProgrammeId={session.programmeId}
     />
   )
 }

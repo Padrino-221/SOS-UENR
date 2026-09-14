@@ -41,6 +41,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
       programmes={programmes}
       isAdmin={isAdmin}
       currentUserId={session.staffId}
+      currentProgrammeId={session.programmeId}
     />
   )
 }
