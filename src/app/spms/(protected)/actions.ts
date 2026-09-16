@@ -11,6 +11,7 @@ import {
   requireSpmsAuth,
   requireSpmsAdmin,
 } from '@/lib/spms-auth'
+import { sendAnnouncementEmail } from '@/lib/email'
 import type { DegreeLevel } from '@prisma/client'
 
 // ---------- Auth ----------
@@ -344,4 +345,53 @@ export async function updateSpmsProfile(prev: unknown, formData: FormData) {
   revalidatePath('/spms/profile')
   revalidatePath('/spms/dashboard')
   return { success: true }
+}
+
+// ---------- Announcements ----------
+
+export async function sendSpmsAnnouncement(prev: unknown, formData: FormData) {
+  await requireSpmsAdmin()
+
+  const subject = String(formData.get('subject') ?? '').trim()
+  const body = String(formData.get('body') ?? '').trim()
+
+  if (!subject || subject.length < 3) return { error: 'Subject must be at least 3 characters.' }
+  if (!body || body.length < 10) return { error: 'Message body must be at least 10 characters.' }
+
+  const recipients = await prisma.staff.findMany({
+    where: { spmsAccess: true, email: { not: null } },
+    select: { id: true, name: true, email: true },
+    orderBy: { name: 'asc' },
+  })
+
+  if (recipients.length === 0) return { error: 'No staff with SPMS access found.' }
+
+  const session = await requireSpmsAdmin()
+  let sent = 0
+
+  for (const r of recipients) {
+    try {
+      await sendAnnouncementEmail({
+        name: r.name,
+        email: r.email!,
+        subject,
+        body,
+      })
+      sent++
+    } catch (err) {
+      console.error(`[Announcement] Failed to send to ${r.email}:`, err)
+    }
+  }
+
+  await prisma.spmsAnnouncement.create({
+    data: {
+      subject,
+      body,
+      senderId: session.staffId,
+      recipientCount: sent,
+    },
+  })
+
+  revalidatePath('/spms/announcements')
+  return { success: true, sent, total: recipients.length }
 }

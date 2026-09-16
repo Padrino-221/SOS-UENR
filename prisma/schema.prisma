@@ -148,7 +148,19 @@ model Staff {
   executiveYearId String?
   executiveYear   AcademicYear? @relation("StaffExecutiveYear", fields: [executiveYearId], references: [id], onDelete: SetNull)
   projects     Project[]
+  announcements SpmsAnnouncement[]
   @@map("staff")
+}
+
+model SpmsAnnouncement {
+  id             String   @id @default(cuid())
+  subject        String
+  body           String
+  senderId       String
+  sender         Staff?   @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  recipientCount Int      @default(0)
+  sentAt         DateTime @default(now())
+  @@map("spms_announcements")
 }
 
 model ResearchArea {

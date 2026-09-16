@@ -195,3 +195,41 @@ export async function sendSpmsAccessRevokedEmail({
     html: emailTemplate({ body }),
   })
 }
+
+/* ------------------------------------------------------------------ */
+/*  sendAnnouncementEmail — one-way broadcast to a single recipient    */
+/* ------------------------------------------------------------------ */
+export async function sendAnnouncementEmail({
+  name,
+  email,
+  subject,
+  body,
+}: {
+  name: string
+  email: string
+  subject: string
+  body: string
+}) {
+  const displayName = name.trim()
+
+  const htmlBody = `
+    <p style="margin:0 0 20px;font-size:18px;font-weight:700;color:${DARK};font-family:${FONT};">Hello, ${displayName},</p>
+
+    <div style="margin:0 0 24px;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">
+      ${body}
+    </div>
+
+    <p style="margin:0;font-size:15px;line-height:1.7;color:${DARK};font-family:${FONT};">Thank you,<br/>
+      <strong style="font-family:${FONT};">School of Sciences &mdash; Support Team</strong>
+    </p>
+  `
+
+  const transporter = getTransporter()
+  if (!transporter) throw new Error('Email service not configured (SMTP_* env vars missing)')
+  await transporter.sendMail({
+    from: FROM_EMAIL,
+    to: email,
+    subject,
+    html: emailTemplate({ body: htmlBody }),
+  })
+}

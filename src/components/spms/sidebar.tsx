@@ -16,6 +16,8 @@ import {
   List,
   X,
   Flask,
+  Megaphone,
+  BookOpen,
 } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { spmsLogout } from '@/app/spms/(protected)/actions'
@@ -25,10 +27,12 @@ const nav = [
   { href: '/spms/dashboard', label: 'Dashboard', icon: SquaresFour },
   { href: '/spms/projects', label: 'Projects', icon: FolderOpen },
   { href: '/spms/records', label: 'Records', icon: Notebook },
+  { href: '/spms/manual', label: 'Manual', icon: BookOpen },
 ]
 
 const adminNav = [
   { href: '/spms/demo-flow', label: 'Demo Flow', icon: Flask },
+  { href: '/spms/announcements', label: 'Announcements', icon: Megaphone },
   { href: '/spms/settings', label: 'Settings', icon: Gear },
 ]
 
