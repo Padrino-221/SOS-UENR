@@ -11,7 +11,6 @@ import {
   requireSpmsAuth,
   requireSpmsAdmin,
 } from '@/lib/spms-auth'
-import { sendAnnouncementEmail } from '@/lib/email'
 import type { DegreeLevel } from '@prisma/client'
 
 // ---------- Auth ----------
@@ -368,6 +367,8 @@ export async function sendSpmsAnnouncement(prev: unknown, formData: FormData) {
 
   const session = await requireSpmsAdmin()
   let sent = 0
+
+  const { sendAnnouncementEmail } = await import('@/lib/email')
 
   for (const r of recipients) {
     try {
