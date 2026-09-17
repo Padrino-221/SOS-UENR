@@ -193,12 +193,6 @@ function FAQSection(): Section {
         ),
       },
       {
-        question: 'Who is my supervisor?',
-        answer: (
-          <p>Your supervisor is assigned by the administrator. Check your project details or contact your department head to find out who your supervisor is.</p>
-        ),
-      },
-      {
         question: 'Can I change my programme?',
         answer: (
           <p>Contact your administrator to update your programme assignment. This is managed in the admin panel under staff management.</p>
