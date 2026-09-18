@@ -172,7 +172,6 @@ export default async function AboutPage() {
 
       {/* VALUES — landing dark band with dot pattern */}
       <section className="section-padding bg-brand-950 relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-15 bg-[radial-gradient(rgba(255,255,255,.3)_1px,transparent_1px)] bg-[size:16px_16px]" />
         <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-gold-400/10 blur-3xl pointer-events-none" />
         <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-brand-700/20 blur-3xl pointer-events-none" />
         <div className="container-premium relative">

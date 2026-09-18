@@ -73,7 +73,6 @@ export default async function NewsPage({
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-100 to-brand-300 grid place-items-center">
                       {categoryMeta[post.category]?.icon ?? <Flask size={40} weight="duotone" className="text-brand-700" />}
                     </div>
-                    <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#d2d2cd_1px,transparent_1px)] bg-[size:12px_12px]" />
                   </div>
                   <div className="p-7 flex-1 flex flex-col">
                     <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-brand-700">

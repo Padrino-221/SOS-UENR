@@ -273,7 +273,6 @@ export default async function HomePage() {
 
       {/* VALUES — dark band with dot pattern */}
       <section className="section-padding bg-brand-950 relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-15 bg-[radial-gradient(rgba(255,255,255,.3)_1px,transparent_1px)] bg-[size:16px_16px]" />
         <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-gold-400/10 blur-3xl pointer-events-none" />
         <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-brand-700/20 blur-3xl pointer-events-none" />
         <div className="container-premium relative">
@@ -309,11 +308,10 @@ export default async function HomePage() {
             ) : (
               featuredPosts.map((post) => (
                 <Link key={post.id} href={`/news/${post.slug}`} className="warm-card overflow-hidden group flex flex-col h-full">
-                  <div className="h-56 relative overflow-hidden">
+                  <div className="h-44 sm:h-56 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-100 to-brand-300 grid place-items-center">
                       <Newspaper size={40} weight="duotone" className="text-brand-700" />
                     </div>
-                    <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#d2d2cd_1px,transparent_1px)] bg-[size:12px_12px]" />
                   </div>
                   <div className="p-7 flex-1 flex flex-col">
                     <span className="text-xs font-bold uppercase tracking-widest text-brand-700">{post.category.toLowerCase().replace('_',' ')} • {formatDate(post.publishedAt)}</span>
