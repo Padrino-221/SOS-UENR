@@ -24,6 +24,7 @@ export default async function StaffPage({
       orderBy: [{ ordering: 'asc' }, { name: 'asc' }],
     }),
     prisma.department.findMany({
+      where: { school: 'School of Sciences' },
       orderBy: { ordering: 'asc' },
       select: { id: true, name: true },
     }),

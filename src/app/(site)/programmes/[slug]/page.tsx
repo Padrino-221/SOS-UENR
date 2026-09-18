@@ -91,12 +91,6 @@ export default async function ProgrammeDetailPage({
                 <GraduationCap size={20} weight="duotone" className="text-brand-700" /> Quick facts
               </h3>
               <dl className="mt-5 space-y-3 text-sm">
-                {programme.code && (
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-ink-500">Code</dt>
-                    <dd className="font-semibold text-ink-900">{programme.code}</dd>
-                  </div>
-                )}
                 <div className="flex justify-between gap-4">
                   <dt className="text-ink-500">Level</dt>
                   <dd className="font-semibold text-ink-900 lowercase">{programme.level}</dd>

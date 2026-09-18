@@ -19,7 +19,6 @@ export default async function AdminProgrammesPage() {
     id: p.id,
     name: p.name,
     slug: p.slug,
-    code: p.code,
     level: p.level,
     mode: p.mode,
     duration: p.duration,

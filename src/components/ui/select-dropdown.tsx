@@ -81,7 +81,7 @@ export function SelectDropdown({
             if (!disabled) setOpen((o) => !o)
           }}
           className={cn(
-            'flex w-full items-center justify-between rounded-xl border bg-white px-3 py-2 text-left text-sm transition',
+            'flex w-full items-center justify-between border bg-white px-3 py-2 text-left text-sm transition',
             open
               ? 'border-system-400 ring-1 ring-system-400'
               : 'border-ink-200 hover:border-ink-300',
@@ -102,7 +102,7 @@ export function SelectDropdown({
         </button>
 
         {open && (
-          <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-ink-200 bg-white shadow-lg">
+          <div className="absolute z-50 mt-1 w-full overflow-hidden border border-ink-200 bg-white">
             {options.length > 6 && (
               <div className="border-b border-ink-100 p-2">
                 <input
@@ -110,7 +110,7 @@ export function SelectDropdown({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search…"
-                  className="w-full rounded-lg border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-system-400 focus:outline-none"
+                  className="w-full border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-system-400 focus:outline-none"
                 />
               </div>
             )}
@@ -124,7 +124,7 @@ export function SelectDropdown({
                       type="button"
                       onClick={() => handleSelect(option.value)}
                       className={cn(
-                        'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition',
+                        'flex w-full items-center justify-between px-3 py-2 text-left text-sm transition',
                         option.value === value
                           ? 'bg-system-50 text-system-700 font-medium'
                           : 'text-ink-700 hover:bg-ink-50',

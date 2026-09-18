@@ -91,7 +91,6 @@ export async function upsertProgramme(formData: FormData) {
   const id = String(formData.get('id') ?? '')
   const name = String(formData.get('name') ?? '').trim()
   const slug = String(formData.get('slug') ?? '').trim() || slugify(name)
-  const code = String(formData.get('code') ?? '').trim() || null
   const level = String(formData.get('level') ?? 'DEGREE') as ProgrammeLevel
   const mode = String(formData.get('mode') ?? '').trim() || null
   const duration = String(formData.get('duration') ?? '').trim() || null
@@ -127,7 +126,6 @@ export async function upsertProgramme(formData: FormData) {
   const data = {
     slug,
     name,
-    code,
     level,
     mode,
     duration,

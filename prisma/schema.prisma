@@ -38,6 +38,7 @@ model Department {
   slug        String   @unique
   name        String
   shortName   String?
+  school      String?  // e.g. "School of Sciences"
   summary     String
   description String   @default("")
   icon        String?
@@ -57,7 +58,6 @@ model Programme {
   id          String         @id @default(cuid())
   slug        String         @unique
   name        String
-  code        String?
   level       ProgrammeLevel @default(DEGREE)
   mode        String? // e.g. "Regular / Weekend"
   duration    String? // e.g. "4 Years"

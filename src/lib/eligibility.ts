@@ -10,7 +10,7 @@ export type ProgrammeForCheck = {
   name: string
   level: "DIPLOMA" | "DEGREE" | "POSTGRADUATE"
   summary: string
-  department?: { name: string } | null
+  department?: { name: string; school?: string | null } | null
   eligibilityRule?: EligibilityRule | null
   requirements: string // legacy text fallback
 }
@@ -80,9 +80,11 @@ function calculateAggregate(results: SubjectResult[]): number | null {
   return points.slice(0, 6).reduce((a, b) => a + b, 0)
 }
 
-function coreDisplay(cores: string[], alt: string | null | undefined): string {
-  if (alt) return `${cores.join(", ")} (or ${alt} in place of ${cores[cores.length - 1]})`
-  return cores.join(", ")
+/** Shortens a list for one-line UI copy: "A, B +2 more" */
+function shortList(items: string[], max = 2): string {
+  if (items.length === 0) return ""
+  const head = items.slice(0, max).join(", ")
+  return items.length > max ? `${head} +${items.length - max} more` : head
 }
 
 export function evaluateProgramme(
@@ -100,7 +102,7 @@ export function evaluateProgramme(
       failedGradeSubjects: [],
       aggregate: null,
       score: 0,
-      details: "Postgraduate requires degree class. See programme page.",
+      details: "Postgraduate entry is based on degree class.",
       requiresExam: false,
     }
   }
@@ -118,13 +120,13 @@ export function evaluateProgramme(
       failedGradeSubjects: [],
       aggregate: calculateAggregate(results),
       score: eligible ? 45 : 20,
-      details: "No checker data for this programme. Check programme page.",
+      details: "No checker data acquired — see the programme page.",
       requiresExam: false,
     }
   }
 
   const missingCores: string[] = []
-  const failedGradeSubjects: { subject: string; grade: WASSCEGrade }[] = []
+  const failedCoreGrades: { subject: string; grade: WASSCEGrade }[] = []
 
   // Check cores
   for (const core of rule.cores) {
@@ -141,7 +143,7 @@ export function evaluateProgramme(
       continue
     }
     if (!gradeOk(res.grade, rule.minGrade)) {
-      failedGradeSubjects.push({ subject: usedAlt ? alt! : core, grade: res.grade })
+      failedCoreGrades.push({ subject: usedAlt ? alt! : core, grade: res.grade })
     }
   }
 
@@ -154,6 +156,14 @@ export function evaluateProgramme(
   if (rule.coreAlternative) coreNorms.add(normalizeSubject(rule.coreAlternative))
   // Don't double-exclude: cores are separate pool; electives are non-core subjects only
   const electivePool = results.filter((r) => !coreNorms.has(normalizeSubject(r.subject)))
+
+  // Track electives with failing grades (entered but below min)
+  const failedElectiveGrades: { subject: string; grade: WASSCEGrade }[] = []
+  for (const r of electivePool) {
+    if (!gradeOk(r.grade, rule.minGrade)) {
+      failedElectiveGrades.push({ subject: r.subject, grade: r.grade })
+    }
+  }
 
   // Filter pool to only passed subjects with required min grade for counting toward requirements
   const passedElectives = electivePool.filter((r) => gradeOk(r.grade, rule.minGrade))
@@ -173,12 +183,21 @@ export function evaluateProgramme(
       }
     }
     if (satisfied < group.any) {
-      missingGroups.push({
-        label: group.label || group.from.join(" / "),
-        options: group.from,
-      })
+      // Check if user entered any of these subjects but with a failing grade
+      const enteredButFailed = electivePool.some(
+        (r) => subjectMatchesAny(r, group.from) && !gradeOk(r.grade, rule.minGrade),
+      )
+      if (!enteredButFailed) {
+        missingGroups.push({
+          label: group.label || group.from.join(" / "),
+          options: group.from,
+        })
+      }
     }
   }
+
+  // Combine core and elective failures for the result
+  const failedGradeSubjects = [...failedCoreGrades, ...failedElectiveGrades]
 
   // Remaining elective slots: total - groups satisfied count
   const groupsAnyTotal = rule.electiveGroups.reduce((sum, g) => sum + g.any, 0)
@@ -197,10 +216,10 @@ export function evaluateProgramme(
   const notEnoughTotal = totalPassCount < totalNeeded
 
   const aggregate = calculateAggregate(results)
-  const failedCores = missingCores.length > 0 || failedGradeSubjects.length > 0
-  const failedGroups = missingGroups.length > 0 || extraMissing > 0
+  const hasCoreProblems = missingCores.length > 0 || failedCoreGrades.length > 0
+  const hasElectiveProblems = missingGroups.length > 0 || extraMissing > 0
 
-  let eligible = !failedCores && !failedGroups && !notEnoughTotal
+  let eligible = !hasCoreProblems && !hasElectiveProblems && !notEnoughTotal
   // If aggregate cut-off exists, check it
   if (eligible && rule.aggregateCutOff && aggregate !== null) {
     if (aggregate > rule.aggregateCutOff) eligible = false
@@ -212,44 +231,45 @@ export function evaluateProgramme(
     missingCores.length <= 1 &&
     missingGroups.length <= 1 &&
     extraMissing === 0 &&
-    failedGradeSubjects.length === 0 &&
+    failedCoreGrades.length === 0 &&
     !notEnoughTotal
   )
     tier = "ALMOST"
 
   const score = (() => {
     if (eligible) {
-      // Higher score for lower aggregate (better grades)
       const aggBonus = aggregate ? Math.max(0, 20 - (aggregate - 6) * 1) : 0
       return Math.min(100, 80 + aggBonus)
     }
     if (tier === "ALMOST") return 62
     // Partial: count how many requirements met
-    const coreMet = rule.cores.length - missingCores.length - failedGradeSubjects.length
+    const coreMet = rule.cores.length - missingCores.length - failedCoreGrades.length
     const groupMet = rule.electiveGroups.length - missingGroups.length
     const base = (coreMet / Math.max(1, rule.cores.length)) * 35 + (groupMet / Math.max(1, rule.electiveGroups.length)) * 35
     return Math.max(10, Math.round(base))
   })()
 
+  // One short summary line
   let details = ""
   if (eligible) {
-    details = `Eligible — cores (${coreDisplay(rule.cores, rule.coreAlternative)}) and electives met at ${rule.minGrade}.`
+    details = `All requirements met at ${rule.minGrade} or better.`
     if (rule.requiresExam) details += " Entrance exam required."
   } else if (tier === "ALMOST") {
-    const whatsMissing = [...missingCores, ...missingGroups.map((g) => g.label)].join(", ")
     if (failedGradeSubjects.length > 0) {
-      details = `Not eligible — grade below ${rule.minGrade}: ${failedGradeSubjects.map((f) => `${f.subject} ${f.grade}`).join(", ")}.`
+      details = `Grade too low: ${shortList(failedGradeSubjects.map((f) => `${f.subject} is ${f.grade}`), 2)}. Need ${rule.minGrade} or better.`
     } else {
-      details = `Not eligible — missing: ${whatsMissing || "1 requirement"}.`
+      const whatsMissing = [...missingCores, ...missingGroups.map((g) => g.label)]
+      details = `Missing: ${shortList(whatsMissing) || "1 requirement"}.`
     }
-    if (rule.requiresExam) details += " (Requires exam if eligible.)"
+    if (rule.requiresExam) details += " Exam if admitted."
   } else {
     const parts: string[] = []
-    if (missingCores.length) parts.push(`Core: ${missingCores.join(", ")}`)
-    if (failedGradeSubjects.length) parts.push(`Below ${rule.minGrade}: ${failedGradeSubjects.map((f) => `${f.subject} ${f.grade}`).join(", ")}`)
-    if (missingGroups.length) parts.push(`Elective: ${missingGroups.map((g) => g.label).join(", ")}`)
-    if (extraMissing > 0) parts.push(`${extraMissing} more elective(s)`)
-    details = `Not eligible — ${parts.join(" · ") || "requirements not met"}.`
+    if (missingCores.length) parts.push(`Missing core: ${shortList(missingCores)}`)
+    if (failedCoreGrades.length) parts.push(`Core grade too low: ${shortList(failedCoreGrades.map((f) => `${f.subject} is ${f.grade}`), 2)}`)
+    if (missingGroups.length) parts.push(`Missing elective: ${shortList(missingGroups.map((g) => g.label))}`)
+    if (failedElectiveGrades.length) parts.push(`Elective grade too low: ${shortList(failedElectiveGrades.map((f) => `${f.subject} is ${f.grade}`), 2)}`)
+    if (extraMissing > 0) parts.push(`${extraMissing} more elective(s) needed`)
+    details = `${parts.slice(0, 3).join(". ") || "Requirements not met"}.`
   }
 
   return {
@@ -291,7 +311,6 @@ export type Recommendation = {
 }
 
 function buildRecommendationReason(
-  programme: ProgrammeForCheck,
   result: CheckResult,
   results: SubjectResult[],
 ): string {
@@ -302,18 +321,24 @@ function buildRecommendationReason(
     .join(", ")
 
   if (result.tier === "ELIGIBLE") {
-    const exam = result.requiresExam ? " Exam required." : ""
-    return `Best match — all requirements met.${strongSubjects ? ` Strength: ${strongSubjects}.` : ""}${exam}`
+    const exam = result.requiresExam ? " Entrance exam required." : ""
+    return `All requirements met.${strongSubjects ? ` Strongest: ${strongSubjects}.` : ""}${exam}`
   }
   if (result.tier === "ALMOST") {
-    const missing = [...result.missingCores, ...result.missingGroups.map((g) => g.label)].join(", ") || "1 requirement"
-    return `Closest match — missing: ${missing}.`
+    const whatsMissing = [...result.missingCores, ...result.missingGroups.map((g) => g.label)]
+    if (result.failedGradeSubjects.length > 0) {
+      const lowGrades = result.failedGradeSubjects.map((f) => f.subject).join(", ")
+      return `Closest match — grades too low in ${lowGrades}.`
+    }
+    const missing = shortList(whatsMissing, 1) || "1 requirement"
+    return `Closest match — missing ${missing}.`
   }
   if (result.score >= 40) {
-    const missing = [...result.missingCores, ...result.missingGroups.map((g) => g.label)].slice(0, 2).join(", ")
-    return `Closest option: ${programme.name}${missing ? ` — needs ${missing}` : ""}.`
+    const whatsMissing = [...result.missingCores, ...result.missingGroups.map((g) => g.label)]
+    const missing = shortList(whatsMissing, 1)
+    return missing ? `Nearest alternative — needs ${missing}.` : "Nearest alternative that fits these grades."
   }
-  return `Closest available: ${programme.name}. Check requirements for alternate pathway.`
+  return "Requirements not met — check alternate pathways."
 }
 
 export function getTopRecommendation(
@@ -328,7 +353,7 @@ export function getTopRecommendation(
   if (!top) return null
 
   const confidence: Recommendation["confidence"] = "HIGH"
-  const reason = buildRecommendationReason(top.programme, top.result, results)
+  const reason = buildRecommendationReason(top.result, results)
   const alternatives = eligibleOnly.slice(1, 4)
 
   return { programme: top.programme, result: top.result, reason, confidence, alternatives }

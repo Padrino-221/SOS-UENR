@@ -18,7 +18,7 @@ import { getSiteSections } from '@/lib/site-content'
 export const dynamic = 'force-dynamic'
 
 export default async function AboutPage() {
-  const [departments, sections] = await Promise.all([getDepartments(), getSiteSections()])
+  const [departments, sections] = await Promise.all([getDepartments('School of Sciences'), getSiteSections()])
 
   const { about } = sections
   const storyParagraphs = about.storyBody.split('\n\n').filter(Boolean)

@@ -1,10 +1,18 @@
 'use client'
-/* eslint-disable react-hooks/set-state-in-effect -- intentional lock for School of Sciences Integrated Science requirement */
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, CheckCircle, WarningCircle, Info, GraduationCap, Sparkle, Trophy, Star } from '@phosphor-icons/react'
-import { ALL_SUBJECTS, WASSCE_GRADES, GRADE_POINTS, normalizeSubject, type WASSCEGrade } from '@/lib/subjects'
+import { useMemo, useState } from 'react'
+import {
+  ArrowClockwise,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  PencilSimple,
+  Sparkle,
+  Star,
+  Trophy,
+} from '@phosphor-icons/react'
+import { WASSCE_GRADES, GRADE_POINTS, normalizeSubject, type WASSCEGrade, type SHSTrack, SHS_TRACKS, getElectivesForTrack } from '@/lib/subjects'
 import { evaluateProgramme, rankProgrammes, getTopRecommendation, type ProgrammeForCheck, type SubjectResult, type EligibilityRule } from '@/lib/eligibility'
 import { SelectDropdown } from '@/components/ui/select-dropdown'
 
@@ -12,24 +20,26 @@ type Props = {
   programmes: ProgrammeForCheck[]
 }
 
-type CoreRow = { subject: string; grade: WASSCEGrade | '' }
-type ElectiveRow = { subject: string; grade: WASSCEGrade | '' }
+type ResultRow = { subject: string; grade: WASSCEGrade | '' }
 
-const SCIENCE_ALT_OPTIONS = ["Integrated Science", "Social Studies"] as const
-const ELECTIVE_SUBJECTS = [...new Set([...ALL_SUBJECTS].filter((s) => !["English Language","Mathematics","Integrated Science","Social Studies"].includes(s)))]
+const CORE_OPTIONS = ["Integrated Science", "Social Studies"] as const
+
+const STEPS = [
+  { label: "Track", hint: "Your SHS background" },
+  { label: "Core", hint: "English, Maths, Science/Social Studies" },
+  { label: "Electives", hint: "Your best three subjects" },
+  { label: "Results", hint: "Programmes you qualify for" },
+] as const
 
 function GradeSelect({ value, onChange }: { value: string; onChange: (v: WASSCEGrade | '') => void }) {
-  const options = WASSCE_GRADES.map((g) => ({
-    value: g,
-    label: g,
-  }))
+  const options = WASSCE_GRADES.map((g) => ({ value: g, label: g }))
   return (
     <SelectDropdown
       options={options}
       value={value}
       onChange={(v) => onChange(v as WASSCEGrade | '')}
       placeholder="Grade"
-      className="rounded-lg !py-2.5 text-sm"
+      className="ck-input"
     />
   )
 }
@@ -42,31 +52,134 @@ function SubjectSelect({ value, onChange, options, placeholder }: { value: strin
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="rounded-lg !py-2.5 text-sm"
+      className="ck-input"
     />
   )
 }
 
+function MobileStepper({ step }: { step: number }) {
+  return (
+    <div className="ck-stepper mb-4 lg:hidden">
+      <span className="ck-stepper-bar" style={{ width: `${(step / (STEPS.length - 1)) * 75}%` }} aria-hidden />
+      {STEPS.map((s, i) => (
+        <div key={s.label} className="ck-stepper-item">
+          <span className={`ck-stepper-dot ${i < step ? 'is-done' : i === step ? 'is-active' : ''}`}>
+            {i < step ? <CheckCircle size={13} weight="duotone" /> : i + 1}
+          </span>
+          <span className={`ck-stepper-label ${i <= step ? 'is-current' : ''}`}>{s.label}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function StepRail({
+  step,
+  onJump,
+  mode,
+  programmeName,
+  aggregate,
+  eligible,
+  checked,
+}: {
+  step: number
+  onJump: (i: number) => void
+  mode: 'specific' | 'best'
+  programmeName?: string
+  aggregate: number | null
+  eligible: number
+  checked: number
+}) {
+  return (
+    <aside className="ck-rail hidden lg:sticky lg:top-8 lg:block">
+      <p className="ck-rail-head">Your progress</p>
+      <ol>
+        {STEPS.map((s, i) => {
+          const done = i < step
+          const active = i === step
+          return (
+            <li key={s.label}>
+              <button
+                type="button"
+                onClick={() => onJump(i)}
+                disabled={!done}
+                aria-current={active ? 'step' : undefined}
+                className={`ck-rail-item ${active ? 'is-active' : ''}`}
+              >
+                <span className={`ck-rail-dot ${done ? 'is-done' : ''} ${active ? 'is-active' : ''}`}>
+                  {done ? <CheckCircle size={14} weight="duotone" /> : i + 1}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-bold text-ink-900">{s.label}</span>
+                  <span className="block text-xs leading-snug text-ink-500">{s.hint}</span>
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ol>
+
+      <div className="ck-rail-foot">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-ink-500">
+          {mode === 'best' ? 'Best fit' : 'Specific programme'}
+        </p>
+        {mode === 'specific' && programmeName && (
+          <p className="mt-1.5 text-xs font-medium leading-snug text-ink-700">{programmeName}</p>
+        )}
+        <dl className="mt-3 space-y-1.5 border-t border-ink-200 pt-3">
+          {aggregate !== null && (
+            <div className="flex items-baseline justify-between gap-2">
+              <dt className="text-xs text-ink-500">Best-6</dt>
+              <dd className="text-sm font-bold text-ink-900">{aggregate}</dd>
+            </div>
+          )}
+          {step === 3 && (
+            <>
+              <div className="flex items-baseline justify-between gap-2">
+                <dt className="text-xs text-ink-500">Eligible</dt>
+                <dd className="text-sm font-bold text-brand-700">{eligible}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-2">
+                <dt className="text-xs text-ink-500">Checked</dt>
+                <dd className="text-sm font-bold text-ink-900">{checked}</dd>
+              </div>
+            </>
+          )}
+        </dl>
+      </div>
+    </aside>
+  )
+}
+
 export function EligibilityChecker({ programmes }: Props) {
+  const [step, setStep] = useState(0)
   const [mode, setMode] = useState<"specific" | "best">("specific")
   const [selectedProgrammeSlug, setSelectedProgrammeSlug] = useState<string>("")
-  const [coreSecond, setCoreSecond] = useState<"Integrated Science" | "Social Studies">("Integrated Science")
-  const [cores, setCores] = useState<CoreRow[]>([
+  const [shsTrack, setShsTrack] = useState<SHSTrack>("SCIENCE")
+  const [coreThird, setCoreThird] = useState<"Integrated Science" | "Social Studies">("Integrated Science")
+  const [cores, setCores] = useState<ResultRow[]>([
     { subject: "English Language", grade: "" },
-    { subject: "Mathematics", grade: "" },
+    { subject: "Core Mathematics", grade: "" },
     { subject: "Integrated Science", grade: "" },
   ])
-  const [electives, setElectives] = useState<ElectiveRow[]>([
+  const [electives, setElectives] = useState<ResultRow[]>([
     { subject: "", grade: "" },
     { subject: "", grade: "" },
     { subject: "", grade: "" },
   ])
   const [submitted, setSubmitted] = useState(false)
   const [levelFilter, setLevelFilter] = useState<"ALL" | "DEGREE" | "DIPLOMA">("ALL")
+  const [schoolFilter, setSchoolFilter] = useState<string>("ALL")
 
-  // Keep cores[2] in sync with alt choice
-  const handleAltChange = (alt: "Integrated Science" | "Social Studies") => {
-    setCoreSecond(alt)
+  const electivesForTrack = useMemo(() => getElectivesForTrack(shsTrack), [shsTrack])
+
+  const handleTrackChange = (track: SHSTrack) => {
+    setShsTrack(track)
+    setElectives([{ subject: "", grade: "" }, { subject: "", grade: "" }, { subject: "", grade: "" }])
+  }
+
+  const handleCoreThirdChange = (alt: "Integrated Science" | "Social Studies") => {
+    setCoreThird(alt)
     setCores((prev) => {
       const copy = [...prev]
       copy[2] = { ...copy[2], subject: alt }
@@ -74,19 +187,15 @@ export function EligibilityChecker({ programmes }: Props) {
     })
   }
 
-  // For specific programme checks, School of Sciences requires Integrated Science only (per 2026/2027 requirements). Lock to Integrated Science.
-  useEffect(() => {
-    if (mode === "specific" && coreSecond !== "Integrated Science") {
-      setCoreSecond("Integrated Science")
-      setCores((prev) => {
-        const copy = [...prev]
-        copy[2] = { ...copy[2], subject: "Integrated Science" }
-        return copy
-      })
-    }
-  }, [mode, coreSecond])
-
   const eligibleProgrammes = useMemo(() => programmes.filter((p) => p.level !== "POSTGRADUATE"), [programmes])
+
+  const schools = useMemo(() => {
+    const schoolSet = new Set<string>()
+    for (const p of eligibleProgrammes) {
+      if (p.department?.school) schoolSet.add(p.department.school)
+    }
+    return ["ALL", ...Array.from(schoolSet).sort()]
+  }, [eligibleProgrammes])
 
   const results: SubjectResult[] = useMemo(() => {
     const all: SubjectResult[] = []
@@ -114,28 +223,29 @@ export function EligibilityChecker({ programmes }: Props) {
   }, [submitted, results, eligibleProgrammes])
 
   const filtered = useMemo(() => {
-    if (levelFilter === "ALL") return ranked
-    return ranked.filter((r) => r.programme.level === levelFilter)
-  }, [ranked, levelFilter])
+    let result = ranked.filter((r) => r.result.tier === "ELIGIBLE")
+    if (levelFilter !== "ALL") result = result.filter((r) => r.programme.level === levelFilter)
+    if (schoolFilter !== "ALL") result = result.filter((r) => r.programme.department?.school === schoolFilter)
+    return result.slice(0, 3)
+  }, [ranked, levelFilter, schoolFilter])
 
   const summary = useMemo(() => {
     if (!submitted || ranked.length === 0) return null
     const eligible = ranked.filter((r) => r.result.tier === "ELIGIBLE").length
-    const almost = ranked.filter((r) => r.result.tier === "ALMOST").length
-    return { eligible, almost, total: ranked.length }
+    return { eligible, total: ranked.length }
   }, [ranked, submitted])
-
-  const hasEligible = useMemo(() => ranked.some((r) => r.result.tier === "ELIGIBLE"), [ranked])
 
   const topRecommendation = useMemo(() => {
     if (!submitted || mode !== "best") return null
-    const pool = levelFilter === "ALL" ? eligibleProgrammes : eligibleProgrammes.filter((p) => p.level === levelFilter)
+    let pool = eligibleProgrammes
+    if (levelFilter !== "ALL") pool = pool.filter((p) => p.level === levelFilter)
+    if (schoolFilter !== "ALL") pool = pool.filter((p) => p.department?.school === schoolFilter)
     const withParsed = pool.map((p) => ({
       ...p,
       eligibilityRule: (p.eligibilityRule as EligibilityRule | null) ?? null,
     }))
     return getTopRecommendation(results, withParsed as ProgrammeForCheck[])
-  }, [submitted, results, eligibleProgrammes, levelFilter, mode])
+  }, [submitted, results, eligibleProgrammes, levelFilter, schoolFilter, mode])
 
   const specificProgramme = useMemo(() => eligibleProgrammes.find((p) => p.slug === selectedProgrammeSlug) ?? null, [eligibleProgrammes, selectedProgrammeSlug])
   const specificResult = useMemo(() => {
@@ -143,338 +253,413 @@ export function EligibilityChecker({ programmes }: Props) {
     return evaluateProgramme(results, (specificProgramme.eligibilityRule as EligibilityRule | null) ?? null, specificProgramme as ProgrammeForCheck)
   }, [submitted, mode, specificProgramme, results])
 
+  const resetAll = () => {
+    setStep(0)
+    setMode("specific")
+    setSelectedProgrammeSlug("")
+    setShsTrack("SCIENCE")
+    setCoreThird("Integrated Science")
+    setCores([
+      { subject: "English Language", grade: "" },
+      { subject: "Core Mathematics", grade: "" },
+      { subject: "Integrated Science", grade: "" },
+    ])
+    setElectives([{ subject: "", grade: "" }, { subject: "", grade: "" }, { subject: "", grade: "" }])
+    setSubmitted(false)
+    setLevelFilter("ALL")
+    setSchoolFilter("ALL")
+  }
+
+  const goNext = () => {
+    if (step === 2) setSubmitted(true)
+    setStep((s) => Math.min(s + 1, 3))
+  }
+  const goBack = () => setStep((s) => Math.max(s - 1, 0))
+
+  const schoolOptions = schools.map((s) => ({ value: s, label: s === "ALL" ? "All schools" : s }))
+
   return (
-    <div className="space-y-8">
-      {/* Intro — short, unambiguous */}
-      <div className="card-premium p-4 sm:p-5 bg-brand-50/60 border-brand-100">
-        <div className="flex gap-2.5 sm:gap-3">
-          <span className="h-8 w-8 sm:h-9 sm:w-9 grid place-items-center rounded-lg bg-brand-700 text-white shrink-0"><Info size={16} weight="duotone" className="sm:hidden" /><Info size={18} weight="duotone" className="hidden sm:block" /></span>
-          <div className="min-w-0 flex-1 text-sm leading-relaxed text-ink-700">
-            <p className="font-semibold text-ink-900 text-[13px] sm:text-sm leading-tight sm:leading-relaxed">WASSCE checker — private &amp; instant. Final decision by Admissions.</p>
-            <p className="mt-1 text-xs sm:text-sm leading-relaxed text-ink-600">Checked against UENR 2026/2027 (WASSCE A1–C6). Nothing is saved — runs on your device.</p>
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="ck-header">
+        <div className="ck-container relative">
+          <p className="ck-kicker">UENR Admissions</p>
+          <h1 className="font-display text-ink-900">Check Your Eligibility</h1>
+          <p className="ck-lede">
+            Enter your SHS background and WASSCE grades to see which programmes you qualify for.
+          </p>
         </div>
-      </div>
+      </header>
 
-      {/* Mode toggle — full width on mobile, auto on desktop */}
-      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
-        <div className="flex gap-2 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={() => { setMode("specific"); setSubmitted(false) }}
-            className={`flex-1 sm:flex-none rounded-full px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold border transition text-center ${mode === "specific" ? "bg-brand-700 text-white border-brand-700" : "bg-white border-ink-100 text-ink-700 hover:border-brand-200"}`}
-          >
-            Check specific
-          </button>
-          <button
-            type="button"
-            onClick={() => { setMode("best"); setSubmitted(false) }}
-            className={`flex-1 sm:flex-none rounded-full px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold border transition text-center ${mode === "best" ? "bg-brand-700 text-white border-brand-700" : "bg-white border-ink-100 text-ink-700 hover:border-brand-200"}`}
-          >
-            Find best fit
-          </button>
-        </div>
-        <p className="w-full text-xs leading-relaxed text-ink-500">
-          {mode === "specific" ? "Choose a programme to check if you qualify." : "Enter grades to see your top match and all eligible programmes."}
-        </p>
-      </div>
+      <div className="ck-container ck-section">
+        <div className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-8">
+          <StepRail
+            step={step}
+            onJump={setStep}
+            mode={mode}
+            programmeName={specificProgramme?.name}
+            aggregate={aggregate}
+            eligible={summary?.eligible ?? 0}
+            checked={summary?.total ?? 0}
+          />
 
-      <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-12">
-        {/* Form */}
-        <div className="lg:col-span-5">
-          <div className="card-premium p-4 sm:p-6 lg:sticky lg:top-24">
-            <h2 className="font-serif text-xl text-ink-900">Your WASSCE results</h2>
-            <p className="mt-1 text-sm text-ink-600">WASSCE A1 (best) → F9. Private — stays on your device.</p>
+          <div className="min-w-0">
+            <MobileStepper step={step} />
 
-            <div className="mt-6 space-y-5">
-              {mode === "specific" && (
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-ink-700">Programme to check</p>
-                  <div className="mt-2">
+            {/* Step 0 — track & programme */}
+            {step === 0 && (
+              <section className="ck-card">
+                <h2 className="font-display text-xl text-ink-900">What did you study?</h2>
+                <p className="mt-1.5 text-sm text-ink-500">
+                  Your track sets the electives you can pick.
+                </p>
+
+                <div className="mt-5 space-y-5">
+                  <div>
+                    <label className="ck-field-label">SHS track</label>
                     <SelectDropdown
-                      options={[...eligibleProgrammes]
-                        .sort((a, b) => a.name.localeCompare(b.name))
-                        .map((p) => ({ value: p.slug, label: `${p.name} — ${p.level.toLowerCase()}` }))}
-                      value={selectedProgrammeSlug}
-                      onChange={(v) => { setSelectedProgrammeSlug(v); setSubmitted(false) }}
-                      placeholder="Select programme"
-                      className="rounded-lg !py-2.5 text-sm"
+                      options={SHS_TRACKS.map((t) => ({ value: t.value, label: t.label }))}
+                      value={shsTrack}
+                      onChange={(v) => handleTrackChange(v as SHSTrack)}
+                      placeholder="Select track"
+                      className="ck-input"
                     />
                   </div>
-                </div>
-              )}
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-ink-700">Core subjects (3)</p>
-                <div className="mt-3 space-y-3">
-                  {cores.slice(0,2).map((c, idx) => (
-                    <div key={idx} className="grid grid-cols-5 gap-2">
-                      <div className="col-span-3 min-w-0">
-                        <div className="rounded-lg border border-ink-100 bg-ink-50 px-3 py-2.5 text-sm text-ink-800">{c.subject}</div>
-                      </div>
-                      <div className="col-span-2 min-w-0">
-                        <GradeSelect value={c.grade} onChange={(v) => setCores((prev) => { const cp=[...prev]; cp[idx]={...cp[idx], grade: v}; return cp })} />
-                      </div>
+
+                  <div>
+                    <span className="ck-field-label">What are you here to check?</span>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        onClick={() => setMode("specific")}
+                        aria-pressed={mode === "specific"}
+                        className={`ck-choice ${mode === "specific" ? "is-active" : ""}`}
+                      >
+                        <span className="ck-choice-title">Specific programme</span>
+                        <span className="ck-choice-hint">One programme you already have in mind</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMode("best")}
+                        aria-pressed={mode === "best"}
+                        className={`ck-choice ${mode === "best" ? "is-active" : ""}`}
+                      >
+                        <span className="ck-choice-title">Find best fit</span>
+                        <span className="ck-choice-hint">Rank everything you qualify for</span>
+                      </button>
                     </div>
-                  ))}
-                  {mode === "specific" ? (
-                    <div className="grid grid-cols-5 gap-2">
-                      <div className="col-span-3 min-w-0">
-                        <div className="rounded-lg border border-ink-100 bg-ink-50 px-3 py-2.5 text-sm text-ink-800">Integrated Science</div>
-                      </div>
-                      <div className="col-span-2 min-w-0">
-                        <GradeSelect value={cores[2].grade} onChange={(v) => setCores((prev) => { const cp=[...prev]; cp[2]={...cp[2], grade: v}; return cp })} />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-5 gap-2">
-                      <div className="col-span-3 min-w-0">
-                        <SubjectSelect value={coreSecond} onChange={(v) => handleAltChange(v as typeof coreSecond)} options={SCIENCE_ALT_OPTIONS} placeholder="Core" />
-                      </div>
-                      <div className="col-span-2 min-w-0">
-                        <GradeSelect value={cores[2].grade} onChange={(v) => setCores((prev) => { const cp=[...prev]; cp[2]={...cp[2], grade: v}; return cp })} />
-                      </div>
+                  </div>
+
+                  {mode === "specific" && (
+                    <div>
+                      <label className="ck-field-label">Programme</label>
+                      <SelectDropdown
+                        options={[...eligibleProgrammes]
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((p) => ({ value: p.slug, label: p.name }))}
+                        value={selectedProgrammeSlug}
+                        onChange={setSelectedProgrammeSlug}
+                        placeholder="Select programme"
+                        className="ck-input"
+                      />
                     </div>
                   )}
                 </div>
-              </div>
 
-              <div>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase tracking-widest text-ink-700">Electives (2–3)</p>
-                  <button type="button" onClick={() => setElectives((prev) => prev.length < 4 ? [...prev, {subject:"",grade:""}] : prev)} className="text-xs font-semibold text-brand-700 hover:underline">+ Add</button>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    disabled={mode === "specific" && !selectedProgrammeSlug}
+                    onClick={goNext}
+                    className="ck-btn ck-btn-primary w-full sm:w-auto"
+                  >
+                    Next <ArrowRight size={14} weight="duotone" />
+                  </button>
                 </div>
-                <div className="mt-3 space-y-3">
-                  {electives.map((e, idx) => (
-                    <div key={idx} className="grid grid-cols-5 gap-2">
-                      <div className="col-span-3 min-w-0">
-                        <SubjectSelect value={e.subject} onChange={(v) => setElectives((prev) => { const cp=[...prev]; cp[idx]={...cp[idx], subject: v}; return cp })} options={ELECTIVE_SUBJECTS} placeholder="Choose elective" />
+              </section>
+            )}
+
+            {/* Step 1 — core subjects */}
+            {step === 1 && (
+              <section className="ck-card">
+                <h2 className="font-display text-xl text-ink-900">Core subjects</h2>
+                <p className="mt-1.5 text-sm text-ink-500">
+                  Select your grade for all three.
+                </p>
+
+                <div className="mt-5 space-y-3">
+                  {cores.slice(0, 2).map((c, idx) => (
+                    <div key={c.subject} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+                      <span className="flex-1 truncate border border-ink-100 bg-ink-50 px-3 py-2.5 text-sm font-medium text-ink-800">
+                        {c.subject}
+                      </span>
+                      <div className="w-full sm:w-28 sm:shrink-0">
+                        <GradeSelect value={c.grade} onChange={(v) => setCores((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], grade: v }; return cp })} />
                       </div>
-                      <div className="col-span-2 flex gap-1">
-                        <div className="flex-1 min-w-0"><GradeSelect value={e.grade} onChange={(v) => setElectives((prev) => { const cp=[...prev]; cp[idx]={...cp[idx], grade: v}; return cp })} /></div>
+                    </div>
+                  ))}
+                  <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+                    <div className="min-w-0 flex-1">
+                      <SubjectSelect value={coreThird} onChange={(v) => handleCoreThirdChange(v as typeof coreThird)} options={CORE_OPTIONS} placeholder="3rd core" />
+                    </div>
+                    <div className="w-full sm:w-28 sm:shrink-0">
+                      <GradeSelect value={cores[2].grade} onChange={(v) => setCores((prev) => { const cp = [...prev]; cp[2] = { ...cp[2], grade: v }; return cp })} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-between">
+                  <button type="button" onClick={goBack} className="ck-btn ck-btn-secondary w-full sm:w-auto">
+                    <ArrowLeft size={14} weight="duotone" /> Back
+                  </button>
+                  <button type="button" disabled={!cores.every((c) => c.grade)} onClick={goNext} className="ck-btn ck-btn-primary w-full sm:w-auto">
+                    Next <ArrowRight size={14} weight="duotone" />
+                  </button>
+                </div>
+              </section>
+            )}
+
+            {/* Step 2 — electives */}
+            {step === 2 && (
+              <section className="ck-card">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="font-display text-xl text-ink-900">Electives</h2>
+                  <button
+                    type="button"
+                    onClick={() => setElectives((prev) => prev.length < 5 ? [...prev, { subject: "", grade: "" }] : prev)}
+                    disabled={electives.length >= 5}
+                    className="text-sm font-bold text-brand-700 hover:text-brand-800 disabled:opacity-40"
+                  >
+                    + Add subject
+                  </button>
+                </div>
+                <p className="mt-1.5 text-sm text-ink-500">
+                  Pick at least two — add up to five for a sharper match.
+                </p>
+
+                <div className="mt-5 space-y-3">
+                  {electives.map((e, idx) => (
+                    <div key={idx} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+                      <div className="min-w-0 flex-1">
+                        <SubjectSelect value={e.subject} onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], subject: v }; return cp })} options={electivesForTrack} placeholder={`Elective ${idx + 1}`} />
+                      </div>
+                      <div className="flex w-full gap-2 sm:w-auto">
+                        <div className="flex-1 sm:w-28 sm:flex-none sm:shrink-0">
+                          <GradeSelect value={e.grade} onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], grade: v }; return cp })} />
+                        </div>
                         {electives.length > 2 && (
-                          <button type="button" onClick={() => setElectives((prev) => prev.filter((_,i)=>i!==idx))} className="shrink-0 px-2 text-ink-400 hover:text-red-600 text-sm">×</button>
+                          <button
+                            type="button"
+                            aria-label={`Remove elective ${idx + 1}`}
+                            onClick={() => setElectives((prev) => prev.filter((_, i) => i !== idx))}
+                            className="shrink-0 self-center px-2 text-lg text-ink-300 hover:text-red-500 sm:px-1"
+                          >
+                            &times;
+                          </button>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
+
                 {aggregate !== null && (
-                  <p className="mt-3 text-xs text-ink-600">Your best-6 aggregate: <span className="font-bold text-ink-900">{aggregate}</span> <span className="text-ink-400">(lower is better)</span></p>
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <div className="ck-tile">
+                      <p className="ck-stat-num accent">{aggregate}</p>
+                      <p className="ck-stat-label">Best-6 aggregate</p>
+                    </div>
+                    <div className="ck-tile">
+                      <p className="ck-stat-num">{results.filter((r) => GRADE_POINTS[r.grade] <= 6).length}</p>
+                      <p className="ck-stat-label">Credit passes</p>
+                    </div>
+                  </div>
                 )}
-              </div>
 
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  disabled={!canSubmit}
-                  onClick={() => setSubmitted(true)}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-700 px-5 py-3 text-sm font-bold text-white hover:bg-brand-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  <Sparkle size={16} weight="duotone" /> {mode === "specific" ? "Check eligibility" : "Find best fit"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setCores([{subject:"English Language",grade:""},{subject:"Mathematics",grade:""},{subject:coreSecond,grade:""}]); setElectives([{subject:"",grade:""},{subject:"",grade:""},{subject:"",grade:""}]); setSubmitted(false) }}
-                  className="rounded-lg border border-ink-100 bg-white px-4 py-3 text-sm font-semibold text-ink-700 hover:border-brand-200"
-                >
-                  Reset
-                </button>
-              </div>
-              {!canSubmit && (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-                  {mode === "specific" && !selectedProgrammeSlug ? "Select a programme, then fill 3 cores and 2 electives." : "Fill 3 cores and 2 electives to check."}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="lg:col-span-7 min-w-0">
-          {!submitted ? (
-            <div className="card-premium p-6 sm:p-10 text-center">
-              <div className="mx-auto h-12 w-12 grid place-items-center rounded-full bg-brand-50 text-brand-700"><GraduationCap size={22} weight="duotone" /></div>
-              <h3 className="mt-4 font-serif text-lg text-ink-900">{mode === "specific" ? "Check one programme" : "Find your best fit"}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-600 max-w-md mx-auto">
-                {mode === "specific"
-                  ? "Select a programme on the left and enter your grades. We'll tell you clearly: eligible or not, and what's missing."
-                  : "Enter your grades and we'll rank every programme and highlight your top match. Private — stays on your device."}
-              </p>
-            </div>
-          ) : mode === "specific" ? (
-            <>
-              {specificProgramme && specificResult ? (
-                <div className={`overflow-hidden rounded-xl border-2 bg-white ${specificResult.tier==="ELIGIBLE" ? "border-emerald-500" : specificResult.tier==="ALMOST" ? "border-amber-400" : "border-ink-200"}`}>
-                  <div className={`px-5 py-3 flex items-center gap-2 text-white ${specificResult.tier==="ELIGIBLE" ? "bg-emerald-600" : specificResult.tier==="ALMOST" ? "bg-amber-500" : "bg-ink-700"}`}>
-                    <span className="h-7 w-7 grid place-items-center rounded-full bg-white/15">
-                      {specificResult.tier==="ELIGIBLE" ? <CheckCircle size={14} weight="duotone" /> : specificResult.tier==="ALMOST" ? <WarningCircle size={14} weight="duotone" /> : <Info size={14} weight="duotone" />}
-                    </span>
-                    <p className="text-xs font-bold uppercase tracking-[0.14em]">
-                      {specificResult.tier==="ELIGIBLE" ? "Eligible" : specificResult.tier==="ALMOST" ? "Not eligible — close" : "Not eligible"}
-                    </p>
-                    <span className="ml-auto rounded-full bg-white/20 px-2.5 py-1 text-xs font-bold">{specificResult.score}% match</span>
-                  </div>
-                  <div className="p-5 sm:p-6">
-                    <h3 className="font-serif text-xl sm:text-2xl text-ink-900 leading-tight">{specificProgramme.name}</h3>
-                    <p className="mt-1 text-xs font-bold uppercase tracking-widest text-brand-700">{specificProgramme.level.toLowerCase()} {specificProgramme.department ? `· ${specificProgramme.department.name}` : ""}</p>
-                    <p className="mt-3 text-sm leading-relaxed text-ink-800">{specificResult.details}</p>
-                    {(specificResult.missingCores.length > 0 || specificResult.missingGroups.length > 0 || specificResult.failedGradeSubjects.length > 0) && (
-                      <ul className="mt-3 flex flex-wrap gap-1.5">
-                        {specificResult.missingCores.map((m) => <li key={m} className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs text-amber-800">Missing: {m}</li>)}
-                        {specificResult.missingGroups.map((g) => <li key={g.label} className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs text-amber-800">Need: {g.label}</li>)}
-                        {specificResult.failedGradeSubjects.map((f) => <li key={f.subject} className="rounded-full bg-red-50 border border-red-200 px-2.5 py-1 text-xs text-red-700">{f.subject}: {f.grade} (need C6)</li>)}
-                      </ul>
-                    )}
-                    {aggregate !== null && <p className="mt-3 text-xs text-ink-500">Your best-6 aggregate: <span className="font-bold text-ink-700">{aggregate}</span></p>}
-                    {specificResult.requiresExam && <p className="mt-2 text-xs font-semibold text-ink-700">Note: This programme requires an entrance exam/interview if eligible.</p>}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Link href={`/programmes/${specificProgramme.slug}`} className="inline-flex items-center gap-2 rounded-lg bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800">View programme <ArrowRight size={14} weight="duotone" /></Link>
-                      {specificResult.tier==="ELIGIBLE" ? (
-                        <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-ink-100 bg-white px-5 py-2.5 text-sm font-bold text-ink-700 hover:border-brand-200">Apply now</a>
-                      ) : hasEligible ? (
-                        <button type="button" onClick={() => setMode("best")} className="inline-flex items-center gap-2 rounded-lg border border-ink-100 bg-white px-5 py-2.5 text-sm font-bold text-ink-700 hover:border-brand-200">Find best fit instead</button>
-                      ) : null}
-                    </div>
-                  </div>
+                <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-between">
+                  <button type="button" onClick={goBack} className="ck-btn ck-btn-secondary w-full sm:w-auto">
+                    <ArrowLeft size={14} weight="duotone" /> Back
+                  </button>
+                  <button type="button" disabled={!canSubmit} onClick={goNext} className="ck-btn ck-btn-primary w-full sm:w-auto">
+                    <Sparkle size={14} weight="duotone" /> Show results
+                  </button>
                 </div>
-              ) : (
-                <p className="text-center py-8 text-sm text-ink-600">Select a programme to check.</p>
-              )}
-              <div className="mt-6 card-premium p-5 bg-ink-50 border-ink-100">
-                <p className="text-xs font-bold uppercase tracking-widest text-ink-700">Note</p>
-                <p className="mt-2 text-sm leading-relaxed text-ink-600">Guidance only. Final decision by Admissions. WASSCE A1–C6 required.</p>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {[
-                  { k: "ALL", l: "All levels" },
-                  { k: "DEGREE", l: "Degree" },
-                  { k: "DIPLOMA", l: "Diploma" },
-                ].map((tab) => (
-                  <button key={tab.k} onClick={() => setLevelFilter(tab.k as typeof levelFilter)} className={`rounded-full px-4 py-1.5 text-xs font-bold border transition ${levelFilter===tab.k ? "bg-brand-700 text-white border-brand-700" : "bg-white border-ink-100 text-ink-600 hover:border-brand-200"}`}>{tab.l}</button>
-                ))}
-                <button onClick={() => window.print()} className="ml-auto text-xs font-semibold text-ink-600 hover:text-brand-700">Print / Save</button>
-              </div>
-
-              {summary && (
-                <div className="grid grid-cols-3 gap-3 mb-6">
-                  <div className="card-premium p-4 text-center bg-emerald-50/60 border-emerald-100">
-                    <p className="text-2xl font-serif text-emerald-700">{summary.eligible}</p>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-emerald-800">Eligible</p>
-                  </div>
-                  <div className="card-premium p-4 text-center bg-amber-50/70 border-amber-100">
-                    <p className="text-2xl font-serif text-amber-700">{summary.almost}</p>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-amber-800">Almost</p>
-                  </div>
-                  <div className="card-premium p-4 text-center bg-ink-50">
-                    <p className="text-2xl font-serif text-ink-800">{summary.total - summary.eligible - summary.almost}</p>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-ink-600">Other</p>
-                  </div>
-                </div>
-              )}
-
-              {topRecommendation && (
-                <div className="mb-8 overflow-hidden rounded-xl border-2 border-brand-700 bg-white">
-                  <div className="bg-brand-700 px-5 py-3 flex items-center gap-2 text-white">
-                    <span className="h-7 w-7 grid place-items-center rounded-full bg-white/15"><Trophy size={14} weight="duotone" /></span>
-                    <p className="text-xs font-bold uppercase tracking-[0.14em]">Top recommendation</p>
-                    <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-bold text-white">
-                      <Star size={12} weight="duotone" /> Strong match
-                    </span>
-                  </div>
-                  <div className="p-5 sm:p-6">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <h3 className="font-serif text-xl sm:text-2xl text-ink-900 leading-tight">{topRecommendation.programme.name}</h3>
-                        <p className="mt-1 text-xs font-bold uppercase tracking-widest text-brand-700">
-                          {topRecommendation.programme.level.toLowerCase()} {topRecommendation.programme.department ? `· ${topRecommendation.programme.department.name}` : ""}
-                          <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-ink-50 border border-ink-100 px-2 py-0.5 text-xs font-bold text-ink-600">{topRecommendation.result.score}% match</span>
-                        </p>
-                      </div>
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold border border-emerald-600 text-white">
-                        <CheckCircle size={14} weight="duotone" /> Eligible
-                      </span>
-                    </div>
-                    <p className="mt-3 text-sm leading-relaxed text-ink-700">{topRecommendation.reason}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-ink-600">{topRecommendation.result.details}</p>
-                    {topRecommendation.alternatives.length > 0 && (
-                      <p className="mt-3 text-xs leading-relaxed text-ink-500">
-                        Also consider: {topRecommendation.alternatives.map((a) => a.programme.name).join(" · ")}
-                      </p>
-                    )}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Link href={`/programmes/${topRecommendation.programme.slug}`} className="inline-flex items-center gap-2 rounded-lg bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800">
-                        View {topRecommendation.programme.name} <ArrowRight size={14} weight="duotone" />
-                      </Link>
-                      <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-ink-100 bg-white px-5 py-2.5 text-sm font-bold text-ink-700 hover:border-brand-200 hover:text-brand-700">Apply now</a>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {!topRecommendation && submitted && (
-                <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50/60 p-5">
-                  <p className="text-sm font-bold text-amber-900">{hasEligible ? "No eligible programmes in this level" : "No eligible programmes with these grades"}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-ink-700">
-                    {hasEligible
-                      ? "Try All levels or review the missing requirements below."
-                      : "None of the programmes will accept these results as-is. Review the missing requirements below — improving a core to C6 or adding the needed elective could make you eligible."}
+                {!canSubmit && (
+                  <p className="ck-note ck-note-warn mt-3">
+                    Add all 3 cores and 2 electives to continue.
                   </p>
-                </div>
-              )}
+                )}
+              </section>
+            )}
 
+            {/* Step 3 — results */}
+            {step === 3 && (
               <div className="space-y-4">
-                {filtered.map(({ programme, result }) => (
-                  <div key={programme.slug} className={`card-premium p-5 ${result.tier==="ELIGIBLE" ? "border-emerald-200 bg-emerald-50/30" : result.tier==="ALMOST" ? "border-amber-200 bg-amber-50/20" : "bg-white"}`}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold border ${result.tier==="ELIGIBLE" ? "bg-emerald-600 text-white border-emerald-600" : result.tier==="ALMOST" ? "bg-amber-500 text-white border-amber-500" : "bg-ink-100 text-ink-600 border-ink-100"}`}>
-                            {result.tier==="ELIGIBLE" ? <CheckCircle size={14} weight="duotone" /> : result.tier==="ALMOST" ? <WarningCircle size={14} weight="duotone" /> : <Info size={14} weight="duotone" />}
-                            {result.tier==="ELIGIBLE" ? "Eligible" : result.tier==="ALMOST" ? "Almost" : "Not eligible"}
-                          </span>
-                          <span className="text-xs font-bold uppercase tracking-widest text-brand-700">{programme.level.toLowerCase()}</span>
-                          {programme.department && <span className="text-xs text-ink-500">{programme.department.name}</span>}
-                          {result.requiresExam && <span className="rounded-full bg-ink-900 text-white px-2 py-1 text-xs">Exam</span>}
+                {/* Filters */}
+                <div className="ck-card">
+                  <div className="grid grid-cols-3 gap-1">
+                    {([{ k: "ALL", l: "All" }, { k: "DEGREE", l: "Degree" }, { k: "DIPLOMA", l: "Diploma" }] as const).map((tab) => (
+                      <button
+                        key={tab.k}
+                        type="button"
+                        onClick={() => setLevelFilter(tab.k)}
+                        className={`ck-tab ${levelFilter === tab.k ? "active" : ""}`}
+                      >
+                        {tab.l}
+                      </button>
+                    ))}
+                  </div>
+                  {schools.length > 2 && (
+                    <div className="mt-3">
+                      <label className="ck-field-label">School</label>
+                      <SelectDropdown
+                        options={schoolOptions}
+                        value={schoolFilter}
+                        onChange={setSchoolFilter}
+                        placeholder="All schools"
+                        className="ck-input"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Summary tiles */}
+                {summary && (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div className="ck-tile">
+                      <p className="ck-stat-num accent">{summary.eligible}</p>
+                      <p className="ck-stat-label">Eligible</p>
+                    </div>
+                    <div className="ck-tile">
+                      <p className="ck-stat-num">{summary.total}</p>
+                      <p className="ck-stat-label">Checked</p>
+                    </div>
+                    {aggregate !== null && (
+                      <div className="ck-tile col-span-2 sm:col-span-1">
+                        <p className="ck-stat-num">{aggregate}</p>
+                        <p className="ck-stat-label">Best-6 aggregate</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Specific result */}
+                {mode === "specific" && specificProgramme && specificResult && (
+                  <article className={`ck-card ck-card-flush ${specificResult.tier === "ELIGIBLE" ? "border-emerald-200" : ""}`}>
+                    <div className={`ck-card-head ${specificResult.tier === "ELIGIBLE" ? "ck-card-head-success" : "ck-card-head-neutral"}`}>
+                      <span className={`ck-badge ${specificResult.tier === "ELIGIBLE" ? "ck-badge-success" : "ck-badge-neutral"}`}>
+                        {specificResult.tier === "ELIGIBLE" ? "Eligible" : "Not eligible"}
+                      </span>
+                      <span className="ml-auto text-ink-500">{specificResult.score}% match</span>
+                    </div>
+                    <div className="ck-card-body">
+                      <h3 className="font-display text-lg leading-tight break-words text-ink-900">{specificProgramme.name}</h3>
+                      <p className="mt-1 text-xs font-bold uppercase tracking-widest text-brand-600">
+                        {specificProgramme.level.toLowerCase()} {specificProgramme.department?.school ? `· ${specificProgramme.department.school}` : ""}
+                      </p>
+                      <p className="mt-3 text-sm text-ink-700">{specificResult.details}</p>
+                      {(specificResult.missingCores.length > 0 || specificResult.missingGroups.length > 0 || specificResult.failedGradeSubjects.length > 0) && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {specificResult.missingCores.map((m) => <span key={m} className="ck-chip ck-chip-warn">Missing: {m}</span>)}
+                          {specificResult.missingGroups.map((g) => <span key={g.label} className="ck-chip ck-chip-warn">Missing: {g.label}</span>)}
+                          {specificResult.failedGradeSubjects.slice(0, 3).map((f) => <span key={f.subject} className="ck-chip ck-chip-error">{f.subject}: {f.grade} — need C6</span>)}
+                          {specificResult.failedGradeSubjects.length > 3 && (
+                            <span className="ck-chip ck-chip-error">+{specificResult.failedGradeSubjects.length - 3} more below grade</span>
+                          )}
                         </div>
-                        <h3 className="mt-2 font-serif text-lg leading-tight text-ink-900">{programme.name}</h3>
-                        <p className="mt-1 text-sm text-ink-600 line-clamp-2">{programme.summary}</p>
-                        <p className="mt-2 text-sm leading-relaxed text-ink-700">{result.details}</p>
-                        {(result.missingCores.length > 0 || result.missingGroups.length > 0) && (
-                          <ul className="mt-2 flex flex-wrap gap-1.5">
-                            {result.missingCores.map((m) => (
-                              <li key={m} className="rounded-full bg-white border border-amber-200 px-2.5 py-1 text-xs text-amber-800">Missing: {m}</li>
-                            ))}
-                            {result.missingGroups.map((g) => (
-                              <li key={g.label} className="rounded-full bg-white border border-amber-200 px-2.5 py-1 text-xs text-amber-800">Need: {g.label}</li>
-                            ))}
-                            {result.failedGradeSubjects.map((f) => (
-                              <li key={f.subject} className="rounded-full bg-red-50 border border-red-200 px-2.5 py-1 text-xs text-red-700">{f.subject}: {f.grade} (need C6)</li>
-                            ))}
-                          </ul>
+                      )}
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                        <Link href={`/programmes/${specificProgramme.slug}`} className="ck-btn ck-btn-primary ck-btn-sm w-full sm:w-auto">
+                          View programme <ArrowRight size={12} weight="duotone" />
+                        </Link>
+                        {specificResult.tier === "ELIGIBLE" && (
+                          <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-secondary ck-btn-sm w-full sm:w-auto">
+                            Apply
+                          </a>
                         )}
                       </div>
-                      <span className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-ink-500 shrink-0">{result.score}%</span>
                     </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Link href={`/programmes/${programme.slug}`} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-700 px-4 py-2 text-xs font-bold text-white hover:bg-brand-800">View <ArrowRight size={14} weight="duotone" /></Link>
-                      {result.tier==="ELIGIBLE" && <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-ink-100 bg-white px-4 py-2 text-xs font-bold text-ink-700 hover:border-brand-200">Apply</a>}
+                  </article>
+                )}
+
+                {/* Top recommendation */}
+                {mode === "best" && topRecommendation && (
+                  <article className="ck-card ck-card-flush border-brand-200">
+                    <div className="ck-card-head ck-card-head-brand">
+                      <Trophy size={13} weight="duotone" />
+                      <span>Top pick</span>
+                      <span className="ml-auto inline-flex items-center gap-1 bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                        <Star size={10} weight="duotone" /> Strong
+                      </span>
+                    </div>
+                    <div className="ck-card-body">
+                      <h3 className="font-display text-lg leading-tight break-words text-ink-900">{topRecommendation.programme.name}</h3>
+                      <p className="mt-1 text-xs font-bold uppercase tracking-widest text-brand-600">
+                        {topRecommendation.programme.level.toLowerCase()} {topRecommendation.programme.department?.school ? `· ${topRecommendation.programme.department.school}` : ""}
+                      </p>
+                      <p className="mt-3 text-sm text-ink-700">{topRecommendation.reason}</p>
+                      {topRecommendation.alternatives.length > 0 && (
+                        <p className="mt-2 truncate text-xs text-ink-400">
+                          Also eligible: {topRecommendation.alternatives.slice(0, 2).map((a) => a.programme.name).join(" · ")}
+                          {topRecommendation.alternatives.length > 2 ? ` +${topRecommendation.alternatives.length - 2} more` : ""}
+                        </p>
+                      )}
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                        <Link href={`/programmes/${topRecommendation.programme.slug}`} className="ck-btn ck-btn-primary ck-btn-sm w-full sm:w-auto">
+                          View programme <ArrowRight size={12} weight="duotone" />
+                        </Link>
+                        <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-secondary ck-btn-sm w-full sm:w-auto">
+                          Apply
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                )}
+
+                {mode === "best" && submitted && !topRecommendation && (
+                  <p className="ck-note ck-note-warn">
+                    No programmes match these grades yet — edit your grades to try again.
+                  </p>
+                )}
+
+                {/* Other matches */}
+                {mode === "best" && filtered.length > 0 && (
+                  <div>
+                    <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-500">Other matches</h3>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {filtered.map(({ programme, result }) => (
+                        <article key={programme.slug} className="ck-result ck-result-eligible flex flex-col">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="ck-badge ck-badge-success"><CheckCircle size={10} weight="duotone" /> Eligible</span>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">{programme.level.toLowerCase()}</span>
+                              {result.requiresExam && <span className="ck-badge ck-badge-exam">Exam</span>}
+                            </div>
+                            <span className="shrink-0 text-xs font-bold text-ink-400">{result.score}%</span>
+                          </div>
+                          <h3 className="mt-1.5 text-sm font-bold leading-tight break-words text-ink-900">{programme.name}</h3>
+                          <p className="mt-0.5 text-xs text-ink-500">{programme.department?.school}</p>
+                          <p className="mt-1 line-clamp-2 text-xs text-ink-600">{result.details}</p>
+                          <div className="mt-auto flex flex-col gap-1.5 pt-3 sm:flex-row">
+                            <Link href={`/programmes/${programme.slug}`} className="ck-btn ck-btn-primary ck-btn-xs w-full sm:w-auto">View</Link>
+                            <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-secondary ck-btn-xs w-full sm:w-auto">Apply</a>
+                          </div>
+                        </article>
+                      ))}
                     </div>
                   </div>
-                ))}
-                {filtered.length===0 && (
-                  <p className="text-center py-8 text-sm text-ink-600">No programmes in this filter.</p>
                 )}
-              </div>
 
-              <div className="mt-8 card-premium p-5 bg-ink-50 border-ink-100">
-                <p className="text-xs font-bold uppercase tracking-widest text-ink-700">Note</p>
-                <p className="mt-2 text-sm leading-relaxed text-ink-600">Guidance only — final decision by Admissions. WASSCE A1–C6.</p>
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                  <button type="button" onClick={() => { setStep(2); setSubmitted(false) }} className="ck-btn ck-btn-secondary w-full sm:w-auto">
+                    <PencilSimple size={14} weight="duotone" /> Edit grades
+                  </button>
+                  <button type="button" onClick={resetAll} className="ck-btn ck-btn-secondary w-full sm:w-auto">
+                    <ArrowClockwise size={14} weight="duotone" /> Start over
+                  </button>
+                </div>
               </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

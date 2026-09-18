@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const [departments, featuredPosts, programmes, sections] = await Promise.all([
-    getDepartments(),
+    getDepartments('School of Sciences'),
     getFeaturedPosts(3),
-    getProgrammes(),
+    getProgrammes({ school: 'School of Sciences' }),
     getSiteSections(),
   ])
 

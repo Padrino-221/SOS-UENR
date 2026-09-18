@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { GraduationCap, Clock } from '@phosphor-icons/react/dist/ssr'
 import { PageHero } from '@/components/site/page-hero'
+import { ProgrammesTable } from '@/components/site/programmes-table'
 import { getProgrammes } from '@/lib/data'
 import { getSiteSections } from '@/lib/site-content'
 import { cn } from '@/lib/utils'
@@ -30,7 +30,7 @@ export default async function ProgrammesPage({
           : null
 
   const [programmes, sections] = await Promise.all([
-    getProgrammes({ level }),
+    getProgrammes({ level, school: 'School of Sciences' }),
     getSiteSections(),
   ])
 
@@ -76,33 +76,17 @@ export default async function ProgrammesPage({
           {programmes.length === 0 ? (
             <p className="text-center py-12 text-ink-600">No programmes found in this category yet.</p>
           ) : (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {programmes.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/programmes/${p.slug}`}
-                  className="card-premium p-7 group flex flex-col h-full"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="text-xs font-bold uppercase tracking-widest text-brand-700">{p.level.toLowerCase()}</span>
-                    <span className="h-10 w-10 grid place-items-center rounded-lg bg-brand-50 text-brand-700 group-hover:bg-brand-700 group-hover:text-white transition">
-                      <GraduationCap size={18} weight="duotone" />
-                    </span>
-                  </div>
-                  <h3 className="mt-3 text-lg font-serif text-ink-900 group-hover:text-brand-700 leading-tight">{p.name}</h3>
-                  {p.department && <p className="mt-1 text-xs text-ink-500">{p.department.name}</p>}
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-600 line-clamp-3">{p.summary}</p>
-                  <div className="mt-5 flex items-center gap-3 text-xs text-ink-500">
-                    {p.duration && (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Clock size={14} weight="duotone" /> {p.duration}
-                      </span>
-                    )}
-                    {p.code && <span className="rounded-full bg-ink-50 border border-ink-100 px-2.5 py-1 text-xs font-semibold">{p.code}</span>}
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <ProgrammesTable
+              programmes={programmes.map((p) => ({
+                id: p.id,
+                slug: p.slug,
+                name: p.name,
+                level: p.level,
+                duration: p.duration,
+                summary: p.summary,
+                departmentName: p.department?.name ?? null,
+              }))}
+            />
           )}
 
           <div className="mt-12 rounded-xl bg-brand-700 p-8 sm:p-10 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-6">

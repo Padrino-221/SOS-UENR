@@ -10,7 +10,7 @@ export default async function DepartmentPage({
   params,
 }: PageProps<'/departments/[slug]'>) {
   const { slug } = await params
-  const dept = await getDepartment(slug)
+  const dept = await getDepartment(slug, 'School of Sciences')
 
   if (!dept) notFound()
 

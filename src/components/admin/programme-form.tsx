@@ -37,7 +37,6 @@ export function ProgrammeForm({
           defaultValue={programme?.slug}
           hint="Leave blank to auto-generate from the name."
         />
-        <Field label="Code" name="code" defaultValue={programme?.code} placeholder="e.g. CS" />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

@@ -6,16 +6,17 @@ export async function getSiteSetting(key: string) {
   return row?.value ?? ''
 }
 
-export async function getDepartments() {
+export async function getDepartments(school?: string) {
   return prisma.department.findMany({
+    where: school ? { school } : {},
     orderBy: { ordering: 'asc' },
     include: { _count: { select: { programmes: true } } },
   })
 }
 
-export async function getDepartment(slug: string) {
+export async function getDepartment(slug: string, school?: string) {
   return prisma.department.findUnique({
-    where: { slug },
+    where: school ? { slug, school } : { slug },
     include: {
       programmes: { where: { published: true }, orderBy: { ordering: 'asc' } },
       staff: { where: { showOnPublic: true }, orderBy: { ordering: 'asc' } },
@@ -26,6 +27,7 @@ export async function getDepartment(slug: string) {
 export async function getProgrammes(filters?: {
   level?: ProgrammeLevel | null
   departmentId?: string | null
+  school?: string | null
 }) {
   return prisma.programme.findMany({
     where: {
@@ -33,6 +35,9 @@ export async function getProgrammes(filters?: {
       ...(filters?.level ? { level: filters.level } : {}),
       ...(filters?.departmentId
         ? { departmentId: filters.departmentId }
+        : {}),
+      ...(filters?.school
+        ? { department: { school: filters.school } }
         : {}),
     },
     include: { department: true },

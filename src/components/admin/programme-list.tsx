@@ -17,7 +17,6 @@ interface ProgrammeRow {
   id: string
   name: string
   slug: string
-  code: string | null
   level: string
   mode: string | null
   duration: string | null
