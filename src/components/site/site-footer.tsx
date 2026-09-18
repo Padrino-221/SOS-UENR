@@ -79,10 +79,9 @@ export function SiteFooter({ footer, logo }: { footer: SiteFooterType; logo: str
             <Image
               src={logo}
               alt="School of Sciences logo"
-              width={48}
-              height={48}
-              className="h-12 w-12 object-cover"
-              style={{ borderRadius: '50% 50% 50% 12px' }}
+              width={44}
+              height={54}
+              className="h-12 w-auto object-contain"
             />
             <div>
               <span className="block text-lg font-extrabold tracking-[-.01em]">                {footer.brandName}

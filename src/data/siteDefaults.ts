@@ -176,7 +176,7 @@ export interface SiteSections {
 export const siteDefaults: SiteSections = {
   branding: {
     siteName: 'School of Sciences',
-    logo: '/SCHOOL OF SCIENCES LOGO OFFICIAL NEW.jpg.jpeg',
+    logo: '/logo-transparent.png',
   },
 
   hero: {

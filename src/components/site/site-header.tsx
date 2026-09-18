@@ -41,10 +41,9 @@ export function SiteHeader({
           <Image
             src={logo}
             alt="School of Sciences logo"
-            width={36}
-            height={36}
-            className="h-9 w-9 object-cover"
-            style={{ borderRadius: '50% 50% 50% 12px' }}
+            width={40}
+            height={49}
+            className="h-10 w-auto object-contain"
           />
           <span className="leading-tight">
             <span className="block text-[0.92rem] font-extrabold text-ink-900 tracking-[-.01em] whitespace-nowrap">

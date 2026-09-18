@@ -9,11 +9,11 @@ export default function NotFound() {
     <div className="flex min-h-screen flex-col bg-white">
       <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
         <Image
-          src="/SCHOOL OF SCIENCES LOGO OFFICIAL NEW.jpg.jpeg"
+          src="/logo-transparent.png"
           alt="Logo"
           width={56}
-          height={56}
-          className="mb-8 h-14 w-14 object-cover"
+          height={68}
+          className="mb-8 h-14 w-auto object-contain"
         />
         <p className="font-serif text-7xl font-bold text-brand-700">404</p>
         <h1 className="mt-4 text-3xl font-serif text-ink-900">Page not found</h1>
