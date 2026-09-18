@@ -22,12 +22,20 @@ type Props = {
 
 type ResultRow = { subject: string; grade: WASSCEGrade | '' }
 
-const CORE_OPTIONS = ["Integrated Science", "Social Studies"] as const
+const CORE_ROWS = ["English Language", "Core Mathematics", "Integrated Science", "Social Studies"] as const
+
+function makeCores(): ResultRow[] {
+  return CORE_ROWS.map((subject): ResultRow => ({ subject, grade: "" }))
+}
+
+function makeElectives(): ResultRow[] {
+  return Array.from({ length: 4 }, (): ResultRow => ({ subject: "", grade: "" }))
+}
 
 const STEPS = [
   { label: "Track", hint: "Your SHS background" },
-  { label: "Core", hint: "English, Maths, Science/Social Studies" },
-  { label: "Electives", hint: "Your best three subjects" },
+  { label: "Core", hint: "English, Maths, Science & Social" },
+  { label: "Electives", hint: "Your four best subjects" },
   { label: "Results", hint: "Programmes you qualify for" },
 ] as const
 
@@ -156,51 +164,25 @@ export function EligibilityChecker({ programmes }: Props) {
   const [mode, setMode] = useState<"specific" | "best">("specific")
   const [selectedProgrammeSlug, setSelectedProgrammeSlug] = useState<string>("")
   const [shsTrack, setShsTrack] = useState<SHSTrack>("SCIENCE")
-  const [coreThird, setCoreThird] = useState<"Integrated Science" | "Social Studies">("Integrated Science")
-  const [cores, setCores] = useState<ResultRow[]>([
-    { subject: "English Language", grade: "" },
-    { subject: "Core Mathematics", grade: "" },
-    { subject: "Integrated Science", grade: "" },
-  ])
-  const [electives, setElectives] = useState<ResultRow[]>([
-    { subject: "", grade: "" },
-    { subject: "", grade: "" },
-    { subject: "", grade: "" },
-  ])
+  const [cores, setCores] = useState<ResultRow[]>(makeCores())
+  const [electives, setElectives] = useState<ResultRow[]>(makeElectives())
   const [submitted, setSubmitted] = useState(false)
   const [levelFilter, setLevelFilter] = useState<"ALL" | "DEGREE" | "DIPLOMA">("ALL")
-  const [schoolFilter, setSchoolFilter] = useState<string>("ALL")
-
-  const electivesForTrack = useMemo(() => getElectivesForTrack(shsTrack), [shsTrack])
+  const [visiblePicks, setVisiblePicks] = useState(5)
 
   const handleTrackChange = (track: SHSTrack) => {
     setShsTrack(track)
-    setElectives([{ subject: "", grade: "" }, { subject: "", grade: "" }, { subject: "", grade: "" }])
+    setElectives(makeElectives())
   }
 
-  const handleCoreThirdChange = (alt: "Integrated Science" | "Social Studies") => {
-    setCoreThird(alt)
-    setCores((prev) => {
-      const copy = [...prev]
-      copy[2] = { ...copy[2], subject: alt }
-      return copy
-    })
-  }
+  const electivesForTrack = useMemo(() => getElectivesForTrack(shsTrack), [shsTrack])
 
   const eligibleProgrammes = useMemo(() => programmes.filter((p) => p.level !== "POSTGRADUATE"), [programmes])
-
-  const schools = useMemo(() => {
-    const schoolSet = new Set<string>()
-    for (const p of eligibleProgrammes) {
-      if (p.department?.school) schoolSet.add(p.department.school)
-    }
-    return ["ALL", ...Array.from(schoolSet).sort()]
-  }, [eligibleProgrammes])
 
   const results: SubjectResult[] = useMemo(() => {
     const all: SubjectResult[] = []
     for (const c of cores) if (c.subject && c.grade) all.push({ subject: normalizeSubject(c.subject), grade: c.grade as WASSCEGrade })
-    for (const e of electives) if (e.subject && e.grade) all.push({ subject: normalizeSubject(e.subject), grade: e.grade as WASSCEGrade })
+    for (const e of electives) if (e.subject.trim() && e.grade) all.push({ subject: normalizeSubject(e.subject), grade: e.grade as WASSCEGrade })
     return all
   }, [cores, electives])
 
@@ -211,7 +193,8 @@ export function EligibilityChecker({ programmes }: Props) {
     return pts.reduce((a, b) => a + b, 0)
   }, [results])
 
-  const canSubmit = cores.every((c) => c.grade) && electives.filter((e) => e.subject && e.grade).length >= 2 && (mode === "best" || !!selectedProgrammeSlug)
+  const filledElectives = electives.filter((e) => e.subject.trim() && e.grade).length
+  const canSubmit = cores.every((c) => c.grade) && filledElectives >= 4 && (mode === "best" || !!selectedProgrammeSlug)
 
   const ranked = useMemo(() => {
     if (!submitted) return []
@@ -225,9 +208,8 @@ export function EligibilityChecker({ programmes }: Props) {
   const filtered = useMemo(() => {
     let result = ranked.filter((r) => r.result.tier === "ELIGIBLE")
     if (levelFilter !== "ALL") result = result.filter((r) => r.programme.level === levelFilter)
-    if (schoolFilter !== "ALL") result = result.filter((r) => r.programme.department?.school === schoolFilter)
-    return result.slice(0, 3)
-  }, [ranked, levelFilter, schoolFilter])
+    return result
+  }, [ranked, levelFilter])
 
   const summary = useMemo(() => {
     if (!submitted || ranked.length === 0) return null
@@ -239,13 +221,12 @@ export function EligibilityChecker({ programmes }: Props) {
     if (!submitted || mode !== "best") return null
     let pool = eligibleProgrammes
     if (levelFilter !== "ALL") pool = pool.filter((p) => p.level === levelFilter)
-    if (schoolFilter !== "ALL") pool = pool.filter((p) => p.department?.school === schoolFilter)
     const withParsed = pool.map((p) => ({
       ...p,
       eligibilityRule: (p.eligibilityRule as EligibilityRule | null) ?? null,
     }))
     return getTopRecommendation(results, withParsed as ProgrammeForCheck[])
-  }, [submitted, results, eligibleProgrammes, levelFilter, schoolFilter, mode])
+  }, [submitted, results, eligibleProgrammes, levelFilter, mode])
 
   const specificProgramme = useMemo(() => eligibleProgrammes.find((p) => p.slug === selectedProgrammeSlug) ?? null, [eligibleProgrammes, selectedProgrammeSlug])
   const specificResult = useMemo(() => {
@@ -253,30 +234,34 @@ export function EligibilityChecker({ programmes }: Props) {
     return evaluateProgramme(results, (specificProgramme.eligibilityRule as EligibilityRule | null) ?? null, specificProgramme as ProgrammeForCheck)
   }, [submitted, mode, specificProgramme, results])
 
+  // Top pick is shown in its own highlight card; the list holds the rest.
+  const otherPicks = useMemo(
+    () => filtered.filter((r) => r.programme.slug !== topRecommendation?.programme.slug),
+    [filtered, topRecommendation],
+  )
+  const visiblePickList = otherPicks.slice(0, visiblePicks)
+  const hasMorePicks = otherPicks.length > visiblePicks
+
   const resetAll = () => {
     setStep(0)
     setMode("specific")
     setSelectedProgrammeSlug("")
     setShsTrack("SCIENCE")
-    setCoreThird("Integrated Science")
-    setCores([
-      { subject: "English Language", grade: "" },
-      { subject: "Core Mathematics", grade: "" },
-      { subject: "Integrated Science", grade: "" },
-    ])
-    setElectives([{ subject: "", grade: "" }, { subject: "", grade: "" }, { subject: "", grade: "" }])
+    setCores(makeCores())
+    setElectives(makeElectives())
     setSubmitted(false)
     setLevelFilter("ALL")
-    setSchoolFilter("ALL")
+    setVisiblePicks(5)
   }
 
   const goNext = () => {
-    if (step === 2) setSubmitted(true)
+    if (step === 2) {
+      setSubmitted(true)
+      setVisiblePicks(5)
+    }
     setStep((s) => Math.min(s + 1, 3))
   }
   const goBack = () => setStep((s) => Math.max(s - 1, 0))
-
-  const schoolOptions = schools.map((s) => ({ value: s, label: s === "ALL" ? "All schools" : s }))
 
   return (
     <div className="min-h-screen bg-white">
@@ -384,11 +369,11 @@ export function EligibilityChecker({ programmes }: Props) {
               <section className="ck-card">
                 <h2 className="font-display text-xl text-ink-900">Core subjects</h2>
                 <p className="mt-1.5 text-sm text-ink-500">
-                  Select your grade for all three.
+                  Enter your grade for all four core subjects.
                 </p>
 
                 <div className="mt-5 space-y-3">
-                  {cores.slice(0, 2).map((c, idx) => (
+                  {cores.map((c, idx) => (
                     <div key={c.subject} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
                       <span className="flex-1 truncate border border-ink-100 bg-ink-50 px-3 py-2.5 text-sm font-medium text-ink-800">
                         {c.subject}
@@ -398,14 +383,6 @@ export function EligibilityChecker({ programmes }: Props) {
                       </div>
                     </div>
                   ))}
-                  <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-                    <div className="min-w-0 flex-1">
-                      <SubjectSelect value={coreThird} onChange={(v) => handleCoreThirdChange(v as typeof coreThird)} options={CORE_OPTIONS} placeholder="3rd core" />
-                    </div>
-                    <div className="w-full sm:w-28 sm:shrink-0">
-                      <GradeSelect value={cores[2].grade} onChange={(v) => setCores((prev) => { const cp = [...prev]; cp[2] = { ...cp[2], grade: v }; return cp })} />
-                    </div>
-                  </div>
                 </div>
 
                 <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-between">
@@ -426,28 +403,44 @@ export function EligibilityChecker({ programmes }: Props) {
                   <h2 className="font-display text-xl text-ink-900">Electives</h2>
                   <button
                     type="button"
-                    onClick={() => setElectives((prev) => prev.length < 5 ? [...prev, { subject: "", grade: "" }] : prev)}
-                    disabled={electives.length >= 5}
+                    onClick={() => setElectives((prev) => prev.length < 6 ? [...prev, { subject: "", grade: "" }] : prev)}
+                    disabled={electives.length >= 6}
                     className="text-sm font-bold text-brand-700 hover:text-brand-800 disabled:opacity-40"
                   >
                     + Add subject
                   </button>
                 </div>
                 <p className="mt-1.5 text-sm text-ink-500">
-                  Pick at least two — add up to five for a sharper match.
+                  Pick your four elective subjects and their grades. Add more if you took extra.
                 </p>
 
                 <div className="mt-5 space-y-3">
                   {electives.map((e, idx) => (
                     <div key={idx} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
                       <div className="min-w-0 flex-1">
-                        <SubjectSelect value={e.subject} onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], subject: v }; return cp })} options={electivesForTrack} placeholder={`Elective ${idx + 1}`} />
+                        {idx < 4 ? (
+                          <SubjectSelect
+                            value={e.subject}
+                            onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], subject: v }; return cp })}
+                            options={electivesForTrack}
+                            placeholder={`Elective ${idx + 1}`}
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={e.subject}
+                            onChange={(ev) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], subject: ev.target.value }; return cp })}
+                            placeholder={`Elective ${idx + 1} — type subject`}
+                            autoComplete="off"
+                            className="ck-input"
+                          />
+                        )}
                       </div>
                       <div className="flex w-full gap-2 sm:w-auto">
                         <div className="flex-1 sm:w-28 sm:flex-none sm:shrink-0">
                           <GradeSelect value={e.grade} onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], grade: v }; return cp })} />
                         </div>
-                        {electives.length > 2 && (
+                        {electives.length > 4 && (
                           <button
                             type="button"
                             aria-label={`Remove elective ${idx + 1}`}
@@ -485,7 +478,7 @@ export function EligibilityChecker({ programmes }: Props) {
                 </div>
                 {!canSubmit && (
                   <p className="ck-note ck-note-warn mt-3">
-                    Add all 3 cores and 2 electives to continue.
+                    Add all 4 cores and 4 electives to continue.
                   </p>
                 )}
               </section>
@@ -501,25 +494,13 @@ export function EligibilityChecker({ programmes }: Props) {
                       <button
                         key={tab.k}
                         type="button"
-                        onClick={() => setLevelFilter(tab.k)}
+                        onClick={() => { setLevelFilter(tab.k); setVisiblePicks(5) }}
                         className={`ck-tab ${levelFilter === tab.k ? "active" : ""}`}
                       >
                         {tab.l}
                       </button>
                     ))}
                   </div>
-                  {schools.length > 2 && (
-                    <div className="mt-3">
-                      <label className="ck-field-label">School</label>
-                      <SelectDropdown
-                        options={schoolOptions}
-                        value={schoolFilter}
-                        onChange={setSchoolFilter}
-                        placeholder="All schools"
-                        className="ck-input"
-                      />
-                    </div>
-                  )}
                 </div>
 
                 {/* Summary tiles */}
@@ -621,12 +602,14 @@ export function EligibilityChecker({ programmes }: Props) {
                   </p>
                 )}
 
-                {/* Other matches */}
-                {mode === "best" && filtered.length > 0 && (
+                {/* More picks */}
+                {mode === "best" && otherPicks.length > 0 && (
                   <div>
-                    <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-500">Other matches</h3>
+                    <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-500">
+                      More picks
+                    </h3>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      {filtered.map(({ programme, result }) => (
+                      {visiblePickList.map(({ programme, result }) => (
                         <article key={programme.slug} className="ck-result ck-result-eligible flex flex-col">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-1.5">
@@ -646,11 +629,26 @@ export function EligibilityChecker({ programmes }: Props) {
                         </article>
                       ))}
                     </div>
+
+                    <div className="mt-4 flex flex-col items-center gap-2">
+                      <p className="text-xs text-ink-400">
+                        Showing {Math.min(visiblePicks, otherPicks.length)} of {otherPicks.length} more picks
+                      </p>
+                      {hasMorePicks && (
+                        <button
+                          type="button"
+                          onClick={() => setVisiblePicks((n) => n + 5)}
+                          className="ck-btn ck-btn-secondary w-full sm:w-auto"
+                        >
+                          Show more picks <ArrowRight size={14} weight="duotone" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
                 <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-                  <button type="button" onClick={() => { setStep(2); setSubmitted(false) }} className="ck-btn ck-btn-secondary w-full sm:w-auto">
+                  <button type="button" onClick={() => { setStep(2); setSubmitted(false); setVisiblePicks(5) }} className="ck-btn ck-btn-secondary w-full sm:w-auto">
                     <PencilSimple size={14} weight="duotone" /> Edit grades
                   </button>
                   <button type="button" onClick={resetAll} className="ck-btn ck-btn-secondary w-full sm:w-auto">

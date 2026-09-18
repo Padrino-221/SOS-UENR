@@ -1,4 +1,4 @@
-import { GRADE_POINTS, isWASSCEPass, normalizeSubject, type WASSCEGrade } from "./subjects"
+import { CORE_SUBJECTS, GRADE_POINTS, isWASSCEPass, normalizeSubject, type WASSCEGrade } from "./subjects"
 
 export type SubjectResult = {
   subject: string // canonical e.g. "Elective Mathematics"
@@ -128,16 +128,26 @@ export function evaluateProgramme(
   const missingCores: string[] = []
   const failedCoreGrades: { subject: string; grade: WASSCEGrade }[] = []
 
-  // Check cores
+  // Check cores. When a rule allows an alternative (e.g. Integrated Science OR
+  // Social Studies) and the student entered both, use whichever grade is better.
   for (const core of rule.cores) {
     const isLastCore = core === rule.cores[rule.cores.length - 1]
     const alt = isLastCore ? rule.coreAlternative : null
-    let res = findResultForSubject(results, core)
+    const coreRes = findResultForSubject(results, core)
+    const altRes = alt ? findResultForSubject(results, alt) : undefined
+
+    let res = coreRes
     let usedAlt = false
-    if (!res && alt) {
-      res = findResultForSubject(results, alt)
-      usedAlt = !!res
+    if (coreRes && altRes) {
+      if (GRADE_POINTS[altRes.grade] < GRADE_POINTS[coreRes.grade]) {
+        res = altRes
+        usedAlt = true
+      }
+    } else if (!coreRes && altRes) {
+      res = altRes
+      usedAlt = true
     }
+
     if (!res) {
       missingCores.push(alt ? `${core} (or ${alt})` : core)
       continue
@@ -150,11 +160,12 @@ export function evaluateProgramme(
   // Check grades for all results that are part of cores/electives — already above for cores
   // Also fail if any core grade is D7/E8/F9
 
-  // Electives: need to allocate subjects distinctively
-  // First, collect eligible elective results (exclude cores that were already counted as core)
-  const coreNorms = new Set(rule.cores.map(normalizeSubject))
+  // Electives: need to allocate subjects distinctively.
+  // Exclude every core subject (English, Maths, Science, Social) from the pool —
+  // cores are never counted as electives, even if a rule doesn't list them.
+  const coreNorms = new Set<string>(CORE_SUBJECTS.map(normalizeSubject))
+  for (const c of rule.cores) coreNorms.add(normalizeSubject(c))
   if (rule.coreAlternative) coreNorms.add(normalizeSubject(rule.coreAlternative))
-  // Don't double-exclude: cores are separate pool; electives are non-core subjects only
   const electivePool = results.filter((r) => !coreNorms.has(normalizeSubject(r.subject)))
 
   // Track electives with failing grades (entered but below min)
