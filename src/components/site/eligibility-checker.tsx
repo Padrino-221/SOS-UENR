@@ -194,7 +194,19 @@ export function EligibilityChecker({ programmes }: Props) {
   }, [results])
 
   const filledElectives = electives.filter((e) => e.subject.trim() && e.grade).length
-  const canSubmit = cores.every((c) => c.grade) && filledElectives >= 4 && (mode === "best" || !!selectedProgrammeSlug)
+  const chosenElectiveNorms = useMemo(
+    () => new Set(electives.filter((e) => e.subject.trim()).map((e) => normalizeSubject(e.subject))),
+    [electives],
+  )
+  const hasDuplicateElectives = useMemo(() => {
+    const norms = electives.filter((e) => e.subject.trim()).map((e) => normalizeSubject(e.subject))
+    return new Set(norms).size !== norms.length
+  }, [electives])
+  const canSubmit =
+    cores.every((c) => c.grade) &&
+    filledElectives >= 4 &&
+    !hasDuplicateElectives &&
+    (mode === "best" || !!selectedProgrammeSlug)
 
   const ranked = useMemo(() => {
     if (!submitted) return []
@@ -422,7 +434,10 @@ export function EligibilityChecker({ programmes }: Props) {
                           <SubjectSelect
                             value={e.subject}
                             onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], subject: v }; return cp })}
-                            options={electivesForTrack}
+                            options={electivesForTrack.filter((s) => {
+                              const norm = normalizeSubject(s)
+                              return norm === normalizeSubject(e.subject) || !chosenElectiveNorms.has(norm)
+                            })}
                             placeholder={`Elective ${idx + 1}`}
                           />
                         ) : (
@@ -478,7 +493,9 @@ export function EligibilityChecker({ programmes }: Props) {
                 </div>
                 {!canSubmit && (
                   <p className="ck-note ck-note-warn mt-3">
-                    Add all 4 cores and 4 electives to continue.
+                    {hasDuplicateElectives
+                      ? "Each elective can only be entered once — remove the duplicate to continue."
+                      : "Add all 4 cores and 4 electives to continue."}
                   </p>
                 )}
               </section>
