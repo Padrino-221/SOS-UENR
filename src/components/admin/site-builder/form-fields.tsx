@@ -97,47 +97,47 @@ export function ImageField({
 
   return (
     <div>
-      <label className="mb-1 block text-xs font-semibold text-ink-700">{label}</label>
+ <label className="mb-1 block text-xs font-semibold text-ink-700">{label}</label>
       {value ? (
-        <div className="relative inline-block">
-          <div className="relative h-32 w-32 overflow-hidden rounded-xl border border-ink-200">
+ <div className="relative inline-block">
+ <div className="relative h-32 w-32 overflow-hidden border border-ink-200">
             <Image
               src={value}
               alt={label}
               fill
               sizes="128px"
-              className="object-cover"
+ className="object-cover"
             />
           </div>
           <button
             type="button"
             onClick={() => onChange('')}
-            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
+ className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center bg-red-500 text-white hover:bg-red-600"
           >
             <X size={12} weight="duotone" />
           </button>
         </div>
       ) : (
         <label
-          className={cn(
-            'flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-ink-200 bg-ink-50 p-6 transition hover:border-brand-400 hover:bg-brand-50',
+ className={cn(
+            'flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed border-ink-200 bg-ink-50 p-6 transition hover:border-brand-400 hover:bg-brand-50',
             uploading && 'pointer-events-none opacity-60',
           )}
         >
-          <Upload size={24} className="text-ink-400" weight="duotone" />
-          <span className="text-xs font-medium text-ink-600">
+ <Upload size={24} className="text-ink-400" weight="duotone" />
+ <span className="text-xs font-medium text-ink-600">
             {uploading ? 'Uploading…' : 'Click to upload'}
           </span>
           <input
             type="file"
             accept="image/*"
-            className="hidden"
+ className="hidden"
             onChange={handleFileChange}
             disabled={uploading}
           />
         </label>
       )}
-      {hint && <p className="mt-0.5 text-[11px] text-ink-400">{hint}</p>}
+ {hint && <p className="mt-0.5 text-[11px] text-ink-400">{hint}</p>}
     </div>
   )
 }
@@ -180,37 +180,37 @@ export function MultiImageField({
 
   return (
     <div>
-      <label className="mb-1 block text-xs font-semibold text-ink-700">{label}</label>
+ <label className="mb-1 block text-xs font-semibold text-ink-700">{label}</label>
       {safeValue.length > 0 && (
-        <div className="mb-3 flex flex-wrap gap-3">
+ <div className="mb-3 flex flex-wrap gap-3">
           {safeValue.map((src, idx) => (
-            <div key={`${src}-${idx}`} className="relative h-24 w-24 overflow-hidden rounded-xl border border-ink-200">
-              <Image src={src} alt={`${label} ${idx + 1}`} fill sizes="96px" className="object-cover" />
+ <div key={`${src}-${idx}`} className="relative h-24 w-24 overflow-hidden border border-ink-200">
+ <Image src={src} alt={`${label} ${idx + 1}`} fill sizes="96px" className="object-cover" />
               <button
                 type="button"
                 onClick={() => onChange(safeValue.filter((_, i) => i !== idx))}
-                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
+ className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center bg-red-500 text-white hover:bg-red-600"
               >
                 <X size={12} weight="duotone" />
               </button>
-              <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1 py-0.5 text-[10px] font-bold text-white">{idx + 1}</span>
+ <span className="absolute bottom-1 left-1 bg-black/60 px-1 py-0.5 text-[10px] font-bold text-white">{idx + 1}</span>
             </div>
           ))}
         </div>
       )}
       <label
-        className={cn(
-          'flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-ink-200 bg-ink-50 p-4 transition hover:border-brand-400 hover:bg-brand-50',
+ className={cn(
+          'flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed border-ink-200 bg-ink-50 p-4 transition hover:border-brand-400 hover:bg-brand-50',
           uploading && 'pointer-events-none opacity-60',
         )}
       >
-        <Upload size={20} className="text-ink-400" weight="duotone" />
-        <span className="text-xs font-medium text-ink-600">
+ <Upload size={20} className="text-ink-400" weight="duotone" />
+ <span className="text-xs font-medium text-ink-600">
           {uploading ? 'Uploading…' : safeValue.length === 0 ? 'Click to upload images' : 'Add more images'}
         </span>
-        <input type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} disabled={uploading} />
+ <input type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} disabled={uploading} />
       </label>
-      {hint && <p className="mt-1 text-[11px] text-ink-400">{hint}</p>}
+ {hint && <p className="mt-1 text-[11px] text-ink-400">{hint}</p>}
     </div>
   )
 }
@@ -223,11 +223,11 @@ export function FieldGroup({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-ink-200 bg-white p-5">
-      <h4 className="mb-4 text-xs font-bold uppercase tracking-widest text-ink-400">
+ <div className="border border-ink-200 bg-white p-5">
+ <h4 className="mb-4 text-xs font-bold uppercase tracking-widest text-ink-400">
         {title}
       </h4>
-      <div className="space-y-4">{children}</div>
+ <div className="space-y-4">{children}</div>
     </div>
   )
 }

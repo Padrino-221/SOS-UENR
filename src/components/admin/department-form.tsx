@@ -9,11 +9,11 @@ export function DepartmentForm({ department }: { department?: Department | null 
   return (
     <form
       action={upsertDepartment}
-      className="grid max-w-3xl gap-6 rounded-lg border border-ink-100 bg-white p-6"
+ className="grid max-w-3xl gap-6 border border-ink-100 bg-white p-6"
     >
       {department && <input type="hidden" name="id" value={department.id} />}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field
           label="Department name"
           name="name"
@@ -27,7 +27,7 @@ export function DepartmentForm({ department }: { department?: Department | null 
           hint="Leave blank to auto-generate."
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field
           label="Short name"
           name="shortName"

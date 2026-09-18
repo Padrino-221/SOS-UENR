@@ -17,12 +17,12 @@ export function ProgrammeForm({
   return (
     <form
       action={upsertProgramme}
-      className="grid max-w-3xl gap-6 rounded-lg border border-ink-100 bg-white p-6"
+ className="grid max-w-3xl gap-6 border border-ink-100 bg-white p-6"
     >
       {programme && <input type="hidden" name="id" value={programme.id} />}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2">
+ <div className="grid gap-4 sm:grid-cols-2">
+ <div className="sm:col-span-2">
           <Field
             label="Programme name"
             name="name"
@@ -39,7 +39,7 @@ export function ProgrammeForm({
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+ <div className="grid gap-4 sm:grid-cols-3">
         <Select
           label="Level"
           name="level"
@@ -109,7 +109,7 @@ export function ProgrammeForm({
         hint='Structured rule for the checker. Empty = legacy text fallback. Example: {"level":"DEGREE","cores":["English Language","Mathematics","Integrated Science"],"coreAlternative":"Social Studies","minGrade":"C6","electiveCount":3,"electiveGroups":[{"any":1,"from":["Elective Mathematics"],"label":"Elective Mathematics"},{"any":2,"from":["Physics","Chemistry","Biology"]}]}'
       />
 
-      <div className="flex flex-wrap gap-6">
+ <div className="flex flex-wrap gap-6">
         <Toggle
           label="Published"
           name="published"
@@ -117,7 +117,7 @@ export function ProgrammeForm({
         />
       </div>
 
-      <div className="flex items-center gap-3">
+ <div className="flex items-center gap-3">
         <SubmitButton label={programme ? 'Update programme' : 'Create programme'} />
       </div>
     </form>

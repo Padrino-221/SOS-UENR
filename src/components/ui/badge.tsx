@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
 
 /**
- * Yedent Badge — uppercase 11px tracking-wide, 5px rounded, tone-based.
+ * Yedent Badge — uppercase 11px tracking-wide, square, tone-based.
  * School palette: success green, warning amber, info system (brand-blue), danger red.
  */
 const variantStyles: Record<BadgeVariant, string> = {
@@ -17,16 +17,16 @@ const variantStyles: Record<BadgeVariant, string> = {
 export interface BadgeProps {
   variant?: BadgeVariant
   children: React.ReactNode
-  className?: string
+ className?: string
 }
 
 export function Badge({ variant = 'default', children, className }: BadgeProps) {
   return (
     <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide',
+ className={cn(
+        'inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide',
         variantStyles[variant],
-        className,
+ className,
       )}
     >
       {children}

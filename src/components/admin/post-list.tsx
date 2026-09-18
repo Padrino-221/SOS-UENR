@@ -42,8 +42,8 @@ export function PostList({ posts }: { posts: PostRow[] }) {
   }
 
   const columns: Column<PostRow>[] = [
-    { key: 'title', header: 'Title', render: (p) => <span className="font-medium text-ink-900">{p.title}</span> },
-    { key: 'category', header: 'Category', render: (p) => <span className="capitalize">{p.category.replace('_', ' ').toLowerCase()}</span> },
+ { key: 'title', header: 'Title', render: (p) => <span className="font-medium text-ink-900">{p.title}</span> },
+ { key: 'category', header: 'Category', render: (p) => <span className="capitalize">{p.category.replace('_', ' ').toLowerCase()}</span> },
     { key: 'date', header: 'Date', render: (p) => formatDate(p.publishedAt) },
     {
       key: 'published',
@@ -57,12 +57,12 @@ export function PostList({ posts }: { posts: PostRow[] }) {
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (p) => (
-        <div className="flex items-center justify-end gap-2">
+ <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setEditId(p.id)}
-            className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+ className="border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
             aria-label="Edit"
           >
             <PencilSimple size={16} weight="duotone" />
@@ -74,7 +74,7 @@ export function PostList({ posts }: { posts: PostRow[] }) {
   ]
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <ToastListener />
       <PageHeader
         title="News & Events"

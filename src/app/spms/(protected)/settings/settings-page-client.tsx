@@ -62,7 +62,7 @@ export function SettingsPageClient({ years }: { years: AcademicYear[] }) {
                 <div className="flex items-center gap-3">
                   <span className="font-medium text-ink-900">{y.year}</span>
                   {y.active && (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                    <span className="bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
                       Active
                     </span>
                   )}
@@ -74,7 +74,7 @@ export function SettingsPageClient({ years }: { years: AcademicYear[] }) {
                       <input type="hidden" name="id" value={y.id} />
                       <button
                         type="submit"
-                        className="rounded-lg px-2 py-1 text-xs font-medium text-brand-600 hover:bg-brand-50"
+                        className="px-2 py-1 text-xs font-medium text-brand-600 hover:bg-brand-50"
                       >
                         Set active
                       </button>
@@ -84,7 +84,7 @@ export function SettingsPageClient({ years }: { years: AcademicYear[] }) {
                     <input type="hidden" name="id" value={y.id} />
                     <button
                       type="submit"
-                      className="rounded-lg p-1.5 text-ink-400 hover:bg-red-50 hover:text-red-600"
+                      className="p-1.5 text-ink-400 hover:bg-red-50 hover:text-red-600"
                     >
                       <Trash size={14} weight="duotone" />
                     </button>

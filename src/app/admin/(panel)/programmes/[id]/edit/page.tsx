@@ -16,10 +16,10 @@ export default async function EditProgrammePage({
   if (!programme) notFound()
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Edit programme</h2>
-        <p className="mt-1 text-sm text-ink-700">{programme.name}</p>
+ <h2 className="text-2xl font-bold">Edit programme</h2>
+ <p className="mt-1 text-sm text-ink-700">{programme.name}</p>
       </div>
       <ProgrammeForm programme={programme} departments={departments} />
     </div>

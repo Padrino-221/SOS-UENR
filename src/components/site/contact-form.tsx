@@ -34,7 +34,7 @@ export function ContactForm() {
 
   if (status === 'done') {
     return (
-      <div className="rounded-2xl bg-brand-50 p-10 text-center">
+      <div className="border border-brand-200 bg-brand-50 p-10 text-center">
         <CheckCircle size={48} className="mx-auto text-brand-600" />
         <h3 className="mt-4 text-xl font-bold text-brand-800">Message sent</h3>
         <p className="mt-2 text-brand-700">
@@ -47,7 +47,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-2xl border border-ink-100 bg-white p-6"
+      className="space-y-4"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <Input label="Full name" name="name" required />

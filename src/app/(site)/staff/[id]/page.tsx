@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, ArrowRight } from '@phosphor-icons/react/dist/ssr'
 import { getStaffMember } from '@/lib/data'
 import { getSiteSections } from '@/lib/site-content'
 import { StaffProjectsTable } from '@/components/site/staff-projects-table'
@@ -26,16 +26,14 @@ export default async function StaffDetailPage({ params }: { params: Promise<{ id
 
   return (
     <>
-      <section className="section-padding bg-ink-50 relative overflow-hidden">
-        <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-brand-100/50 blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-gold-100/40 blur-3xl pointer-events-none" />
-        <div className="container-page relative max-w-5xl">
+      <section className="section-padding bg-[#f7f7f5] relative overflow-hidden">
+        <div className="container-premium relative max-w-5xl">
           <Link href="/staff" className="inline-flex items-center gap-2 text-ink-500 hover:text-ink-900 mb-10 transition-colors">
             <ArrowLeft size={16} weight="duotone" /> Back to Staff
           </Link>
 
           <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 lg:gap-14 items-start">
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-brand-50 border border-ink-100">
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-brand-50 border border-[#e5e5e0]">
               {member.photoUrl ? (
                 <Image src={member.photoUrl} alt={member.name} fill priority sizes="(max-width:1024px) 100vw, 40vw" className="object-cover object-top" />
               ) : (
@@ -67,8 +65,9 @@ export default async function StaffDetailPage({ params }: { params: Promise<{ id
                 </div>
               )}
               {member.email && (
-                <a href={`mailto:${member.email}`} className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-700 px-6 py-3 text-sm font-bold text-white hover:bg-brand-800 transition">
-                  {member.email}
+                <a href={`mailto:${member.email}`} className="mt-8 inline-flex items-center gap-2 bg-brand-700 px-6 py-3.5 text-[0.75rem] font-extrabold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-800">
+                  Email {member.name.split(' ')[0]}
+                <ArrowRight size={14} weight="duotone" />
                 </a>
               )}
             </div>

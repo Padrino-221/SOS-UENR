@@ -51,13 +51,13 @@ export function SectionForm({ sectionKey, data, onChange }: Props) {
     case 'navigation':
       return <NavigationForm data={data as SiteSections['navigation']} set={set} />
     default:
-      return <div className="text-sm text-ink-500">Unknown section</div>
+ return <div className="text-sm text-ink-500">Unknown section</div>
   }
 }
 
 function BrandingForm({ data, set }: { data: SiteSections['branding']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Branding" description="Site name and logo" />
       <FieldGroup title="Brand">
         <TextInput label="Site Name" value={data.siteName} onChange={(v) => set('siteName', v)} />
@@ -69,7 +69,7 @@ function BrandingForm({ data, set }: { data: SiteSections['branding']; set: (k: 
 
 function HeroForm({ data, set, setNested }: { data: SiteSections['hero']; set: (k: string, v: unknown) => void; setNested: (k: string, sub: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Hero Section" description="Homepage hero banner with title, description, and stats" />
       <FieldGroup title="Content">
         <TextInput label="Badge" value={data.badge} onChange={(v) => set('badge', v)} />
@@ -108,7 +108,7 @@ function HeroForm({ data, set, setNested }: { data: SiteSections['hero']; set: (
 
 function HomeForm({ data, set, setNested }: { data: SiteSections['home']; set: (k: string, v: unknown) => void; setNested: (k: string, sub: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Home Page" description="About preview, departments, programmes, news, and CTA sections" />
       <FieldGroup title="About Preview">
         <TextInput label="Eyebrow" value={data.aboutEyebrow} onChange={(v) => set('aboutEyebrow', v)} />
@@ -156,7 +156,7 @@ function HomeForm({ data, set, setNested }: { data: SiteSections['home']; set: (
 
 function AboutForm({ data, set }: { data: SiteSections['about']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="About Page" description="Story, vision, mission, departments, and values" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -201,7 +201,7 @@ function AboutForm({ data, set }: { data: SiteSections['about']; set: (k: string
 
 function ProgrammesForm({ data, set, setNested }: { data: SiteSections['programmes']; set: (k: string, v: unknown) => void; setNested: (k: string, sub: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Programmes Page" description="Hero and admission requirements" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -219,7 +219,7 @@ function ProgrammesForm({ data, set, setNested }: { data: SiteSections['programm
 
 function NewsForm({ data, set }: { data: SiteSections['news']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="News & Events" description="Page hero content" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -231,7 +231,7 @@ function NewsForm({ data, set }: { data: SiteSections['news']; set: (k: string, 
 
 function StaffForm({ data, set }: { data: SiteSections['staff']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Staff Page" description="Page hero content for academic staff" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -243,7 +243,7 @@ function StaffForm({ data, set }: { data: SiteSections['staff']; set: (k: string
 
 function StudentLeadershipForm({ data, set }: { data: SiteSections['studentLeadership']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Student Leadership Page" description="Page hero content for student leadership" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -255,7 +255,7 @@ function StudentLeadershipForm({ data, set }: { data: SiteSections['studentLeade
 
 function LeadershipForm({ data, set }: { data: SiteSections['leadership']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Leadership Page" description="Page hero content for leadership and administration" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -267,7 +267,7 @@ function LeadershipForm({ data, set }: { data: SiteSections['leadership']; set: 
 
 function ContactForm({ data, set }: { data: SiteSections['contact']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Contact Page" description="Contact info, map, and form" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -292,7 +292,7 @@ function ContactForm({ data, set }: { data: SiteSections['contact']; set: (k: st
 
 function ProjectsForm({ data, set }: { data: SiteSections['projects']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Projects Page" description="Coming soon placeholder content" />
       <FieldGroup title="Hero">
         <TextInput label="Title" value={data.heroTitle} onChange={(v) => set('heroTitle', v)} />
@@ -316,7 +316,7 @@ function ProjectsForm({ data, set }: { data: SiteSections['projects']; set: (k: 
 
 function FooterForm({ data, set }: { data: SiteSections['footer']; set: (k: string, v: unknown) => void }) {
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Footer" description="Brand, links, contact info, and copyright" />
       <FieldGroup title="Brand">
         <TextInput label="Brand Name" value={data.brandName} onChange={(v) => set('brandName', v)} />
@@ -399,7 +399,7 @@ function NavigationForm({ data, set }: { data: SiteSections['navigation']; set: 
   }
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <SectionHeader title="Navigation" description="Top bar, navigation items, and CTA button" />
       <FieldGroup title="Top Bar">
         <TextInput label="Text" value={data.topBarText} onChange={(v) => set('topBarText', v)} />
@@ -411,65 +411,65 @@ function NavigationForm({ data, set }: { data: SiteSections['navigation']; set: 
         <TextInput label="Link" value={data.ctaHref} onChange={(v) => set('ctaHref', v)} />
       </FieldGroup>
       <FieldGroup title="Navigation Items">
-        <div className="mb-2 flex items-center justify-between">
-          <label className="text-xs font-semibold text-ink-700">Items</label>
+ <div className="mb-2 flex items-center justify-between">
+ <label className="text-xs font-semibold text-ink-700">Items</label>
           <button
             type="button"
             onClick={addItem}
-            className="inline-flex items-center gap-1 rounded-lg bg-brand-50 px-2 py-1 text-[11px] font-bold text-brand-700 hover:bg-brand-100"
+ className="inline-flex items-center gap-1 bg-brand-50 px-2 py-1 text-[11px] font-bold text-brand-700 hover:bg-brand-100"
           >
             <Plus size={12} weight="duotone" /> Add
           </button>
         </div>
-        <div className="space-y-4">
+ <div className="space-y-4">
           {data.items.map((item, i) => (
-            <div key={i} className="rounded-xl border border-ink-100 bg-ink-50/50 p-3 space-y-2">
-              <div className="flex items-start gap-2">
-                <div className="flex-1 space-y-2">
+ <div key={i} className="border border-ink-100 bg-ink-50/50 p-3 space-y-2">
+ <div className="flex items-start gap-2">
+ <div className="flex-1 space-y-2">
                   <input
                     value={item.label}
                     onChange={(e) => updateItem(i, 'label', e.target.value)}
                     placeholder="Label"
-                    className="w-full rounded-lg border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
+ className="w-full border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
                   />
                   <input
                     value={item.href}
                     onChange={(e) => updateItem(i, 'href', e.target.value)}
                     placeholder="Link"
-                    className="w-full rounded-lg border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
+ className="w-full border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => removeItem(i)}
-                  className="mt-1 rounded-lg p-1.5 text-ink-400 hover:bg-red-50 hover:text-red-600"
+ className="mt-1 p-1.5 text-ink-400 hover:bg-red-50 hover:text-red-600"
                 >
                   <Trash size={14} weight="duotone" />
                 </button>
               </div>
               {item.children && item.children.length > 0 && (
-                <div className="ml-4 space-y-2 border-l-2 border-ink-200 pl-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-ink-400">Children</p>
+ <div className="ml-4 space-y-2 border-l-2 border-ink-200 pl-3">
+ <p className="text-[10px] font-bold uppercase tracking-widest text-ink-400">Children</p>
                   {item.children.map((child, j) => (
-                    <div key={j} className="flex items-start gap-2">
-                      <div className="flex-1 space-y-1">
+ <div key={j} className="flex items-start gap-2">
+ <div className="flex-1 space-y-1">
                         <input
                           value={child.label}
                           onChange={(e) => updateChild(i, j, 'label', e.target.value)}
                           placeholder="Child label"
-                          className="w-full rounded-lg border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
+ className="w-full border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
                         />
                         <input
                           value={child.href}
                           onChange={(e) => updateChild(i, j, 'href', e.target.value)}
                           placeholder="Child link"
-                          className="w-full rounded-lg border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
+ className="w-full border border-ink-200 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-400 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 focus:outline-none"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={() => removeChild(i, j)}
-                        className="mt-1 rounded-lg p-1 text-ink-400 hover:bg-red-50 hover:text-red-600"
+ className="mt-1 p-1 text-ink-400 hover:bg-red-50 hover:text-red-600"
                       >
                         <Trash size={12} weight="duotone" />
                       </button>
@@ -480,7 +480,7 @@ function NavigationForm({ data, set }: { data: SiteSections['navigation']; set: 
               <button
                 type="button"
                 onClick={() => addChild(i)}
-                className="ml-4 inline-flex items-center gap-1 rounded-lg bg-white px-2 py-1 text-[10px] font-bold text-brand-700 hover:bg-brand-50"
+ className="ml-4 inline-flex items-center gap-1 bg-white px-2 py-1 text-[10px] font-bold text-brand-700 hover:bg-brand-50"
               >
                 <Plus size={10} weight="duotone" /> Add Child
               </button>
@@ -495,8 +495,8 @@ function NavigationForm({ data, set }: { data: SiteSections['navigation']; set: 
 function SectionHeader({ title, description }: { title: string; description: string }) {
   return (
     <div>
-      <h3 className="text-lg font-bold text-ink-900">{title}</h3>
-      <p className="text-sm text-ink-500">{description}</p>
+ <h3 className="text-lg font-bold text-ink-900">{title}</h3>
+ <p className="text-sm text-ink-500">{description}</p>
     </div>
   )
 }

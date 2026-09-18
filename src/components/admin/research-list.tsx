@@ -22,7 +22,7 @@ export function ResearchList({ areas }: { areas: ResearchRow[] }) {
   const editArea = areas.find((a) => a.id === editId) ?? null
 
   const columns: Column<ResearchRow>[] = [
-    { key: 'title', header: 'Title', render: (a) => <span className="font-medium text-ink-900">{a.title}</span> },
+ { key: 'title', header: 'Title', render: (a) => <span className="font-medium text-ink-900">{a.title}</span> },
     {
       key: 'published',
       header: 'Status',
@@ -35,12 +35,12 @@ export function ResearchList({ areas }: { areas: ResearchRow[] }) {
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (a) => (
-        <div className="flex items-center justify-end gap-2">
+ <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setEditId(a.id)}
-            className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-system-300 hover:bg-system-50 hover:text-system-700"
+ className="border border-ink-200 p-2 text-ink-600 transition hover:border-system-300 hover:bg-system-50 hover:text-system-700"
             aria-label="Edit"
           >
             <PencilSimple size={16} weight="duotone" />
@@ -55,7 +55,7 @@ export function ResearchList({ areas }: { areas: ResearchRow[] }) {
   ]
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <PageHeader
         title="Research Areas"
         description="Manage research areas & centres."

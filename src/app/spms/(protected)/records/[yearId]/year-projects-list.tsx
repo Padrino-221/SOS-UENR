@@ -106,7 +106,7 @@ export function YearProjectsList({ projects }: YearProjectsListProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={cn(
-                        'rounded-lg p-1.5 transition',
+                        'p-1.5 transition',
                         p.githubLink
                           ? 'text-ink-500 hover:bg-brand-50 hover:text-brand-700'
                           : 'text-ink-300 pointer-events-none',
@@ -120,7 +120,7 @@ export function YearProjectsList({ projects }: YearProjectsListProps) {
                       href={`/projects/${p.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-lg p-1.5 text-ink-500 transition hover:bg-brand-50 hover:text-brand-700"
+                      className="p-1.5 text-ink-500 transition hover:bg-brand-50 hover:text-brand-700"
                     >
                       <Globe size={15} weight="duotone" />
                     </a>
@@ -131,7 +131,7 @@ export function YearProjectsList({ projects }: YearProjectsListProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={cn(
-                        'rounded-lg p-1.5 transition',
+                        'p-1.5 transition',
                         p.documentUrl
                           ? 'text-ink-500 hover:bg-brand-50 hover:text-brand-700'
                           : 'text-ink-300 pointer-events-none',

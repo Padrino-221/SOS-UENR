@@ -61,19 +61,23 @@ export default async function LeadershipPage() {
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Leadership' }]}
       />
 
-      <section className="py-16 bg-white">
-        <div className="container-page">
+      <section className="section-padding bg-[#f7f7f5]">
+        <div className="container-premium">
           {staff.length === 0 ? (
-            <p className="text-ink-700">Profiles are being updated. Please check back soon.</p>
+            <div className="border border-dashed border-ink-300 bg-white p-12 text-center">
+              <p className="font-serif text-ink-900">Profiles are being updated.</p>
+              <p className="mt-2 text-sm text-ink-500">Please check back soon.</p>
+            </div>
           ) : (
-            <div className="space-y-12">
+            <div className="space-y-14">
               {[...sorted.entries()].map(([group, members]) => (
                 <div key={group}>
-                  <div className="mb-6">
-                    <span className="kicker">{group}</span>
-                    <h2 className="mt-3 text-2xl md:text-3xl font-serif text-ink-900">{group}</h2>
+                  <div className="mb-6 flex items-center gap-4">
+                    <h2 className="text-[0.78rem] font-extrabold uppercase tracking-[0.16em] text-ink-900">{group}</h2>
+                    <span aria-hidden className="h-[2px] w-8 bg-gold-400" />
+                    <span aria-hidden className="h-px flex-1 bg-[#e5e5e0]" />
                   </div>
-                  <div className="grid gap-6 md:grid-cols-2">
+                  <div className="grid gap-4 md:grid-cols-2">
                     {members.map((m) => (
                       <StaffCard
                         key={m.id}

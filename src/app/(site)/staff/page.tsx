@@ -41,20 +41,23 @@ export default async function StaffPage({
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Staff' }]}
       />
 
-      <section className="py-16 bg-white">
-        <div className="container-page">
-          <div className="max-w-3xl mx-auto text-center mb-10">
-            <span className="kicker justify-center">Our People</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-serif text-ink-900">Academic Staff</h2>
-            <p className="mt-3 text-ink-600 leading-relaxed">Meet the dedicated lecturers driving teaching and research across the School of Sciences.</p>
+      <section className="section-padding bg-white">
+        <div className="container-premium">
+          <div className="max-w-2xl mb-10">
+            <span className="kicker">Our People</span>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-ink-900">Academic staff</h2>
+            <p className="mt-3 text-ink-500 leading-[1.75] text-[0.95rem]">Meet the dedicated lecturers driving teaching and research across the School of Sciences.</p>
           </div>
 
           <DepartmentFilter departments={departments} active={department ?? ''} />
 
           {allStaff.length === 0 ? (
-            <p className="text-ink-700 text-center py-12">No staff found for this department. Please check back soon.</p>
+            <div className="border border-dashed border-ink-300 bg-white p-12 text-center">
+              <p className="font-serif text-ink-900">No staff found for this department.</p>
+              <p className="mt-2 text-sm text-ink-500">Please check back soon.</p>
+            </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               {allStaff.map((m) => (
                 <StaffCard
                   key={m.id}

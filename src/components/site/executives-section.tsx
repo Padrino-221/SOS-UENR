@@ -57,15 +57,15 @@ type YearOpt = { id: string; year: string; active: boolean }
 
 function ExecutiveCard({ exec }: { exec: PublicExecutive }) {
   return (
-    <div className="card-premium overflow-hidden flex flex-col md:flex-row">
+    <div className="flex flex-col overflow-hidden border border-[#e5e5e0] bg-white transition-all duration-200 hover:border-brand-700 hover:-translate-y-1 md:flex-row">
       <Portrait src={exec.photoUrl} alt={exec.name} name={exec.name} />
-      <div className="flex-1 p-7 md:p-8 flex flex-col justify-center">
-        <h3 className="text-xl md:text-2xl font-serif text-ink-900 mb-1.5">{exec.name}</h3>
-        <p className="text-brand-700 text-[11px] font-bold uppercase tracking-[0.18em] mb-2">
+      <div className="flex flex-1 flex-col justify-center p-7 md:p-8">
+        <h3 className="mb-1.5 font-serif text-xl md:text-[1.35rem] text-ink-900">{exec.name}</h3>
+        <p className="mb-2 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-brand-700">
           {exec.position}
         </p>
         {exec.department && (
-          <p className="mt-0.5 text-xs text-ink-500">{exec.department.name}</p>
+          <p className="text-xs text-ink-500">{exec.department.name}</p>
         )}
       </div>
     </div>
@@ -91,12 +91,12 @@ export function ExecutivesSection({
     yearFilter === 'all' ? executives : executives.filter((e) => e.academicYearId === yearFilter)
 
   return (
-    <section className="py-16 bg-ink-50">
-      <div className="container-page max-w-5xl">
+    <section className="section-padding bg-[#f7f7f5]">
+      <div className="container-premium max-w-5xl">
         <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
           <div>
             <span className="kicker">Executives</span>
-            <h2 className="mt-3 text-2xl md:text-3xl font-serif text-ink-900">Student Executives</h2>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-serif text-ink-900">Student Executives</h2>
             <p className="mt-2 text-sm text-ink-600 max-w-xl">
               Student leaders grouped by their tenure — switch academic year to view past executives.
             </p>
@@ -117,7 +117,7 @@ export function ExecutivesSection({
         </div>
 
         {filtered.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-ink-200 bg-white p-12 text-center">
+          <div className="border border-dashed border-ink-300 bg-white p-12 text-center">
             <p className="font-serif text-ink-900">
               {yearFilter === 'all' ? 'No executives yet.' : 'No executives for this tenure yet.'}
             </p>
@@ -126,7 +126,7 @@ export function ExecutivesSection({
             </p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             {filtered.map((ex) => (
               <ExecutiveCard key={ex.id} exec={ex} />
             ))}

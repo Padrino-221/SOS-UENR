@@ -68,7 +68,7 @@ export function ProjectsList({
             <button
               onClick={() => setFilter('all')}
               className={cn(
-                'rounded-lg px-3 py-1.5 text-sm font-medium transition',
+                'px-3 py-1.5 text-sm font-medium transition',
                 filter === 'all' ? 'bg-brand-700 text-white' : 'text-ink-600 hover:bg-ink-100',
               )}
             >
@@ -77,7 +77,7 @@ export function ProjectsList({
             <button
               onClick={() => setFilter('mine')}
               className={cn(
-                'rounded-lg px-3 py-1.5 text-sm font-medium transition',
+                'px-3 py-1.5 text-sm font-medium transition',
                 filter === 'mine' ? 'bg-brand-700 text-white' : 'text-ink-600 hover:bg-ink-100',
               )}
             >
@@ -149,14 +149,14 @@ export function ProjectsList({
                 <div className="flex items-center gap-1">
                   <Link
                     href={`/spms/projects/${p.id}/edit`}
-                    className="rounded-lg p-1.5 text-ink-500 hover:bg-brand-50 hover:text-brand-700"
+                    className="p-1.5 text-ink-500 hover:bg-brand-50 hover:text-brand-700"
                     title="Edit"
                   >
                     <PencilSimple size={15} weight="duotone" />
                   </Link>
                   <button
                     onClick={() => setDeleteTarget(p)}
-                    className="rounded-lg p-1.5 text-ink-500 hover:bg-red-50 hover:text-red-600"
+                    className="p-1.5 text-ink-500 hover:bg-red-50 hover:text-red-600"
                     title="Delete"
                   >
                     <Trash size={15} weight="duotone" />

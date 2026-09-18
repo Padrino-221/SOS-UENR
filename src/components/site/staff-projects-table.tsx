@@ -23,7 +23,7 @@ export function StaffProjectsTable({ projects }: { projects: Project[] }) {
 
   return (
     <div>
-      <div className="overflow-hidden rounded-xl border border-ink-100 bg-white">
+      <div className="overflow-hidden border border-ink-100 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
@@ -59,7 +59,7 @@ export function StaffProjectsTable({ projects }: { projects: Project[] }) {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="inline-flex items-center gap-1 rounded-lg border border-ink-200 px-2.5 py-1.5 font-medium text-ink-600 transition hover:border-brand-300 hover:text-brand-700 disabled:opacity-40 disabled:pointer-events-none"
+              className="inline-flex items-center gap-1 border border-ink-200 px-2.5 py-1.5 font-medium text-ink-600 transition hover:border-brand-300 hover:text-brand-700 disabled:opacity-40 disabled:pointer-events-none"
             >
               <CaretLeft size={12} weight="duotone" /> Prev
             </button>
@@ -68,7 +68,7 @@ export function StaffProjectsTable({ projects }: { projects: Project[] }) {
                 key={p}
                 onClick={() => setPage(p)}
                 className={cn(
-                  'h-8 w-8 rounded-lg text-xs font-medium transition',
+                  'h-8 w-8 text-xs font-medium transition',
                   p === page
                     ? 'bg-brand-700 text-white'
                     : 'text-ink-600 hover:bg-ink-100',
@@ -80,7 +80,7 @@ export function StaffProjectsTable({ projects }: { projects: Project[] }) {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="inline-flex items-center gap-1 rounded-lg border border-ink-200 px-2.5 py-1.5 font-medium text-ink-600 transition hover:border-brand-300 hover:text-brand-700 disabled:opacity-40 disabled:pointer-events-none"
+              className="inline-flex items-center gap-1 border border-ink-200 px-2.5 py-1.5 font-medium text-ink-600 transition hover:border-brand-300 hover:text-brand-700 disabled:opacity-40 disabled:pointer-events-none"
             >
               Next <CaretRight size={12} weight="duotone" />
             </button>

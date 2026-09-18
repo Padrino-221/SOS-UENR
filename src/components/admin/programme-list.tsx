@@ -53,8 +53,8 @@ export function ProgrammeList({
   }
 
   const columns: Column<ProgrammeRow>[] = [
-    { key: 'name', header: 'Programme', render: (p) => <span className="font-medium text-ink-900">{p.name}</span> },
-    { key: 'level', header: 'Level', render: (p) => <span className="capitalize">{p.level.toLowerCase()}</span> },
+ { key: 'name', header: 'Programme', render: (p) => <span className="font-medium text-ink-900">{p.name}</span> },
+ { key: 'level', header: 'Level', render: (p) => <span className="capitalize">{p.level.toLowerCase()}</span> },
     { key: 'department', header: 'Department', render: (p) => p.department?.name ?? '—' },
     {
       key: 'published',
@@ -68,12 +68,12 @@ export function ProgrammeList({
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (p) => (
-        <div className="flex items-center justify-end gap-2">
+ <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setEditId(p.id)}
-            className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+ className="border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
             aria-label="Edit"
           >
             <PencilSimple size={16} weight="duotone" />
@@ -85,7 +85,7 @@ export function ProgrammeList({
   ]
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <ToastListener />
       <PageHeader
         title="Programmes"

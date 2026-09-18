@@ -41,7 +41,7 @@ export function DashboardClient({
           <Link
             href="/"
             target="_blank"
-            className="inline-flex items-center gap-2 rounded-[5px] border border-ink-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink-700 hover:bg-brand-900 hover:text-white hover:border-brand-900 transition"
+            className="inline-flex items-center gap-2 border border-ink-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink-700 hover:bg-brand-900 hover:text-white hover:border-brand-900 transition"
           >
             <ArrowSquareOut size={16} weight="duotone" /> View live site
           </Link>
@@ -49,7 +49,7 @@ export function DashboardClient({
       />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 mb-10">
-        <Link href="/spms/projects" className="rounded-lg border border-ink-100 bg-white p-5 hover:border-brand-200 transition">
+        <Link href="/spms/projects" className="border border-ink-100 bg-white p-5 hover:border-brand-200 transition">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Total Projects</span>
             <FolderOpen size={20} weight="duotone" className="text-gold-600" />
@@ -57,7 +57,7 @@ export function DashboardClient({
           <p className="text-3xl font-bold leading-none text-ink-900">{totalProjects}</p>
         </Link>
 
-        <div className="rounded-lg border border-ink-100 bg-white p-5">
+        <div className="border border-ink-100 bg-white p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Published</span>
             <GraduationCap size={20} weight="duotone" className="text-gold-600" />
@@ -67,7 +67,7 @@ export function DashboardClient({
         </div>
 
         {isAdmin && (
-          <div className="rounded-lg border border-ink-100 bg-white p-5">
+          <div className="border border-ink-100 bg-white p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Departments</span>
               <Buildings size={20} weight="duotone" className="text-gold-600" />
@@ -77,7 +77,7 @@ export function DashboardClient({
         )}
       </div>
 
-      <div className="rounded-lg border border-ink-100 bg-white p-6 mb-6">
+      <div className="border border-ink-100 bg-white p-6 mb-6">
         <h2 className="text-lg font-bold text-ink-900 mb-4">Quick actions</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
@@ -88,7 +88,7 @@ export function DashboardClient({
             <Link
               key={a.href}
               href={a.href}
-              className="inline-flex items-center justify-between gap-2 rounded-[5px] border border-ink-200 px-4 py-3 text-sm font-semibold text-ink-700 hover:border-brand-600 hover:bg-brand-50 hover:text-brand-700 transition"
+              className="inline-flex items-center justify-between gap-2 border border-ink-200 px-4 py-3 text-sm font-semibold text-ink-700 hover:border-brand-600 hover:bg-brand-50 hover:text-brand-700 transition"
             >
               {a.label}
               <Plus size={16} weight="duotone" className="text-gold-600" />

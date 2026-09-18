@@ -13,10 +13,10 @@ export default async function EditPostPage({
   if (!post) notFound()
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Edit post</h2>
-        <p className="mt-1 text-sm text-ink-700">{post.title}</p>
+ <h2 className="text-2xl font-bold">Edit post</h2>
+ <p className="mt-1 text-sm text-ink-700">{post.title}</p>
       </div>
       <PostForm post={post} />
     </div>

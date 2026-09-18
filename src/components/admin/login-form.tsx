@@ -13,10 +13,10 @@ export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, initialState)
 
   return (
-    <form action={formAction} className="w-full max-w-sm space-y-5">
+ <form action={formAction} className="w-full max-w-sm space-y-5">
       <div>
-        <h1 className="text-2xl font-extrabold text-ink-900">Log in to your account</h1>
-        <p className="mt-1 text-sm text-ink-500">
+ <h1 className="text-2xl font-extrabold text-ink-900">Log in to your account</h1>
+ <p className="mt-1 text-sm text-ink-500">
           Welcome back! Please enter your details.
         </p>
       </div>
@@ -31,13 +31,13 @@ export function LoginForm() {
       />
 
       <div>
-        <div className="flex items-center justify-between">
-          <label htmlFor="password" className="text-xs font-semibold text-ink-700">
+ <div className="flex items-center justify-between">
+ <label htmlFor="password" className="text-xs font-semibold text-ink-700">
             Password
           </label>
           <Link
             href="/admin/forgot-password"
-            className="text-xs font-medium text-brand-600 hover:text-brand-700"
+ className="text-xs font-medium text-brand-600 hover:text-brand-700"
           >
             Forgot password
           </Link>
@@ -47,12 +47,12 @@ export function LoginForm() {
           placeholder="Enter your password"
           required
           autoComplete="current-password"
-          className="mt-1"
+ className="mt-1"
         />
       </div>
 
       {state.error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+ <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {state.error}
         </div>
       )}
@@ -60,7 +60,7 @@ export function LoginForm() {
       <Button
         type="submit"
         disabled={pending}
-        className="w-full"
+ className="w-full"
         size="lg"
       >
         {pending ? 'Signing in…' : 'Login'}

@@ -26,11 +26,11 @@ export function ExecutiveForm({
   executive?: ExecutiveInput | null
 }) {
   return (
-    <form action={upsertExecutive} className="grid gap-4">
+ <form action={upsertExecutive} className="grid gap-4">
       {executive?.id && <input type="hidden" name="id" value={executive.id} />}
       <input type="hidden" name="academicYearId" value={academicYearId} />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Full name" name="name" defaultValue={executive?.name} required />
         <Field
           label="Position"
@@ -40,7 +40,7 @@ export function ExecutiveForm({
           required
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Select
           label="Department"
           name="departmentId"

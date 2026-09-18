@@ -33,10 +33,10 @@ export function UserTable({ users }: { users: UserRow[] }) {
       key: 'name',
       header: 'Name',
       render: (u) => (
-        <span className="font-medium text-ink-900">
+ <span className="font-medium text-ink-900">
           {u.name}
           {u.isCurrent && (
-            <Badge variant="info" className="ml-2">you</Badge>
+ <Badge variant="info" className="ml-2">you</Badge>
           )}
         </span>
       ),
@@ -55,9 +55,9 @@ export function UserTable({ users }: { users: UserRow[] }) {
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (u) => (
-        <div className="flex justify-end">
+ <div className="flex justify-end">
           {!u.isCurrent && (
             <DeleteButton onClick={() => handleDelete(u.id)} disabled={pending} />
           )}

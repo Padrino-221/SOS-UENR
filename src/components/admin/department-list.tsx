@@ -44,8 +44,8 @@ export function DepartmentList({ departments }: { departments: DepartmentRow[] }
       header: 'Department',
       render: (d) => (
         <div>
-          <p className="font-medium text-ink-900">{d.name}</p>
-          <p className="text-xs text-ink-500">/{d.slug}</p>
+ <p className="font-medium text-ink-900">{d.name}</p>
+ <p className="text-xs text-ink-500">/{d.slug}</p>
         </div>
       ),
     },
@@ -53,12 +53,12 @@ export function DepartmentList({ departments }: { departments: DepartmentRow[] }
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (d) => (
-        <div className="flex items-center justify-end gap-2">
+ <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setEditId(d.id)}
-            className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+ className="border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
             aria-label="Edit"
           >
             <PencilSimple size={16} weight="duotone" />
@@ -70,7 +70,7 @@ export function DepartmentList({ departments }: { departments: DepartmentRow[] }
   ]
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <ToastListener />
       <PageHeader
         title="Departments"

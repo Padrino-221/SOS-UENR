@@ -22,7 +22,7 @@ export function SpmsLoginForm() {
             required
             autoComplete="email"
             placeholder="admin@example.com"
-            className="w-full pl-10 pr-3.5 py-2.5 text-sm bg-white border border-ink-200 rounded-[5px] focus:outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/10 placeholder:text-ink-400"
+            className="w-full pl-10 pr-3.5 py-2.5 text-sm bg-white border border-ink-200 focus:outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/10 placeholder:text-ink-400"
           />
         </div>
       </div>
@@ -40,7 +40,7 @@ export function SpmsLoginForm() {
             required
             autoComplete="current-password"
             placeholder="••••••••"
-            className="w-full pl-10 pr-11 py-2.5 text-sm bg-white border border-ink-200 rounded-[5px] focus:outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/10 placeholder:text-ink-400"
+            className="w-full pl-10 pr-11 py-2.5 text-sm bg-white border border-ink-200 focus:outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/10 placeholder:text-ink-400"
           />
           <button
             type="button"
@@ -54,7 +54,7 @@ export function SpmsLoginForm() {
       </div>
 
       {state.error && (
-        <div className="rounded-[5px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {state.error}
         </div>
       )}
@@ -62,7 +62,7 @@ export function SpmsLoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-wide bg-brand-900 text-white rounded-[5px] hover:bg-brand-800 disabled:opacity-50 transition"
+        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-wide bg-brand-900 text-white hover:bg-brand-800 disabled:opacity-50 transition"
       >
         {pending ? 'Signing in…' : 'Sign in'}
       </button>

@@ -53,7 +53,7 @@ export function StaffList({
   }
 
   const columns: Column<StaffRow>[] = [
-    { key: 'name', header: 'Name', render: (s) => <span className="font-medium text-ink-900">{s.name}</span> },
+ { key: 'name', header: 'Name', render: (s) => <span className="font-medium text-ink-900">{s.name}</span> },
     { key: 'title', header: 'Title', render: (s) => s.title ?? '—' },
     { key: 'department', header: 'Department', render: (s) => s.department?.name ?? '—' },
     {
@@ -86,12 +86,12 @@ export function StaffList({
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (s) => (
-        <div className="flex items-center justify-end gap-2">
+ <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setEditId(s.id)}
-            className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+ className="border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
             aria-label="Edit"
           >
             <PencilSimple size={16} weight="duotone" />
@@ -103,7 +103,7 @@ export function StaffList({
   ]
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <ToastListener />
       <PageHeader
         title="Staff"

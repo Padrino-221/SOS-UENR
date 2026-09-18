@@ -81,37 +81,37 @@ export function SiteBuilder({
   }
 
   return (
-    <div className="fixed inset-0 z-[999] flex bg-white">
+ <div className="fixed inset-0 z-[999] flex bg-white">
       {/* Sidebar */}
       <div
-        className={`flex h-full flex-col border-r border-ink-100 bg-ink-50 transition-all ${
+ className={`flex h-full flex-col border-r border-ink-100 bg-ink-50 transition-all ${
           collapsed ? 'w-16' : 'w-64'
         }`}
       >
-        <div className="flex items-center justify-between border-b border-ink-100 px-4 py-3">
+ <div className="flex items-center justify-between border-b border-ink-100 px-4 py-3">
           {!collapsed && (
-            <span className="text-sm font-bold text-ink-900">Site Builder</span>
+ <span className="text-sm font-bold text-ink-900">Site Builder</span>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="rounded-lg p-1.5 text-ink-500 hover:bg-ink-100"
+ className="p-1.5 text-ink-500 hover:bg-ink-100"
           >
             {collapsed ? <CaretRight size={16} weight="duotone" /> : <CaretLeft size={16} weight="duotone" />}
           </button>
         </div>
 
         {!collapsed && (
-          <nav className="flex-1 overflow-y-auto p-3">
+ <nav className="flex-1 overflow-y-auto p-3">
             {SECTIONS.map((group) => (
-              <div key={group.group} className="mb-4">
-                <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-widest text-ink-400">
+ <div key={group.group} className="mb-4">
+ <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-widest text-ink-400">
                   {group.group}
                 </p>
                 {group.items.map((item) => (
                   <button
                     key={item.key}
                     onClick={() => setActive(item.key)}
-                    className={`w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition ${
+ className={`w-full px-3 py-2 text-left text-sm font-medium transition ${
                       active === item.key
                         ? 'bg-brand-50 text-brand-700'
                         : 'text-ink-600 hover:bg-ink-100 hover:text-ink-900'
@@ -127,25 +127,25 @@ export function SiteBuilder({
       </div>
 
       {/* Main area */}
-      <div className="flex flex-1 flex-col">
+ <div className="flex flex-1 flex-col">
         {/* Toolbar */}
-        <div className="flex items-center justify-between border-b border-ink-100 px-6 py-3">
-          <div className="flex items-center gap-3">
-            <h2 className="text-sm font-bold text-ink-900">
+ <div className="flex items-center justify-between border-b border-ink-100 px-6 py-3">
+ <div className="flex items-center gap-3">
+ <h2 className="text-sm font-bold text-ink-900">
               {SECTIONS.flatMap((g) => g.items).find((i) => i.key === active)?.label}
             </h2>
             {dirty && (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+ <span className="bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
                 Unsaved
               </span>
             )}
             {savedMsg && (
-              <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+ <span className="bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
                 Saved
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+ <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => {
@@ -156,21 +156,21 @@ export function SiteBuilder({
                 } catch {}
                 window.open('/preview', '_blank')
               }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:text-brand-700"
+ className="inline-flex items-center gap-1.5 border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:text-brand-700"
             >
               <Eye size={14} weight="duotone" /> Preview
             </button>
             <button
               onClick={handleSave}
               disabled={saving || !dirty}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-brand-700 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-800 disabled:opacity-50"
+ className="inline-flex items-center gap-1.5 bg-brand-700 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-800 disabled:opacity-50"
             >
               <FloppyDisk size={14} weight="duotone" />
               {saving ? 'Saving…' : 'Save'}
             </button>
             <button
               onClick={onClose}
-              className="rounded-xl p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
+ className="p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
             >
               <X size={18} weight="duotone" />
             </button>
@@ -178,8 +178,8 @@ export function SiteBuilder({
         </div>
 
         {/* Canvas */}
-        <div className="flex-1 overflow-y-auto bg-ink-100 p-8">
-          <div className="mx-auto max-w-[860px]">
+ <div className="flex-1 overflow-y-auto bg-ink-100 p-8">
+ <div className="mx-auto max-w-[860px]">
             <SectionForm
               sectionKey={active}
               data={sections[active]}

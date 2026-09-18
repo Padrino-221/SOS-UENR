@@ -6,7 +6,7 @@ import { SubmitButton } from '@/components/admin/submit-button'
 
 export function TenureForm() {
   return (
-    <form action={createTenure} className="grid gap-4">
+ <form action={createTenure} className="grid gap-4">
       <Field
         label="Academic year"
         name="year"

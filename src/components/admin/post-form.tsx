@@ -10,12 +10,12 @@ export function PostForm({ post }: { post?: Post | null }) {
   return (
     <form
       action={upsertPost}
-      className="grid max-w-3xl gap-6 rounded-lg border border-ink-100 bg-white p-6"
+ className="grid max-w-3xl gap-6 border border-ink-100 bg-white p-6"
     >
       {post && <input type="hidden" name="id" value={post.id} />}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2">
+ <div className="grid gap-4 sm:grid-cols-2">
+ <div className="sm:col-span-2">
           <Field
             label="Title"
             name="title"
@@ -65,7 +65,7 @@ export function PostForm({ post }: { post?: Post | null }) {
         hint="Upload a cover image for this post"
       />
 
-      <div className="flex flex-wrap gap-6">
+ <div className="flex flex-wrap gap-6">
         <Toggle
           label="Published"
           name="published"

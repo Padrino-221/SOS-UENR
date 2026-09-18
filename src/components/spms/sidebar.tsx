@@ -96,7 +96,7 @@ export function SpmsSidebar({
     <div className="flex h-full flex-col">
       <div className="border-b border-white/10 px-5 py-5">
         <Link href="/spms/dashboard" className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden bg-white">
             <Image
               src="/SCHOOL OF SCIENCES LOGO OFFICIAL NEW.jpg.jpeg"
               alt="Logo"
@@ -121,7 +121,7 @@ export function SpmsSidebar({
               href={item.href}
               onClick={() => setSidebarOpen(false)}
               className={cn(
-                'flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition',
+                'flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition',
                 isActive ? 'bg-gold-500 text-brand-950 font-semibold' : 'text-white/75 hover:bg-white/10 hover:text-white',
               )}
             >
@@ -143,7 +143,7 @@ export function SpmsSidebar({
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={cn(
-                    'flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition',
+                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition',
                     isActive ? 'bg-gold-500 text-brand-950 font-semibold' : 'text-white/75 hover:bg-white/10 hover:text-white',
                   )}
                 >
@@ -165,7 +165,7 @@ export function SpmsSidebar({
               href={item.href}
               onClick={() => setSidebarOpen(false)}
               className={cn(
-                'flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition',
+                'flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition',
                 isActive ? 'bg-gold-500 text-brand-950 font-semibold' : 'text-white/75 hover:bg-white/10 hover:text-white',
               )}
             >
@@ -183,9 +183,9 @@ export function SpmsSidebar({
             onClick={() => setUserMenuOpen((o) => !o)}
             aria-haspopup="menu"
             aria-expanded={userMenuOpen}
-            className="flex w-full items-center gap-3 rounded px-1.5 py-2 hover:bg-white/10 transition"
+            className="flex w-full items-center gap-3 px-1.5 py-2 hover:bg-white/10 transition"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-500 text-xs font-bold text-brand-950">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-gold-500 text-xs font-bold text-brand-950">
               {initials}
             </span>
             <span className="min-w-0 flex-1 text-left">
@@ -196,7 +196,7 @@ export function SpmsSidebar({
           </button>
 
           {userMenuOpen && (
-            <div role="menu" className="absolute bottom-full left-0 right-0 mb-2 rounded-lg border border-ink-100 bg-white py-1.5">
+            <div role="menu" className="absolute bottom-full left-0 right-0 mb-2 border border-ink-100 bg-white py-1.5">
               <Link
                 href="/spms/profile"
                 role="menuitem"

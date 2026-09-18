@@ -20,14 +20,14 @@ export default async function ChangePasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-ink-50 p-6">
-      <div className="w-full max-w-md rounded-xl border border-ink-200 bg-white p-8">
+      <div className="w-full max-w-md border border-ink-200 bg-white p-8">
         <Link href="/" className="mb-6 flex items-center justify-center gap-2">
           <Image
             src="/SCHOOL OF SCIENCES LOGO OFFICIAL NEW.jpg.jpeg"
             alt="Logo"
             width={32}
             height={32}
-            className="h-8 w-8 rounded-lg object-cover"
+            className="h-8 w-8 object-cover"
           />
           <span className="text-sm font-bold text-ink-900">School of Sciences</span>
         </Link>

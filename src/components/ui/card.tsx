@@ -2,12 +2,12 @@ import { cn } from '@/lib/utils'
 
 export interface CardProps {
   children: React.ReactNode
-  className?: string
+ className?: string
   padding?: 'none' | 'sm' | 'md' | 'lg'
 }
 
 /**
- * Yedent Card — white, border ink-100, rounded-lg (12px), subtle hover lift.
+ * Yedent Card — white, border ink-100, square, subtle hover lift.
  */
 const paddingStyles = {
   none: '',
@@ -19,10 +19,10 @@ const paddingStyles = {
 export function Card({ children, className, padding = 'md' }: CardProps) {
   return (
     <div
-      className={cn(
-        'rounded-lg border border-ink-100 bg-white',
+ className={cn(
+        'border border-ink-100 bg-white',
         paddingStyles[padding],
-        className,
+ className,
       )}
     >
       {children}
@@ -32,7 +32,7 @@ export function Card({ children, className, padding = 'md' }: CardProps) {
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('mb-4', className)}>
+ <div className={cn('mb-4', className)}>
       {children}
     </div>
   )
@@ -40,7 +40,7 @@ export function CardHeader({ children, className }: { children: React.ReactNode;
 
 export function CardTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <h3 className={cn('text-lg font-bold text-ink-900', className)}>
+ <h3 className={cn('text-lg font-bold text-ink-900', className)}>
       {children}
     </h3>
   )
@@ -48,7 +48,7 @@ export function CardTitle({ children, className }: { children: React.ReactNode; 
 
 export function CardDescription({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <p className={cn('text-sm text-ink-500', className)}>
+ <p className={cn('text-sm text-ink-500', className)}>
       {children}
     </p>
   )

@@ -16,10 +16,10 @@ export default async function EditStaffPage({
   if (!staff) notFound()
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Edit staff</h2>
-        <p className="mt-1 text-sm text-ink-700">{staff.name}</p>
+ <h2 className="text-2xl font-bold">Edit staff</h2>
+ <p className="mt-1 text-sm text-ink-700">{staff.name}</p>
       </div>
       <StaffForm staff={staff} departments={departments} />
     </div>

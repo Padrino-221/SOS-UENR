@@ -95,8 +95,8 @@ function SupervisorGuide(): Section {
         answer: (
           <ul className="list-disc list-inside space-y-1">
             <li>First page must include: Project Topic, Student Name(s), Programme, Degree Level, Academic Year, Supervisor, Abstract, Objective</li>
-            <li>File name format: <code className="bg-ink-50 px-1.5 py-0.5 rounded text-xs font-mono">AcademicYear_Project Topic.pdf</code></li>
-            <li>Example: <code className="bg-ink-50 px-1.5 py-0.5 rounded text-xs font-mono">2024-2025_Design of Smart Irrigation System.pdf</code></li>
+            <li>File name format: <code className="bg-ink-50 px-1.5 py-0.5 text-xs font-mono">AcademicYear_Project Topic.pdf</code></li>
+            <li>Example: <code className="bg-ink-50 px-1.5 py-0.5 text-xs font-mono">2024-2025_Design of Smart Irrigation System.pdf</code></li>
             <li>Upload your project to GitHub and paste the repository link in Step 3</li>
           </ul>
         ),
@@ -218,7 +218,7 @@ function FAQSection(): Section {
 
 function AccordionItem({ item, isOpen, onToggle }: { item: GuideItem; isOpen: boolean; onToggle: () => void }) {
   return (
-    <div className="border border-ink-100 rounded-lg overflow-hidden">
+    <div className="border border-ink-100 overflow-hidden">
       <button
         type="button"
         onClick={onToggle}
@@ -262,7 +262,7 @@ export function ManualClient({ isAdmin }: { isAdmin: boolean }) {
 
       <div className="space-y-8 max-w-3xl">
         {allSections.map((section) => (
-          <div key={section.id} className="rounded-xl border border-ink-100 bg-white p-6">
+          <div key={section.id} className="border border-ink-100 bg-white p-6">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-brand-700">{section.icon}</span>
               <h2 className="text-base font-bold text-ink-900">{section.title}</h2>

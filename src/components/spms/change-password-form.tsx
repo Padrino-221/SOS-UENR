@@ -35,7 +35,7 @@ export function ChangePasswordForm({ staffName }: { staffName: string }) {
         />
 
         {state.error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
             {state.error}
           </div>
         )}

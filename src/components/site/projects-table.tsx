@@ -77,7 +77,7 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
             key={l}
             onClick={() => { setLevel(l); setPage(1) }}
             className={cn(
-              'rounded-lg px-4 py-2 text-sm font-semibold transition',
+              'border px-4 py-2 text-sm font-semibold transition',
               level === l
                 ? 'bg-brand-700 text-white'
                 : 'border border-ink-200 bg-white text-ink-600 hover:border-brand-300',
@@ -95,11 +95,11 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1) }}
           placeholder="Search projects…"
-          className="w-full rounded-xl border border-ink-200 bg-white py-2.5 pl-10 pr-4 text-sm text-ink-900 placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="w-full border border-ink-200 bg-white py-2.5 pl-10 pr-4 text-sm text-ink-900 placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
         />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-ink-100 bg-white">
+      <div className="overflow-hidden border border-ink-100 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
@@ -134,7 +134,7 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
                           <div className="flex items-center gap-2">
                             <button
                               className={cn(
-                                'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-brand-700 text-brand-700 transition-transform',
+                                'flex h-6 w-6 shrink-0 items-center justify-center border-2 border-brand-700 text-brand-700 transition-transform',
                                 isExpanded && 'rotate-90',
                               )}
                             >
@@ -180,7 +180,7 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
                                 <div className="pt-2">
                                   <Link
                                     href={`/projects/${project.slug}`}
-                                    className="inline-flex items-center gap-1.5 rounded-xl bg-brand-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-brand-800"
+                                    className="inline-flex items-center gap-1.5 bg-brand-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-brand-800"
                                   >
                                     <FileText size={14} weight="duotone" /> View Details
                                   </Link>
@@ -207,7 +207,7 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={safePage <= 1}
-                className="rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-ink-300 disabled:opacity-40"
+                className="border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-ink-300 disabled:opacity-40"
               >
                 Previous
               </button>
@@ -222,7 +222,7 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
                     className={cn(
-                      'min-w-[32px] rounded-lg px-2 py-1.5 text-xs font-semibold transition',
+                      'min-w-[32px] border px-2 py-1.5 text-xs font-semibold transition',
                       pageNum === safePage
                         ? 'bg-brand-700 text-white'
                         : 'border border-ink-200 bg-white text-ink-600 hover:border-ink-300',
@@ -235,7 +235,7 @@ export function ProjectsTable({ projects }: { projects: ProjectRow[] }) {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safePage >= totalPages}
-                className="rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-ink-300 disabled:opacity-40"
+                className="border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-ink-300 disabled:opacity-40"
               >
                 Next
               </button>

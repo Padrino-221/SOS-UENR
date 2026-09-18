@@ -50,7 +50,7 @@ export function AnnouncementsClient({
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         {/* Compose */}
-        <div className="rounded-xl border border-ink-100 bg-white p-6">
+        <div className="border border-ink-100 bg-white p-6">
           <div className="flex items-center gap-2 mb-5">
             <Megaphone size={20} weight="duotone" className="text-brand-700" />
             <h2 className="text-sm font-bold uppercase tracking-wider text-ink-700">Compose Announcement</h2>
@@ -87,7 +87,7 @@ export function AnnouncementsClient({
         </div>
 
         {/* History */}
-        <div className="rounded-xl border border-ink-100 bg-white p-6">
+        <div className="border border-ink-100 bg-white p-6">
           <h2 className="text-sm font-bold uppercase tracking-wider text-ink-700 mb-5">Recent Announcements</h2>
 
           {announcements.length === 0 ? (
@@ -95,7 +95,7 @@ export function AnnouncementsClient({
           ) : (
             <div className="space-y-4 max-h-[500px] overflow-y-auto">
               {announcements.map((a) => (
-                <div key={a.id} className="rounded-lg border border-ink-100 p-4">
+                <div key={a.id} className="border border-ink-100 p-4">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <h3 className="text-sm font-semibold text-ink-900">{a.subject}</h3>
                     <Badge variant="info">{a.recipientCount} sent</Badge>

@@ -13,10 +13,10 @@ export default async function EditDepartmentPage({
   if (!department) notFound()
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Edit department</h2>
-        <p className="mt-1 text-sm text-ink-700">{department.name}</p>
+ <h2 className="text-2xl font-bold">Edit department</h2>
+ <p className="mt-1 text-sm text-ink-700">{department.name}</p>
       </div>
       <DepartmentForm department={department} />
     </div>

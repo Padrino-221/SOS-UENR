@@ -43,10 +43,10 @@ export function ProfilePageClient({ staff }: { staff: Staff }) {
                 <img
                   src={staff.photoUrl}
                   alt={staff.name}
-                  className="mb-3 h-20 w-20 rounded-full object-cover object-top"
+                  className="mb-3 h-20 w-20 object-cover object-top"
                 />
               ) : (
-                <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-brand-50 text-2xl font-bold text-brand-700">
+                <div className="mb-3 flex h-20 w-20 items-center justify-center bg-brand-50 text-2xl font-bold text-brand-700">
                   {staff.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                 </div>
               )}
@@ -93,13 +93,13 @@ function ProfileForm({ staff }: { staff: Staff }) {
         <label className="mb-1.5 block text-sm font-semibold text-ink-700">Profile Photo</label>
         <div className="flex items-center gap-4">
           {photoUrl ? (
-            <img src={photoUrl} alt="Profile" className="h-16 w-16 rounded-full object-cover object-top" />
+            <img src={photoUrl} alt="Profile" className="h-16 w-16 object-cover object-top" />
           ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-lg font-bold text-brand-700">
+            <div className="flex h-16 w-16 items-center justify-center bg-brand-50 text-lg font-bold text-brand-700">
               {staff.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
             </div>
           )}
-          <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-ink-200 bg-ink-50 px-4 py-2.5 text-sm text-ink-600 transition hover:border-brand-300 hover:bg-brand-50">
+          <label className="flex cursor-pointer items-center gap-2 border border-ink-200 bg-ink-50 px-4 py-2.5 text-sm text-ink-600 transition hover:border-brand-300 hover:bg-brand-50">
             <UploadSimple size={16} weight="duotone" />
             {uploading ? 'Uploading…' : 'Choose Photo'}
             <input
@@ -148,12 +148,12 @@ function ProfileForm({ staff }: { staff: Staff }) {
       />
 
       {state.error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {state.error}
         </div>
       )}
       {state.success && (
-        <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+        <div className="border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
           Profile updated successfully.
         </div>
       )}
@@ -191,12 +191,12 @@ function PasswordForm() {
       </div>
 
       {state.error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {state.error}
         </div>
       )}
       {state.success && (
-        <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+        <div className="border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
           Password changed successfully.
         </div>
       )}

@@ -13,14 +13,14 @@ export function CreateUserForm() {
   return (
     <form
       action={formAction}
-      className="max-w-xl space-y-4 rounded-lg border border-ink-100 bg-white p-6"
+ className="max-w-xl space-y-4 border border-ink-100 bg-white p-6"
     >
-      <h3 className="font-bold">Create a user</h3>
-      <div className="grid gap-4 sm:grid-cols-2">
+ <h3 className="font-bold">Create a user</h3>
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Name" name="name" required />
         <Field label="Email" name="email" type="email" required />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field
           label="Password"
           name="password"
@@ -40,12 +40,12 @@ export function CreateUserForm() {
       </div>
 
       {state.error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+ <p className="bg-red-50 px-3 py-2 text-sm text-red-600">
           {state.error}
         </p>
       )}
       {state.success && (
-        <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
+ <p className="bg-green-50 px-3 py-2 text-sm text-green-700">
           User created successfully.
         </p>
       )}

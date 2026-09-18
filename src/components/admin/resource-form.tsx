@@ -45,7 +45,7 @@ export function ResourceForm({
   }
 
   return (
-    <form action={upsertResource} className="grid max-w-3xl gap-6 rounded-lg border border-ink-100 bg-white p-6">
+ <form action={upsertResource} className="grid max-w-3xl gap-6 border border-ink-100 bg-white p-6">
       {resource && <input type="hidden" name="id" value={resource.id} />}
       <input type="hidden" name="fileUrl" value={fileUrl} />
       <input type="hidden" name="fileName" value={fileName} />
@@ -53,7 +53,7 @@ export function ResourceForm({
       <Field label="Title" name="title" defaultValue={resource?.title} required placeholder="e.g. Student Handbook 2024/2025" />
       <Field label="Description" name="description" defaultValue={resource?.description} textarea rows={3} placeholder="Short description" />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Select
           label="Category"
           name="category"
@@ -78,16 +78,16 @@ export function ResourceForm({
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-ink-900">File (PDF) *</label>
-        <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-ink-200 bg-ink-50 p-6 text-center hover:border-brand-300 hover:bg-brand-50/50">
-          <UploadSimple size={20} weight="duotone" className="text-brand-600" />
-          <span className="text-sm font-semibold text-ink-700">{uploading ? 'Uploading…' : fileName || 'Click to upload PDF'}</span>
-          <span className="text-xs text-ink-500">PDF, DOCX, etc. — uploaded to Cloudinary</span>
-          <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" className="hidden" onChange={handleFile} disabled={uploading} />
+ <label className="mb-1.5 block text-sm font-semibold text-ink-900">File (PDF) *</label>
+ <label className="flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed border-ink-200 bg-ink-50 p-6 text-center hover:border-brand-300 hover:bg-brand-50/50">
+ <UploadSimple size={20} weight="duotone" className="text-brand-600" />
+ <span className="text-sm font-semibold text-ink-700">{uploading ? 'Uploading…' : fileName || 'Click to upload PDF'}</span>
+ <span className="text-xs text-ink-500">PDF, DOCX, etc. — uploaded to Cloudinary</span>
+ <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" className="hidden" onChange={handleFile} disabled={uploading} />
         </label>
-        {fileUrl && <p className="mt-2 truncate font-mono text-xs text-green-700">{fileName} — {fileUrl}</p>}
-        {uploadError && <p className="mt-1 text-xs text-red-600">{uploadError}</p>}
-        {!fileUrl && <p className="mt-1 text-xs text-amber-600">File is required — upload a document</p>}
+ {fileUrl && <p className="mt-2 truncate font-mono text-xs text-green-700">{fileName} — {fileUrl}</p>}
+ {uploadError && <p className="mt-1 text-xs text-red-600">{uploadError}</p>}
+ {!fileUrl && <p className="mt-1 text-xs text-amber-600">File is required — upload a document</p>}
       </div>
 
       <div>

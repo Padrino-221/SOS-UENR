@@ -9,7 +9,7 @@ export interface ToggleProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
 }
 
 /**
- * Yedent Toggle — w-11 h-6 rounded-full, brand-700 when on, ink-200 when off, thumb 5w.
+ * Yedent Toggle — w-11 h-6, brand-700 when on, ink-200 when off, thumb 5w.
  */
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
   ({ label, hint, id, defaultChecked, onChange, ...props }, ref) => {
@@ -19,7 +19,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
 
     return (
       <div>
-        <label htmlFor={toggleId} className="flex cursor-pointer items-center gap-3 group">
+ <label htmlFor={toggleId} className="flex cursor-pointer items-center gap-3 group">
           <input
             ref={ref}
             type="checkbox"
@@ -29,27 +29,27 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
               setChecked(e.target.checked)
               onChange?.(e)
             }}
-            className="sr-only"
+ className="sr-only"
             {...props}
           />
           <span
-            className={cn(
-              'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors',
+ className={cn(
+              'relative inline-flex h-6 w-11 shrink-0 items-center transition-colors',
               checked ? 'bg-brand-700' : 'bg-ink-200',
             )}
           >
             <span
-              className={cn(
-                'inline-block h-5 w-5 rounded-full bg-white transition-transform',
+ className={cn(
+                'inline-block h-5 w-5 bg-white transition-transform',
                 checked ? 'translate-x-5' : 'translate-x-0.5',
               )}
             />
           </span>
           {label && (
-            <span className="text-sm text-ink-700 group-hover:text-ink-900">{label}</span>
+ <span className="text-sm text-ink-700 group-hover:text-ink-900">{label}</span>
           )}
         </label>
-        {hint && <p className="mt-1.5 text-xs text-ink-500">{hint}</p>}
+ {hint && <p className="mt-1.5 text-xs text-ink-500">{hint}</p>}
       </div>
     )
   },

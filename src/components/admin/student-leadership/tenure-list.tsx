@@ -41,7 +41,7 @@ export function TenureList({ tenures }: { tenures: TenureRow[] }) {
   }
 
   const columns: Column<TenureRow>[] = [
-    { key: 'year', header: 'Academic Year', render: (t) => <span className="font-medium text-ink-900">{t.year}</span> },
+ { key: 'year', header: 'Academic Year', render: (t) => <span className="font-medium text-ink-900">{t.year}</span> },
     {
       key: 'executiveCount',
       header: 'Executives',
@@ -54,17 +54,17 @@ export function TenureList({ tenures }: { tenures: TenureRow[] }) {
     {
       key: 'active',
       header: 'Status',
-      render: (t) => (t.active ? <Badge variant="success">Current</Badge> : <span className="text-ink-400">—</span>),
+ render: (t) => (t.active ? <Badge variant="success">Current</Badge> : <span className="text-ink-400">—</span>),
     },
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (t) => (
-        <div className="flex items-center justify-end gap-2">
+ <div className="flex items-center justify-end gap-2">
           <Link
             href={`/admin/student-leadership/${t.id}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-2.5 py-1.5 text-xs font-bold text-brand-700 transition hover:border-brand-300 hover:bg-brand-100"
+ className="inline-flex items-center gap-1.5 border border-brand-200 bg-brand-50 px-2.5 py-1.5 text-xs font-bold text-brand-700 transition hover:border-brand-300 hover:bg-brand-100"
           >
             Manage
             <ArrowRight size={12} weight="duotone" />
@@ -74,7 +74,7 @@ export function TenureList({ tenures }: { tenures: TenureRow[] }) {
               type="button"
               disabled={pending}
               onClick={() => handleSetCurrent(t.id)}
-              className="rounded-lg border border-ink-200 px-2.5 py-1.5 text-xs font-semibold text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 disabled:opacity-50"
+ className="border border-ink-200 px-2.5 py-1.5 text-xs font-semibold text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 disabled:opacity-50"
             >
               Set current
             </button>
@@ -86,7 +86,7 @@ export function TenureList({ tenures }: { tenures: TenureRow[] }) {
   ]
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <ToastListener />
       <PageHeader
         title="Student Leadership"

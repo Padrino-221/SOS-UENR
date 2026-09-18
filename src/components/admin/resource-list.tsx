@@ -48,7 +48,7 @@ export function ResourceList({
   }
 
   const columns: Column<ResourceRow>[] = [
-    { key: 'title', header: 'Title', render: (r) => <span className="font-medium text-ink-900 line-clamp-2">{r.title}</span> },
+ { key: 'title', header: 'Title', render: (r) => <span className="font-medium text-ink-900 line-clamp-2">{r.title}</span> },
     {
       key: 'category',
       header: 'Category',
@@ -63,7 +63,7 @@ export function ResourceList({
       key: 'file',
       header: 'File',
       render: (r) => (
-        <a href={r.fileUrl} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline truncate max-w-[200px] inline-block">
+ <a href={r.fileUrl} target="_blank" rel="noopener noreferrer" className="text-brand-700 hover:underline truncate max-w-[200px] inline-block">
           {r.fileName || r.fileUrl}
         </a>
       ),
@@ -71,12 +71,12 @@ export function ResourceList({
     {
       key: 'actions',
       header: 'Actions',
-      className: 'text-right',
+ className: 'text-right',
       render: (r) => (
-        <div className="flex items-center justify-end gap-2">
+ <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => setEditId(r.id)}
-            className="rounded-lg border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+ className="border border-ink-200 p-2 text-ink-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
             aria-label="Edit"
           >
             <PencilSimple size={16} weight="duotone" />
@@ -88,7 +88,7 @@ export function ResourceList({
   ]
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <ToastListener />
       <PageHeader
         title="Resources"

@@ -23,7 +23,7 @@ export default async function AdminUsersPage() {
   }))
 
   return (
-    <div className="space-y-8">
+ <div className="space-y-8">
       <PageHeader
         title="Users"
         description="Manage admin and editor accounts. Only admins can access this page."

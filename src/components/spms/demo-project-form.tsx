@@ -405,7 +405,7 @@ export function DemoProjectForm({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-200 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-brand-700">
+            <span className="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-200 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-brand-700">
               <Flask size={12} weight="duotone" /> Demo Flow
             </span>
           </div>
@@ -413,18 +413,18 @@ export function DemoProjectForm({
           <p className="mt-1 text-sm text-ink-500">Same 4-step flow as SPMS, but reads the entire document to auto-fill. Preview only — nothing is saved.</p>
         </div>
         {mounted && lastSavedAt && !showDraftBanner && (
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1 text-xs text-ink-500" suppressHydrationWarning>
+          <span className="inline-flex items-center gap-2 border border-ink-200 bg-white px-3 py-1 text-xs text-ink-500" suppressHydrationWarning>
             <span className="inline-flex items-center gap-1.5"><ClockCounterClockwise size={12} weight="duotone" /> Autosaved {new Date(lastSavedAt).toLocaleTimeString()}</span>
-            <button type="button" onClick={clearDraft} className="ml-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-ink-600 hover:bg-ink-100">Clear</button>
+            <button type="button" onClick={clearDraft} className="ml-1 px-2 py-0.5 text-[11px] font-semibold text-ink-600 hover:bg-ink-100">Clear</button>
           </span>
         )}
       </div>
 
       {/* Draft banner */}
       {mounted && showDraftBanner && draftMeta && (
-        <div className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="border border-brand-200 bg-brand-50 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-brand-700 text-white">
               <ClockCounterClockwise size={18} weight="duotone" />
             </span>
             <div>
@@ -438,14 +438,14 @@ export function DemoProjectForm({
             <button
               type="button"
               onClick={handleDiscardDraft}
-              className="inline-flex items-center gap-1.5 rounded-[5px] border border-ink-200 bg-white px-3 py-2 text-xs font-semibold text-ink-600 hover:bg-ink-50"
+              className="inline-flex items-center gap-1.5 border border-ink-200 bg-white px-3 py-2 text-xs font-semibold text-ink-600 hover:bg-ink-50"
             >
               <Trash size={14} weight="duotone" /> Discard
             </button>
             <button
               type="button"
               onClick={handleContinueDraft}
-              className="inline-flex items-center gap-1.5 rounded-[5px] bg-brand-700 px-4 py-2 text-xs font-bold text-white hover:bg-brand-800"
+              className="inline-flex items-center gap-1.5 bg-brand-700 px-4 py-2 text-xs font-bold text-white hover:bg-brand-800"
             >
               Continue draft
             </button>
@@ -453,7 +453,7 @@ export function DemoProjectForm({
         </div>
       )}
 
-      <div className="rounded-lg border border-ink-100 bg-white p-6">
+      <div className="border border-ink-100 bg-white p-6">
         {/* Step indicator — Yedent style, no shadows */}
         <div className="mb-8 flex flex-wrap items-center gap-2">
           {STEPS.map((s, i) => {
@@ -463,7 +463,7 @@ export function DemoProjectForm({
               <div key={s} className="flex items-center gap-2">
                 <div
                   className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition border',
+                    'flex h-8 w-8 items-center justify-center text-sm font-bold transition border',
                     isCompleted
                       ? 'bg-brand-700 text-white border-brand-700'
                       : isCurrent
@@ -492,7 +492,7 @@ export function DemoProjectForm({
               <p className="mt-1 text-sm text-ink-500">This demo reads your <span className="font-semibold text-brand-700">entire document</span> — not just the first page — to auto-fill the form fields.</p>
             </div>
 
-            <div className="rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm text-brand-800">
+            <div className="border border-brand-200 bg-brand-50 p-4 text-sm text-brand-800">
               <p className="flex items-start gap-2">
                 <Info size={16} weight="duotone" className="mt-0.5 shrink-0" />
                 <span>
@@ -506,43 +506,43 @@ export function DemoProjectForm({
             <a
               href="/sample-first-page.pdf"
               download
-              className="flex items-center gap-4 rounded-lg border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 transition"
+              className="flex items-center gap-4 border border-brand-200 bg-brand-50 p-4 hover:bg-brand-100 transition"
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white border border-brand-200">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-white border border-brand-200">
                 <FileText size={22} weight="duotone" className="text-brand-700" />
               </span>
               <span className="flex-1 min-w-0 text-left">
                 <span className="block text-sm font-bold text-ink-900">Sample first page — download</span>
                 <span className="block text-xs text-ink-600">PDF with the exact labels the extractor expects (Project Topic, Student Name(s), etc.)</span>
               </span>
-              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-[5px] bg-brand-700 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
+              <span className="inline-flex shrink-0 items-center gap-1.5 bg-brand-700 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
                 <DownloadSimple size={14} weight="duotone" /> Download
               </span>
             </a>
 
-            <div className="rounded-lg border border-ink-100 bg-white p-4">
+            <div className="border border-ink-100 bg-white p-4">
               <ul className="space-y-3 text-sm">
                 <li className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">1</span>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-brand-700 text-xs font-bold text-white">1</span>
                   <span className="pt-0.5 text-ink-700"><span className="font-semibold text-ink-900">Labels anywhere in the document:</span> Project Topic, Student Name(s), Programme, Degree Level, Academic Year, Supervisor, Abstract, Objective — as in the sample.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">2</span>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-brand-700 text-xs font-bold text-white">2</span>
                   <span className="pt-0.5 text-ink-700"><span className="font-semibold text-ink-900">File name:</span> <span className="font-mono">AcademicYear_Project Topic.pdf</span> — topic should match the <span className="font-semibold">Project Topic</span> inside the PDF.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">3</span>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-brand-700 text-xs font-bold text-white">3</span>
                   <span className="pt-0.5 text-ink-700"><span className="font-semibold text-ink-900">Preview only:</span> nothing is uploaded to Cloudinary or saved to the database. Download the extracted JSON if you want to keep it.</span>
                 </li>
               </ul>
             </div>
 
-            <label className="flex items-start gap-3 rounded-lg border border-ink-200 bg-white px-4 py-3 cursor-pointer hover:border-brand-200 transition">
+            <label className="flex items-start gap-3 border border-ink-200 bg-white px-4 py-3 cursor-pointer hover:border-brand-200 transition">
               <input
                 type="checkbox"
                 checked={instructionsAccepted}
                 onChange={(e) => setInstructionsAccepted(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-ink-300 accent-brand-700"
+                className="mt-0.5 h-4 w-4 border-ink-300 accent-brand-700"
               />
               <span className="text-sm text-ink-700">I understand this is a preview — fields will be auto-filled from the full document.</span>
             </label>
@@ -574,18 +574,18 @@ export function DemoProjectForm({
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               className={cn(
-                'flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed px-6 py-10 text-center transition',
+                'flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed px-6 py-10 text-center transition',
                 isDragging ? 'border-brand-600 bg-brand-50' : 'border-ink-200 bg-ink-50 hover:border-brand-300 hover:bg-brand-50/50',
               )}
             >
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white border border-ink-200">
+              <span className="flex h-12 w-12 items-center justify-center bg-white border border-ink-200">
                 {uploading ? <SpinnerGap size={20} weight="duotone" className="animate-spin text-brand-600" /> : <UploadSimple size={20} weight="duotone" className="text-brand-600" />}
               </span>
               <div>
                 <p className="text-sm font-semibold text-ink-900">{uploading ? 'Reading entire document…' : isDragging ? 'Drop PDF now' : 'Drop your PDF here or click to browse'}</p>
                 <p className="mt-1 text-xs text-ink-500">PDF only • extracted fully in your browser</p>
               </div>
-              <span className="mt-1 inline-flex items-center gap-2 rounded-[5px] bg-brand-700 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white">
+              <span className="mt-1 inline-flex items-center gap-2 bg-brand-700 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white">
                 {uploading ? 'Extracting…' : documentName || 'Choose PDF file'}
               </span>
               <input type="file" accept=".pdf" className="hidden" onChange={handleUpload} />
@@ -593,7 +593,7 @@ export function DemoProjectForm({
             <p className="text-center font-mono text-xs text-ink-500">AcademicYear_Project Topic.pdf</p>
 
             {documentReady && (
-              <div className="rounded-[5px] border border-green-200 bg-green-50 px-4 py-3">
+              <div className="border border-green-200 bg-green-50 px-4 py-3">
                 <p className="flex items-center gap-2 text-sm font-semibold text-green-800">
                   <CheckCircle size={16} weight="duotone" /> Document read
                 </p>
@@ -632,7 +632,7 @@ export function DemoProjectForm({
         {step === 2 && (
           <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
             {autoFilled.length > 0 && (
-              <div className="rounded-[5px] border border-brand-200 bg-brand-50 px-4 py-3 text-sm">
+              <div className="border border-brand-200 bg-brand-50 px-4 py-3 text-sm">
                 <p className="flex items-center gap-2 font-semibold text-brand-800">
                   <Info size={16} weight="duotone" /> {autoFilled.length} fields auto-filled from your PDF
                 </p>
@@ -732,7 +732,7 @@ export function DemoProjectForm({
                   required
                   placeholder="Main objective of the project..."
                 />
-                <div className="rounded-lg border border-ink-100 bg-ink-50 px-4 py-3 text-xs text-ink-600">
+                <div className="border border-ink-100 bg-ink-50 px-4 py-3 text-xs text-ink-600">
                   <p className="font-semibold text-ink-700">Document</p>
                   <p className="mt-1 truncate font-mono">{documentName || '—'}</p>
                   {scanInfo && isFullScan && (
@@ -759,14 +759,14 @@ export function DemoProjectForm({
         {/* Step 3: Confirmation — preview only */}
         {step === 3 && (
           <div className="space-y-4">
-            <div className="rounded-[5px] border border-gold-400 bg-gold-50 px-4 py-3 text-sm">
+            <div className="border border-gold-400 bg-gold-50 px-4 py-3 text-sm">
               <p className="flex items-center gap-2 font-bold text-brand-900">
                 <Flask size={16} weight="duotone" /> Preview Mode — nothing was saved
               </p>
               <p className="mt-1 text-ink-600">This demo never uploads to Cloudinary or writes to the database. Download the extracted JSON to keep the result.</p>
             </div>
 
-            <div className="rounded-lg border border-ink-100 bg-ink-50 p-5 text-sm">
+            <div className="border border-ink-100 bg-ink-50 p-5 text-sm">
               <dl className="space-y-3">
                 <Row label="Project Topic" value={title} />
                 <Row label="Student Names" value={studentName} />
@@ -784,7 +784,7 @@ export function DemoProjectForm({
             </div>
 
             {documentName && !fileNameCorrect && (
-              <div className="rounded-[5px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              <div className="border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                 <p className="font-semibold">File name does not match the required format.</p>
                 <p className="mt-1">Expected: <span className="font-mono font-semibold">{expectedFileName}</span></p>
                 <p className="mt-0.5">Current: <span className="font-mono">{documentName}</span></p>

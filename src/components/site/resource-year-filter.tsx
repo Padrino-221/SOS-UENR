@@ -33,7 +33,6 @@ export function ResourceYearFilter({
         value={currentYear ?? ''}
         onChange={handleChange}
         placeholder="All years"
-        className="rounded-[10px]"
       />
     </div>
   )

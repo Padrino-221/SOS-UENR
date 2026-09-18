@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 export function SubmitButton({
   children,
-  className,
+ className,
   ...props
 }: Omit<ButtonProps, 'type' | 'disabled'> & { children: React.ReactNode }) {
   const { pending } = useFormStatus()
@@ -14,7 +14,7 @@ export function SubmitButton({
     <Button
       type="submit"
       disabled={pending}
-      className={cn(className)}
+ className={cn(className)}
       {...props}
     >
       {pending ? 'Saving…' : children}

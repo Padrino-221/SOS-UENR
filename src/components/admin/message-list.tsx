@@ -30,7 +30,7 @@ export function MessageList({ messages }: { messages: Message[] }) {
   }
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <ToastListener />
       {messages.length === 0 ? (
         <EmptyState
@@ -39,19 +39,19 @@ export function MessageList({ messages }: { messages: Message[] }) {
           description="Messages from the contact form will appear here."
         />
       ) : (
-        <div className="space-y-4">
+ <div className="space-y-4">
           {messages.map((m) => (
             <Card key={m.id}>
-              <div className="flex flex-wrap items-start justify-between gap-3">
+ <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-ink-900">{m.subject}</h3>
-                  <p className="text-sm text-ink-500">
+ <h3 className="font-bold text-ink-900">{m.subject}</h3>
+ <p className="text-sm text-ink-500">
                     {m.name} · {m.email} · {formatDate(m.createdAt)}
                   </p>
                 </div>
                 <DeleteButton onClick={() => handleDelete(m.id)} disabled={pending} />
               </div>
-              <p className="mt-3 whitespace-pre-line text-sm text-ink-700">
+ <p className="mt-3 whitespace-pre-line text-sm text-ink-700">
                 {m.message}
               </p>
             </Card>

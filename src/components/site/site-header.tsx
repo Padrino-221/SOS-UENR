@@ -3,13 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import {
-  GraduationCap,
-  List,
-  X,
-  CaretDown,
-} from '@phosphor-icons/react'
+import { useState, useEffect } from 'react'
+import { List, X, CaretDown } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import type { SiteNavigation } from '@/data/siteDefaults'
 
@@ -23,42 +18,46 @@ export function SiteHeader({
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-ink-100 bg-white/90 backdrop-blur">
-      <div className="bg-brand-800 text-white">
-        <div className="container-page flex h-9 items-center justify-between text-xs">
-          <p className="hidden sm:block">
-            {navigation.topBarText}
-          </p>
-          <div className="ml-auto flex items-center gap-4">
-            <Link href={navigation.topBarLink.href} className="hover:underline">
-              {navigation.topBarLink.label}
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="container-page flex items-center justify-between py-4">
-        <Link href="/" className="flex items-center gap-3">
+    <header
+      className={cn(
+        'sticky top-0 z-50 w-full transition-all duration-200',
+        scrolled
+          ? 'border-b border-[#e5e5e0] bg-[rgba(247,247,245,.88)] backdrop-blur-[14px] saturate-[1.4]'
+          : 'border-b border-transparent bg-[#f7f7f5]',
+      )}
+    >
+      <div className="container-page flex items-center justify-between h-16">
+        {/* Brand */}
+        <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image
             src={logo}
             alt="School of Sciences logo"
-            width={44}
-            height={44}
-            className="h-11 w-11 rounded-lg object-cover"
+            width={36}
+            height={36}
+            className="h-9 w-9 object-cover"
+            style={{ borderRadius: '50% 50% 50% 12px' }}
           />
           <span className="leading-tight">
-            <span className="block text-lg font-bold text-ink-900">
+            <span className="block text-[0.92rem] font-extrabold text-ink-900 tracking-[-.01em] whitespace-nowrap">
               School of Sciences
             </span>
-            <span className="block text-xs text-ink-700">
+            <span className="hidden sm:block text-[0.68rem] text-ink-500 font-medium">
               University of Energy and Natural Resources
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-1 lg:flex ml-8">
           {navigation.items.map((item) => (
             <div key={item.href} className="relative">
               {item.children && item.children.length > 0 ? (
@@ -66,17 +65,19 @@ export function SiteHeader({
                   type="button"
                   onMouseEnter={() => setOpenMenu(item.href)}
                   onMouseLeave={() => setOpenMenu(null)}
-                  className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-ink-800 transition hover:bg-brand-50 hover:text-brand-800"
+                  className="flex items-center gap-1 px-3.5 py-2 text-[0.82rem] font-bold text-ink-600 transition-colors duration-150 hover:text-ink-900 hover:bg-ink-900/5"
                 >
                   {item.label}
-                  <CaretDown size={14} />
+                  <CaretDown size={13} className="opacity-50" />
                 </button>
               ) : (
                 <Link
                   href={item.href}
                   className={cn(
-                    'block rounded-md px-3 py-2 text-sm font-medium transition hover:bg-brand-50 hover:text-brand-800',
-                    pathname === item.href && 'bg-brand-50 text-brand-800',
+                    'block px-3.5 py-2 text-[0.82rem] font-bold transition-colors duration-150',
+                    pathname === item.href
+                      ? 'text-brand-700 bg-brand-50'
+                      : 'text-ink-600 hover:text-ink-900 hover:bg-ink-900/5',
                   )}
                 >
                   {item.label}
@@ -88,15 +89,16 @@ export function SiteHeader({
                   onMouseEnter={() => setOpenMenu(item.href)}
                   onMouseLeave={() => setOpenMenu(null)}
                   className={cn(
-                    'absolute left-0 top-full z-40 w-60 rounded-lg border border-ink-100 bg-white p-1.5',
+                    'absolute left-0 top-full z-40 w-56 border border-[#e5e5e0] bg-[#f7f7f5] p-1.5',
                     openMenu === item.href ? 'block' : 'hidden',
                   )}
+                  style={{ borderRadius: 0 }}
                 >
                   {item.children.map((child) => (
                     <Link
                       key={child.href}
                       href={child.href}
-                      className="block rounded-md px-3 py-2 text-sm text-ink-700 hover:bg-brand-50 hover:text-brand-800"
+                      className="block px-3 py-2 text-[0.82rem] font-medium text-ink-600 hover:bg-brand-50 hover:text-brand-700"
                     >
                       {child.label}
                     </Link>
@@ -105,33 +107,43 @@ export function SiteHeader({
               )}
             </div>
           ))}
+        </nav>
+
+        {/* CTA + hamburger */}
+        <div className="flex items-center gap-3">
           <Link
             href={navigation.ctaHref}
-            className="ml-3 rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-800"
+            className="hidden lg:inline-flex items-center bg-brand-700 px-5 py-2 text-[0.78rem] font-extrabold uppercase tracking-[0.08em] text-white transition-colors duration-150 hover:bg-brand-800"
           >
             {navigation.ctaLabel}
           </Link>
-        </nav>
 
-        <button
-          type="button"
-          className="grid h-10 w-10 place-items-center rounded-md text-ink-800 lg:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
-        >
-          {open ? <X size={26} /> : <List size={26} />}
-        </button>
+          <button
+            type="button"
+            className="grid h-10 w-10 place-items-center text-ink-700 lg:hidden"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X size={24} /> : <List size={24} />}
+          </button>
+        </div>
       </div>
 
+      {/* Mobile menu */}
       {open && (
-        <div className="border-t border-ink-100 bg-white lg:hidden">
-          <nav className="container-page flex flex-col gap-1 py-3">
+        <div className="border-t border-[#e5e5e0] bg-[#f7f7f5] lg:hidden">
+          <nav className="container-page flex flex-col gap-0.5 py-3">
             {navigation.items.flatMap((item) => [
               <Link
                 key={`nav-${item.href}-${item.label}`}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-2 text-sm font-medium text-ink-800 hover:bg-brand-50"
+                className={cn(
+                  'px-3 py-2.5 text-[0.85rem] font-bold transition-colors',
+                  pathname === item.href
+                    ? 'text-brand-700 bg-brand-50'
+                    : 'text-ink-700 hover:bg-ink-900/5',
+                )}
               >
                 {item.label}
               </Link>,
@@ -140,7 +152,7 @@ export function SiteHeader({
                   key={`nav-child-${item.href}-${child.href}-${child.label}`}
                   href={child.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-md px-6 py-2 text-sm text-ink-700 hover:bg-brand-50"
+                  className="px-6 py-2 text-[0.82rem] text-ink-500 hover:bg-ink-900/5"
                 >
                   {child.label}
                 </Link>
@@ -149,7 +161,7 @@ export function SiteHeader({
             <Link
               href={navigation.ctaHref}
               onClick={() => setOpen(false)}
-              className="mt-2 rounded-lg bg-brand-700 px-4 py-2 text-center text-sm font-semibold text-white"
+              className="mt-2 bg-brand-700 px-4 py-2.5 text-center text-[0.82rem] font-extrabold uppercase tracking-[0.08em] text-white"
             >
               {navigation.ctaLabel}
             </Link>

@@ -10,7 +10,7 @@ export default async function AdminMessagesPage() {
   })
 
   return (
-    <div className="space-y-6">
+ <div className="space-y-6">
       <PageHeader
         title="Messages"
         description="Messages submitted through the contact form."

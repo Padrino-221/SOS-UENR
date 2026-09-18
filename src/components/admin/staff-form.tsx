@@ -18,11 +18,11 @@ export function StaffForm({
   return (
     <form
       action={upsertStaff}
-      className="grid max-w-3xl gap-6 rounded-lg border border-ink-100 bg-white p-6"
+ className="grid max-w-3xl gap-6 border border-ink-100 bg-white p-6"
     >
       {staff && <input type="hidden" name="id" value={staff.id} />}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Full name" name="name" defaultValue={staff?.name} required />
         <Field
           label="Title / Designation"
@@ -31,7 +31,7 @@ export function StaffForm({
           placeholder="e.g. Professor"
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Roles" name="roles" defaultValue={staff?.roles} placeholder="e.g. Dean, Head of Department" />
         <Select
           label="Staff Type"
@@ -44,11 +44,11 @@ export function StaffForm({
           ]}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Ordering" name="ordering" type="number" defaultValue={staff?.ordering != null ? String(staff.ordering) : '0'} />
         <Field label="Email" name="email" type="email" defaultValue={staff?.email} />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+ <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Phone" name="phone" defaultValue={staff?.phone} />
         <Select
           label="Department"

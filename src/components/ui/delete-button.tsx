@@ -4,7 +4,7 @@ import { Trash } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 interface DeleteButtonProps {
-  className?: string
+ className?: string
   onClick?: () => void
   disabled?: boolean
 }
@@ -20,10 +20,10 @@ export function DeleteButton({ className, onClick, disabled }: DeleteButtonProps
       type="button"
       disabled={disabled}
       onClick={handleClick}
-      className={cn(
-        'inline-flex items-center gap-1 rounded-lg border border-ink-200 px-2 py-1.5 text-xs font-semibold text-ink-500 transition',
+ className={cn(
+        'inline-flex items-center gap-1 border border-ink-200 px-2 py-1.5 text-xs font-semibold text-ink-500 transition',
         'hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:opacity-50',
-        className,
+ className,
       )}
     >
       <Trash size={14} weight="duotone" />

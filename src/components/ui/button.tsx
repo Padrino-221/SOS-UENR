@@ -5,7 +5,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 /**
- * Yedent-inspired Button — 5px radius, uppercase tracking-wide, bold.
+ * Yedent-inspired Button — square corners, uppercase tracking-wide, bold.
  * School palette preserved: primary brand-700, secondary brand outline, danger red, ghost muted.
  */
 const variantStyles: Record<ButtonVariant, string> = {
@@ -28,14 +28,14 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', ...props }, ref) => (
+ ({ className, variant = 'primary', size = 'md', ...props }, ref) => (
     <button
       ref={ref}
-      className={cn(
-        'inline-flex items-center justify-center rounded-[5px] font-bold uppercase tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:opacity-50 disabled:pointer-events-none',
+ className={cn(
+        'inline-flex items-center justify-center font-bold uppercase tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:opacity-50 disabled:pointer-events-none',
         variantStyles[variant],
         sizeStyles[size],
-        className,
+ className,
       )}
       {...props}
     />

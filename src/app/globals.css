@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-sora), ui-sans-serif, system-ui, -apple-system,
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-narrow: var(--font-sora), ui-sans-serif, system-ui,
+  --font-narrow: var(--font-archivo), ui-sans-serif, system-ui,
     -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-display: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   /* --- Yedent admin palette — kept for reference; admin redesign keeps School palette (brand/gold/ink) as primary --- */
   --color-dark: #233f2e;
@@ -86,21 +86,23 @@
     overflow-x: hidden;
   }
   body, header, nav, button, input, a {
-    font-family: var(--font-sora), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   body {
-    @apply bg-white text-ink-800 antialiased overflow-x-hidden;
+    @apply text-ink-800 antialiased overflow-x-hidden;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.65;
+    background: #f7f7f5;
+    color: #262b34;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply text-ink-900;
-    font-family: var(--font-space), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     font-weight: 700;
     letter-spacing: -0.03em;
-    line-height: 0.95;
+    line-height: 1.1;
   }
   ::selection {
     background-color: var(--color-gold-400);
@@ -126,12 +128,12 @@
 @layer components {
   .kicker {
     @apply inline-flex items-center gap-2.5 px-0 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em];
-    font-family: var(--font-sora), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     color: var(--color-brand-600);
   }
   .kicker-light {
     @apply inline-flex items-center gap-2.5 px-0 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em];
-    font-family: var(--font-sora), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     color: var(--color-gold-300);
   }
   .bracket-label {
@@ -141,8 +143,9 @@
     @apply transition duration-300 ease-out hover:-translate-y-1 hover:border-brand-400;
   }
   .card-premium {
-    @apply bg-white border border-ink-100;
-    border-radius: 5px;
+    background: #ffffff;
+    border: 1px solid #e5e5e0;
+    border-radius: 0;
     transition: all 0.3s ease;
   }
   .card-premium:hover {
@@ -151,29 +154,29 @@
   }
   .pill-tag {
     @apply inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.12em] border border-brand-200 bg-brand-50 text-brand-700;
-    font-family: var(--font-sora), sans-serif;
-    border-radius: 5px;
+    font-family: var(--font-archivo), sans-serif;
+    border-radius: 0;
   }
   .pill-tag:hover {
     @apply border-brand-600 bg-brand-600 text-white;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
-    font-family: var(--font-sora), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     background: var(--color-brand-700);
     color: #fff;
-    border-radius: 5px;
+    border-radius: 0;
   }
   .btn-primary:hover {
     background: var(--color-brand-800);
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
-    font-family: var(--font-sora), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     border: 1.5px solid var(--color-ink-900);
     color: var(--color-ink-900);
     background: #fff;
-    border-radius: 5px;
+    border-radius: 0;
   }
   .btn-secondary:hover {
     background: var(--color-ink-900);
@@ -182,27 +185,27 @@
   }
   .btn-gold {
     @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
-    font-family: var(--font-sora), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     background: var(--color-gold-500);
     color: #fff;
-    border-radius: 5px;
+    border-radius: 0;
   }
   .btn-gold:hover {
     background: var(--color-gold-600);
   }
   .btn-lime {
     @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
-    font-family: var(--font-sora), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     background: var(--color-gold-500);
     color: #fff;
-    border-radius: 5px;
+    border-radius: 0;
   }
   .btn-white {
     @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] transition-all duration-200;
-    font-family: var(--font-sora), sans-serif;
+    font-family: var(--font-archivo), sans-serif;
     background: #fff;
     color: var(--color-ink-900);
-    border-radius: 5px;
+    border-radius: 0;
   }
   .section-padding {
     @apply py-16 md:py-24;
@@ -216,10 +219,48 @@
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 
-.font-serif { font-family: var(--font-space), sans-serif; }
-.font-display { font-family: var(--font-space), sans-serif; }
-.font-body { font-family: var(--font-sora), sans-serif; }
+.font-serif { font-family: var(--font-archivo), sans-serif; }
+.font-display { font-family: var(--font-archivo), sans-serif; }
+.font-body { font-family: var(--font-archivo), sans-serif; }
 .text-balance { text-wrap: balance; }
+
+/* ==========================================================================
+   Warm backgrounds & decorative patterns
+   ========================================================================== */
+.bg-cream { background: #f7f7f5; }
+.bg-surface { background: #f0f0ed; }
+.bg-warm-white { background: #ffffff; }
+.border-warm { border-color: #e5e5e0; }
+
+.dot-overlay {
+  position: relative;
+}
+.dot-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: radial-gradient(#d2d2cd 1px, transparent 1px);
+  background-size: 20px 20px;
+  mask-image: linear-gradient(100deg, transparent 0 56%, #000 85%, transparent);
+}
+
+.warm-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e0;
+  border-radius: 5px;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.warm-card:hover {
+  border-color: #b1c9eb;
+  transform: translateY(-2px);
+}
+
+.hero-shape {
+  position: absolute;
+  pointer-events: none;
+}
 
 /* ==========================================================================
    Checker page — Sharp corners, no shadows
@@ -817,4 +858,17 @@
   background-size: 10px 10px;
   mask-image: linear-gradient(to right, transparent, #000);
   pointer-events: none;
+}
+
+/* ==========================================================================
+   Sharp corners — zero border-radius on buttons, cards, inputs
+   ========================================================================== */
+button,
+a[class*="btn"],
+.card-premium,
+.warm-card,
+input,
+textarea,
+select {
+  border-radius: 0 !important;
 }
