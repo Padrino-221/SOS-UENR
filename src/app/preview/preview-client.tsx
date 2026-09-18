@@ -120,7 +120,7 @@ export function PreviewClient({
         </span>
         <Link
           href={mounted && isPreview ? '/admin/site-builder' : '/'}
-          className="rounded-lg bg-ink-900 text-white px-3 py-1.5 text-xs font-bold hover:bg-ink-800 inline-flex items-center gap-1.5"
+          className="bg-ink-900 text-white px-3 py-1.5 text-xs font-bold hover:bg-ink-800 inline-flex items-center gap-1.5"
         >
           {mounted && isPreview ? 'Back to Builder' : 'Back to Live Site'}
         </Link>
@@ -148,7 +148,7 @@ export function PreviewClient({
               </div>
             </div>
             <div className="lg:col-span-5">
-              <div className="relative overflow-hidden rounded-xl border border-ink-100 bg-white">
+              <div className="relative overflow-hidden border border-ink-100 bg-white">
                 <HeroImageCarousel images={heroData.images} fallback={heroData.image} />
               </div>
             </div>
@@ -168,15 +168,15 @@ export function PreviewClient({
             </Link>
           </div>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
-            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center">
+            <div className="bg-white/5 border border-white/10 p-6 text-center">
               <p className="text-3xl font-serif text-gold-300">{homeData.aboutYear}</p>
               <p className="text-xs uppercase tracking-widest text-white/60 mt-2">Established</p>
             </div>
-            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center">
+            <div className="bg-white/5 border border-white/10 p-6 text-center">
               <p className="text-3xl font-serif text-gold-300">{homeData.aboutStat1Value}</p>
               <p className="text-xs uppercase tracking-widest text-white/60 mt-2">{homeData.aboutStat1Label}</p>
             </div>
-            <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-center">
+            <div className="bg-white/5 border border-white/10 p-6 text-center">
               <p className="text-3xl font-serif text-gold-300">{homeData.aboutStat2Value}</p>
               <p className="text-xs uppercase tracking-widest text-white/60 mt-2">{homeData.aboutStat2Label}</p>
             </div>
@@ -200,7 +200,7 @@ export function PreviewClient({
               const Icon = getDepartmentIcon(dept.slug)
               return (
                 <div key={dept.id} className="card-premium p-7">
-                  <span className="w-12 h-12 rounded-lg bg-brand-50 text-brand-700 grid place-items-center">
+                  <span className="w-12 h-12 bg-brand-50 text-brand-700 grid place-items-center">
                     <Icon size={22} weight="duotone" />
                   </span>
                   <h3 className="mt-5 text-xl font-serif text-ink-900">{dept.name}</h3>
@@ -237,7 +237,7 @@ export function PreviewClient({
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {about.values.slice(0, 4).map((v: any) => (
-              <div key={v.title} className="rounded-xl bg-white/5 border border-white/10 p-6">
+              <div key={v.title} className="bg-white/5 border border-white/10 p-6">
                 <h4 className="font-serif text-white">{v.title}</h4>
                 <p className="mt-2 text-sm text-white/70">{v.description}</p>
               </div>

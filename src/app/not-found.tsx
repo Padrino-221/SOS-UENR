@@ -13,7 +13,7 @@ export default function NotFound() {
           alt="Logo"
           width={56}
           height={56}
-          className="mb-8 h-14 w-14 rounded-[5px] object-cover"
+          className="mb-8 h-14 w-14 object-cover"
         />
         <p className="font-serif text-7xl font-bold text-brand-700">404</p>
         <h1 className="mt-4 text-3xl font-serif text-ink-900">Page not found</h1>

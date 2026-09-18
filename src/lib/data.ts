@@ -52,15 +52,36 @@ export async function getProgramme(slug: string) {
   })
 }
 
-export async function getPosts(filters?: { category?: PostCategory | null }) {
-  return prisma.post.findMany({
-    where: {
-      published: true,
-      ...(filters?.category ? { category: filters.category } : {}),
-    },
-    include: { author: { select: { name: true } } },
-    orderBy: { publishedAt: 'desc' },
-  })
+export async function getPosts(filters?: {
+  category?: PostCategory | null
+  page?: number
+  pageSize?: number
+}) {
+  const page = Math.max(1, filters?.page ?? 1)
+  const pageSize = filters?.pageSize ?? 9
+  const where = {
+    published: true,
+    ...(filters?.category ? { category: filters.category } : {}),
+  }
+
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      where,
+      include: { author: { select: { name: true } } },
+      orderBy: { publishedAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.post.count({ where }),
+  ])
+
+  return {
+    posts,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  }
 }
 
 export async function getFeaturedPosts(limit = 3) {

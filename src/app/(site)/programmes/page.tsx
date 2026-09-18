@@ -52,7 +52,7 @@ export default async function ProgrammesPage({
                 key={tab.key}
                 href={tab.value ? `/programmes?level=${tab.key}` : '/programmes'}
                 className={cn(
-                  'rounded-lg px-5 py-2.5 text-sm font-bold transition',
+                  'px-5 py-2.5 text-sm font-bold transition',
                   level === tab.value
                     ? 'bg-brand-700 text-white'
                     : 'border border-ink-100 bg-white text-ink-700 hover:border-brand-200 hover:text-brand-700',
@@ -63,12 +63,12 @@ export default async function ProgrammesPage({
             ))}
           </div>
 
-          <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/60 p-5">
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-brand-100 bg-brand-50/60 p-5">
             <div>
               <p className="text-sm font-bold text-brand-800">Not sure where you fit?</p>
               <p className="text-sm text-ink-600">Enter your WASSCE grades and get a friendly, private recommendation for the best programmes for you.</p>
             </div>
-            <Link href="/programmes/eligibility-checker" className="shrink-0 inline-flex items-center gap-2 rounded-lg bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800 transition">
+            <Link href="/programmes/eligibility-checker" className="shrink-0 inline-flex items-center gap-2 bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800 transition">
               Check eligibility
             </Link>
           </div>
@@ -89,12 +89,12 @@ export default async function ProgrammesPage({
             />
           )}
 
-          <div className="mt-12 rounded-xl bg-brand-700 p-8 sm:p-10 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="mt-12 bg-brand-700 p-8 sm:p-10 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-serif">{progContent.reqHeading}</h2>
+              <h2 className="text-xl sm:text-2xl font-serif text-white">{progContent.reqHeading}</h2>
               <p className="mt-2 text-sm leading-relaxed text-white/80 max-w-xl">{progContent.reqBody}</p>
             </div>
-            <a href={progContent.reqCta.href} className="shrink-0 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-brand-700 hover:bg-gold-400 hover:text-brand-900 transition">
+            <a href={progContent.reqCta.href} className="shrink-0 inline-flex items-center gap-2 bg-white px-6 py-3 text-sm font-bold text-brand-700 hover:bg-gold-400 hover:text-brand-900 transition">
               {progContent.reqCta.label}
             </a>
           </div>

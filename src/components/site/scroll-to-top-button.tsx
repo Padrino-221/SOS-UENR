@@ -19,7 +19,7 @@ export function ScrollToTopButton() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-brand-700 text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-brand-800"
+      className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center bg-brand-700 text-white transition-colors hover:bg-brand-800"
       aria-label="Scroll to top"
     >
       <CaretUp size={20} weight="bold" />

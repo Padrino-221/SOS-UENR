@@ -46,7 +46,7 @@ export default async function DepartmentPage({
                         href={`/programmes/${p.slug}`}
                         className="group flex items-center gap-3 card-premium p-4"
                       >
-                        <span className="h-10 w-10 grid place-items-center rounded-lg bg-brand-50 text-brand-700 shrink-0">
+                        <span className="h-10 w-10 grid place-items-center bg-brand-50 text-brand-700 shrink-0">
                           <GraduationCap size={18} weight="duotone" />
                         </span>
                         <div className="min-w-0">
@@ -69,8 +69,8 @@ export default async function DepartmentPage({
                   </div>
                   <div className="space-y-3">
                     {dept.staff.map((s) => (
-                      <Link key={s.id} href={`/staff/${s.id}`} className="flex items-center gap-3 rounded-lg p-2 hover:bg-ink-50 transition">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-bold text-brand-700">
+                      <Link key={s.id} href={`/staff/${s.id}`} className="flex items-center gap-3 p-2 hover:bg-ink-50 transition">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-brand-50 text-xs font-bold text-brand-700">
                           {s.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                         </span>
                         <div>

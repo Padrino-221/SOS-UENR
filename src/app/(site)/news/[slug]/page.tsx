@@ -22,7 +22,7 @@ export default async function NewsDetailPage({
         </Link>
 
         <div className="mt-8">
-          <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-700">
+          <span className="inline-flex items-center gap-2 border border-brand-100 bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-700">
             {post.category.toLowerCase().replace('_', ' ')}
           </span>
           <h1 className="mt-4 text-3xl sm:text-4xl font-serif text-ink-900 leading-tight">{post.title}</h1>
@@ -31,7 +31,7 @@ export default async function NewsDetailPage({
               <UserCircle size={18} weight="duotone" className="text-brand-700" />
               {post.author?.name ?? 'School of Sciences'}
             </span>
-            <span className="h-1 w-1 rounded-full bg-ink-300" />
+            <span className="h-1 w-1 bg-ink-300" />
             <span>{formatDate(post.publishedAt)}</span>
           </div>
         </div>

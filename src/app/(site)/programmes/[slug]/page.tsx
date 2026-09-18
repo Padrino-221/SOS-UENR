@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
   GraduationCap,
-  Clock,
   ArrowRight,
   ListChecks,
   Briefcase,
@@ -61,7 +60,7 @@ export default async function ProgrammeDetailPage({
                 <ul className="mt-5 space-y-3">
                   {requirements.map((r, i) => (
                     <li key={i} className="flex items-start gap-3 card-premium p-4">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-600" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 bg-brand-600" />
                       <span className="text-sm text-ink-700 leading-relaxed">{r}</span>
                     </li>
                   ))}
@@ -97,7 +96,7 @@ export default async function ProgrammeDetailPage({
                 </div>
                 {programme.duration && (
                   <div className="flex justify-between gap-4">
-                    <dt className="flex items-center gap-1 text-ink-500"><Clock size={14} weight="duotone" /> Duration</dt>
+                    <dt className="text-ink-500">Duration</dt>
                     <dd className="font-semibold text-ink-900">{programme.duration}</dd>
                   </div>
                 )}
@@ -116,10 +115,10 @@ export default async function ProgrammeDetailPage({
               </dl>
             </div>
 
-            <Link href="https://admissions.uenr.edu.gh/applicant-login" className="flex items-center justify-center gap-2 rounded-lg bg-brand-700 px-5 py-3 text-sm font-bold text-white hover:bg-brand-800 transition">
+            <Link href="https://admissions.uenr.edu.gh/applicant-login" className="flex items-center justify-center gap-2 bg-brand-700 px-5 py-3 text-sm font-bold text-white hover:bg-brand-800 transition">
               Apply for this programme <ArrowRight size={16} weight="duotone" />
             </Link>
-            <Link href="/programmes" className="flex items-center justify-center gap-2 rounded-lg border border-ink-100 bg-white px-5 py-3 text-sm font-bold text-ink-700 hover:border-brand-200 hover:text-brand-700 transition">
+            <Link href="/programmes" className="flex items-center justify-center gap-2 border border-ink-100 bg-white px-5 py-3 text-sm font-bold text-ink-700 hover:border-brand-200 hover:text-brand-700 transition">
               View other programmes
             </Link>
           </aside>

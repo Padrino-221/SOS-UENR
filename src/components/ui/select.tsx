@@ -116,7 +116,7 @@ export function Select({
         </button>
 
         {open && (
- <div className="absolute z-50 mt-1 w-full overflow-hidden border border-ink-200 bg-white shadow-lg">
+ <div className="absolute z-50 mt-1 w-full overflow-hidden border border-ink-200 bg-white">
             {(searchable || options.length > 6) && (
  <div className="border-b border-ink-100 p-2">
                 <input
