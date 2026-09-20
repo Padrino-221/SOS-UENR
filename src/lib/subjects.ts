@@ -1,7 +1,15 @@
 export const WASSCE_GRADES = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "E8", "F9"] as const
 export type WASSCEGrade = typeof WASSCE_GRADES[number]
 
-export const GRADE_POINTS: Record<WASSCEGrade, number> = {
+// Revised Certificate II (TVET) grading system — Ref/revised_grading_system.md.
+// Points mirror the WASSCE equivalents for the same mark ranges so the engine
+// applies the same thresholds (C6-equivalent credit pass, D7-equivalent fails).
+export const TVET_GRADES = ["A", "B+", "B-", "C+", "C-", "D", "E", "F"] as const
+export type TVETGrade = typeof TVET_GRADES[number]
+
+export type Grade = WASSCEGrade | TVETGrade
+
+export const GRADE_POINTS: Record<Grade, number> = {
   A1: 1,
   B2: 2,
   B3: 3,
@@ -11,11 +19,59 @@ export const GRADE_POINTS: Record<WASSCEGrade, number> = {
   D7: 7,
   E8: 8,
   F9: 9,
+  A: 1,
+  "B+": 2,
+  "B-": 3,
+  "C+": 4,
+  "C-": 6,
+  D: 7,
+  E: 8,
+  F: 9,
 }
 
-export function isWASSCEPass(grade: WASSCEGrade | string): boolean {
-  const p = GRADE_POINTS[grade as WASSCEGrade]
+export function isPassingGrade(grade: string): boolean {
+  const p = GRADE_POINTS[grade as Grade]
   return p !== undefined && p <= 6
+}
+
+export function isWASSCEPass(grade: Grade | string): boolean {
+  return isPassingGrade(grade)
+}
+
+export const TVET_GRADE_LABELS: Record<TVETGrade, { remark: string; range: string }> = {
+  A: { remark: "Distinction", range: "75 – 100" },
+  "B+": { remark: "Upper Credit", range: "70 – 74" },
+  "B-": { remark: "Upper Credit", range: "65 – 69" },
+  "C+": { remark: "Credit", range: "55 – 64" },
+  "C-": { remark: "Lower Credit", range: "50 – 54" },
+  D: { remark: "Pass", range: "45 – 49" },
+  E: { remark: "Pass", range: "40 – 44" },
+  F: { remark: "Fail", range: "0 – 39" },
+}
+
+// Remarks shown to Certificate II students instead of letter grades. Each maps
+// to a representative grade so the engine can still score the result.
+export const TVET_REMARK_GRADES: { remark: string; grade: TVETGrade }[] = [
+  { remark: "Distinction", grade: "A" },
+  { remark: "Upper Credit", grade: "B+" },
+  { remark: "Credit", grade: "C+" },
+  { remark: "Lower Credit", grade: "C-" },
+  { remark: "Pass", grade: "D" },
+  { remark: "Fail", grade: "F" },
+]
+
+export const TVET_REMARK_ROWS: { remark: string; ranges: string }[] = [
+  { remark: "Distinction", ranges: "75 – 100" },
+  { remark: "Upper Credit", ranges: "70 – 74 · 65 – 69" },
+  { remark: "Credit", ranges: "55 – 64" },
+  { remark: "Lower Credit", ranges: "50 – 54" },
+  { remark: "Pass", ranges: "45 – 49 · 40 – 44" },
+  { remark: "Fail", ranges: "0 – 39" },
+]
+
+export function displayGrade(grade: Grade | string): string {
+  const remark = (TVET_GRADE_LABELS as Record<string, { remark: string; range: string }>)[grade]
+  return remark ? remark.remark : grade
 }
 
 export const CORE_SUBJECTS = [
@@ -44,6 +100,10 @@ export const SHS_TRACKS: { value: SHSTrack; label: string }[] = [
   { value: "TECHNICAL", label: "Technical" },
   { value: "VOCATIONAL", label: "Vocational / Home Economics" },
 ]
+
+export function isTVETTrack(track: SHSTrack): boolean {
+  return track === "TECHNICAL" || track === "VOCATIONAL"
+}
 
 // Reference: Ref/WASSCE_Subjects_Structure.md
 export const TRACK_ELECTIVES: Record<SHSTrack, readonly string[]> = {

@@ -633,6 +633,11 @@
   border-color: #fde68a;
   color: #92400e;
 }
+.ck-note-info {
+  background: var(--color-brand-50);
+  border-color: var(--color-brand-200);
+  color: var(--color-brand-800);
+}
 
 /* Stat tile */
 .ck-tile {

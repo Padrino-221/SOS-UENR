@@ -210,18 +210,21 @@ export const rules = {
   // ── Diploma Programmes ──
   "diploma-fire-safety": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [],
     note: "Diploma: 3 cores + 2 electives. Or GCE 'A' Level (3 passes, 1 at D+). Or Certificate in Forestry/Agriculture.",
   }),
   "diploma-natural-resources-management": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [],
     note: "Diploma: 3 cores + 2 electives. Or GCE 'A' Level. Or Certificate in Forestry/Agriculture.",
   }),
   "diploma-geoinformation-science": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [
       { any: 2, from: ["Chemistry", "Physics", "Biology", "General Agriculture", "Elective Mathematics", "Geography", "Economics", "History", "Government", "ICT", "Building Construction"], label: "2 electives from Chemistry, Physics, Biology/General Agriculture/Forestry, Elective Math, Geography, Economics, History, Government, ICT, Building Technology" },
@@ -230,6 +233,7 @@ export const rules = {
   }),
   "diploma-geomatics": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [
       { any: 2, from: ["Chemistry", "Physics", "Biology", "General Agriculture"], label: "2 Science electives (Chemistry, Physics, Biology, General Agriculture/Forestry)" },
@@ -244,14 +248,16 @@ export const rules = {
   }),
   "diploma-statistics": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [
       { any: 1, from: ["Elective Mathematics", "Financial Accounting"], label: "Elective Mathematics or Business Mathematics" },
     ],
-    note: "Diploma: 5 subjects total (3 cores + 2 electives) at A1-C6.",
+    note: "Diploma: 5 subjects total (3 cores + 2 electives) at Passes (D7 or better).",
   }),
   "diploma-computer-science": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [
       { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
@@ -676,17 +682,18 @@ async function main() {
   console.log("\n── Programmes ──")
   for (const p of programmes) {
     const deptId = deptMap[p.deptSlug] ?? null
+    const base = { name: p.name, level: p.level, mode: "Regular", duration: p.duration }
     try {
       const existing = await prisma.programme.findUnique({ where: { slug: p.slug } })
       if (existing) {
         await prisma.programme.update({
           where: { slug: p.slug },
-          data: { name: p.name, level: p.level, mode: "Regular", duration: p.duration, departmentId: deptId },
+          data: { ...base, ...(deptId ? { departmentId: deptId } : {}) },
         })
         console.log(`  ✓ Updated: ${p.name}`)
       } else {
         await prisma.programme.create({
-          data: { slug: p.slug, name: p.name, level: p.level, mode: "Regular", duration: p.duration, departmentId: deptId, summary: `${p.name} programme at the University of Energy and Natural Resources.`, published: true },
+          data: { slug: p.slug, ...base, ...(deptId ? { departmentId: deptId } : {}), summary: `${p.name} programme at the University of Energy and Natural Resources.`, published: true },
         })
         console.log(`  ✓ Created: ${p.name}`)
       }

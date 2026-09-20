@@ -1,8 +1,8 @@
-import { CORE_SUBJECTS, GRADE_POINTS, isWASSCEPass, normalizeSubject, type WASSCEGrade } from "./subjects"
+import { CORE_SUBJECTS, GRADE_POINTS, isWASSCEPass, normalizeSubject, displayGrade, type WASSCEGrade, type Grade } from "./subjects"
 
 export type SubjectResult = {
   subject: string // canonical e.g. "Elective Mathematics"
-  grade: WASSCEGrade
+  grade: Grade
 }
 
 export type ProgrammeForCheck = {
@@ -51,14 +51,14 @@ export type CheckResult = {
   tier: "ELIGIBLE" | "ALMOST" | "NOT"
   missingCores: string[]
   missingGroups: { label: string; options: string[] }[]
-  failedGradeSubjects: { subject: string; grade: WASSCEGrade }[]
+  failedGradeSubjects: { subject: string; grade: Grade }[]
   aggregate: number | null // sum of best 6 points if calculable
   score: number // 0-100 for ranking
   details: string // friendly line
   requiresExam: boolean
 }
 
-function gradeOk(grade: WASSCEGrade, minGrade: WASSCEGrade): boolean {
+function gradeOk(grade: Grade, minGrade: WASSCEGrade): boolean {
   const g = GRADE_POINTS[grade]
   const m = GRADE_POINTS[minGrade]
   return g !== undefined && m !== undefined && g <= m
@@ -185,7 +185,7 @@ export function evaluateProgramme(
   }
 
   const missingCores: string[] = []
-  const failedCoreGrades: { subject: string; grade: WASSCEGrade }[] = []
+  const failedCoreGrades: { subject: string; grade: Grade }[] = []
 
   // Check cores. When a rule allows an alternative (e.g. Integrated Science OR
   // Social Studies) and the student entered both, use whichever grade is better.
@@ -228,7 +228,7 @@ export function evaluateProgramme(
   const electivePool = results.filter((r) => !coreNorms.has(normalizeSubject(r.subject)))
 
   // Track electives with failing grades (entered but below min)
-  const failedElectiveGrades: { subject: string; grade: WASSCEGrade }[] = []
+  const failedElectiveGrades: { subject: string; grade: Grade }[] = []
   for (const r of electivePool) {
     if (!gradeOk(r.grade, rule.minGrade)) {
       failedElectiveGrades.push({ subject: r.subject, grade: r.grade })
@@ -261,9 +261,10 @@ export function evaluateProgramme(
   // Combine core and elective failures for the result
   const failedGradeSubjects = [...failedCoreGrades, ...failedElectiveGrades]
 
-  // Total subjects needed check (for diploma vs degree)
+  // Total subjects needed check (for diploma vs degree).
+  // Counts any subject at/above the rule's min grade (diplomas allow passes, i.e. D7+).
   const totalNeeded = rule.level === "DIPLOMA" ? 5 : 6
-  const totalPassCount = results.filter((r) => isWASSCEPass(r.grade) && gradeOk(r.grade, rule.minGrade)).length
+  const totalPassCount = results.filter((r) => gradeOk(r.grade, rule.minGrade)).length
   const notEnoughTotal = totalPassCount < totalNeeded
 
   const aggregate = calculateAggregate(results)
@@ -306,7 +307,7 @@ export function evaluateProgramme(
     if (rule.requiresExam) details += " Entrance exam required."
   } else if (tier === "ALMOST") {
     if (failedGradeSubjects.length > 0) {
-      details = `Grade too low: ${shortList(failedGradeSubjects.map((f) => `${f.subject} is ${f.grade}`), 2)}. Need ${rule.minGrade} or better.`
+      details = `Grade too low: ${shortList(failedGradeSubjects.map((f) => `${f.subject} is ${displayGrade(f.grade)}`), 2)}. Need ${rule.minGrade} or better.`
     } else {
       const whatsMissing = [...missingCores, ...missingGroups.map((g) => g.label)]
       details = `Missing: ${shortList(whatsMissing) || "1 requirement"}.`
@@ -315,9 +316,9 @@ export function evaluateProgramme(
   } else {
     const parts: string[] = []
     if (missingCores.length) parts.push(`Missing core: ${shortList(missingCores)}`)
-    if (failedCoreGrades.length) parts.push(`Core grade too low: ${shortList(failedCoreGrades.map((f) => `${f.subject} is ${f.grade}`), 2)}`)
+    if (failedCoreGrades.length) parts.push(`Core grade too low: ${shortList(failedCoreGrades.map((f) => `${f.subject} is ${displayGrade(f.grade)}`), 2)}`)
     if (missingGroups.length) parts.push(`Missing elective: ${shortList(missingGroups.map((g) => g.label))}`)
-    if (failedElectiveGrades.length) parts.push(`Elective grade too low: ${shortList(failedElectiveGrades.map((f) => `${f.subject} is ${f.grade}`), 2)}`)
+    if (failedElectiveGrades.length) parts.push(`Elective grade too low: ${shortList(failedElectiveGrades.map((f) => `${f.subject} is ${displayGrade(f.grade)}`), 2)}`)
     if (extraMissing > 0) parts.push(`${extraMissing} more elective(s) needed`)
     details = `${parts.slice(0, 3).join(". ") || "Requirements not met"}.`
   }
@@ -345,9 +346,11 @@ export function rankProgrammes(
       result: evaluateProgramme(results, (p.eligibilityRule as EligibilityRule | null) ?? null, p),
     }))
     .sort((a, b) => {
-      // ELIGIBLE first, then ALMOST, then NOT; within, higher score
+      // ELIGIBLE first, then ALMOST, then NOT; within, DEGREE before DIPLOMA before POSTGRADUATE, then higher score
       const tierOrder = { ELIGIBLE: 0, ALMOST: 1, NOT: 2 } as const
       if (tierOrder[a.result.tier] !== tierOrder[b.result.tier]) return tierOrder[a.result.tier] - tierOrder[b.result.tier]
+      const levelOrder = { DEGREE: 0, DIPLOMA: 1, POSTGRADUATE: 2 } as const
+      if (levelOrder[a.programme.level] !== levelOrder[b.programme.level]) return levelOrder[a.programme.level] - levelOrder[b.programme.level]
       return b.result.score - a.result.score
     })
 }

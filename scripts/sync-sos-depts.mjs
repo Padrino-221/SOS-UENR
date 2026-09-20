@@ -190,12 +190,13 @@ const programmes = [
     summary: 'Practical foundation in IT support, networking, programming, and information systems.',
     overview:
       'The Diploma Information Technology programme provides hands-on grounding in computer hardware and software, networking, web technologies, and information systems, preparing graduates for technical support and entry-level IT roles.',
-    requirements: 'Credit passes in core English, Mathematics and Integrated Science/Social Studies plus two elective subjects.',
+    requirements: 'Passes in core English, Mathematics and Integrated Science/Social Studies plus two elective subjects.',
     rule: rule('DIPLOMA', ['English Language', 'Mathematics', 'Integrated Science'], {
       coreAlternative: 'Social Studies',
+      minGrade: 'D7',
       electiveCount: 2,
       electiveGroups: [],
-      note: 'Diploma: 5 subjects total (3 cores + 2 electives) at A1-C6.',
+      note: 'Diploma: 5 subjects total (3 cores + 2 electives) at Passes (D7 or better).',
     }),
   },
   {
@@ -379,11 +380,11 @@ async function main() {
     }
   }
 
-  // 4. Backfill eligibility rules for existing programmes missing one
+  // 4. Apply eligibility rules for existing programmes (always — authoritative)
   for (const pr of programmes) {
     if (!pr.rule) continue
     const existing = await p.programme.findUnique({ where: { slug: pr.slug } })
-    if (existing && !existing.eligibilityRule) {
+    if (existing) {
       await p.programme.update({ where: { slug: pr.slug }, data: { eligibilityRule: pr.rule } })
       console.log(`rule  ✓ ${pr.slug}`)
     }

@@ -12,7 +12,7 @@ import {
   Star,
   Trophy,
 } from '@phosphor-icons/react'
-import { WASSCE_GRADES, GRADE_POINTS, normalizeSubject, type WASSCEGrade, type SHSTrack, SHS_TRACKS, getElectivesForTrack } from '@/lib/subjects'
+import { WASSCE_GRADES, TVET_REMARK_GRADES, TVET_REMARK_ROWS, GRADE_POINTS, normalizeSubject, isTVETTrack, displayGrade, type Grade, type SHSTrack, SHS_TRACKS, getElectivesForTrack } from '@/lib/subjects'
 import { evaluateProgramme, rankProgrammes, getTopRecommendation, type ProgrammeForCheck, type SubjectResult, type EligibilityRule } from '@/lib/eligibility'
 import { SelectDropdown } from '@/components/ui/select-dropdown'
 
@@ -20,7 +20,7 @@ type Props = {
   programmes: ProgrammeForCheck[]
 }
 
-type ResultRow = { subject: string; grade: WASSCEGrade | '' }
+type ResultRow = { subject: string; grade: Grade | '' }
 
 const CORE_ROWS = ["English Language", "Core Mathematics", "Integrated Science", "Social Studies"] as const
 
@@ -39,16 +39,40 @@ const STEPS = [
   { label: "Results", hint: "Programmes you qualify for" },
 ] as const
 
-function GradeSelect({ value, onChange }: { value: string; onChange: (v: WASSCEGrade | '') => void }) {
-  const options = WASSCE_GRADES.map((g) => ({ value: g, label: g }))
+function GradeSelect({ value, onChange, isTVET }: { value: string; onChange: (v: Grade | '') => void; isTVET: boolean }) {
+  const options = isTVET
+    ? TVET_REMARK_GRADES.map((r) => ({ value: r.grade, label: r.remark }))
+    : WASSCE_GRADES.map((g) => ({ value: g, label: g }))
   return (
     <SelectDropdown
       options={options}
       value={value}
-      onChange={(v) => onChange(v as WASSCEGrade | '')}
+      onChange={(v) => onChange(v as Grade | '')}
       placeholder="Grade"
       className="ck-input"
     />
+  )
+}
+
+function TVETGradingNote({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className="ck-note ck-note-info">
+      <p className="text-[11px] font-bold uppercase tracking-wide">Certificate II revised grading</p>
+      {compact ? (
+        <p className="mt-1">Distinction to Fail — Pass is a pass, Lower Credit and above count as credit.</p>
+      ) : (
+        <>
+          <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+            {TVET_REMARK_ROWS.map(({ remark, ranges }) => (
+              <span key={remark} className="rounded border border-ink-100 bg-white px-1.5 py-1 text-[11px] leading-tight">
+                <b>{remark}</b> <span className="opacity-70">({ranges})</span>
+              </span>
+            ))}
+          </div>
+          <p className="mt-2 text-xs opacity-90">Pass is a pass; Lower Credit and above count as credit for programme requirements.</p>
+        </>
+      )}
+    </div>
   )
 }
 
@@ -172,8 +196,11 @@ export function EligibilityChecker({ programmes }: Props) {
 
   const handleTrackChange = (track: SHSTrack) => {
     setShsTrack(track)
+    setCores(makeCores())
     setElectives(makeElectives())
   }
+
+  const isTVET = isTVETTrack(shsTrack)
 
   const electivesForTrack = useMemo(() => getElectivesForTrack(shsTrack), [shsTrack])
 
@@ -181,8 +208,8 @@ export function EligibilityChecker({ programmes }: Props) {
 
   const results: SubjectResult[] = useMemo(() => {
     const all: SubjectResult[] = []
-    for (const c of cores) if (c.subject && c.grade) all.push({ subject: normalizeSubject(c.subject), grade: c.grade as WASSCEGrade })
-    for (const e of electives) if (e.subject.trim() && e.grade) all.push({ subject: normalizeSubject(e.subject), grade: e.grade as WASSCEGrade })
+    for (const c of cores) if (c.subject && c.grade) all.push({ subject: normalizeSubject(c.subject), grade: c.grade as Grade })
+    for (const e of electives) if (e.subject.trim() && e.grade) all.push({ subject: normalizeSubject(e.subject), grade: e.grade as Grade })
     return all
   }, [cores, electives])
 
@@ -283,7 +310,7 @@ export function EligibilityChecker({ programmes }: Props) {
           <p className="ck-kicker">UENR Admissions</p>
           <h1 className="font-display text-ink-900">Check Your Eligibility</h1>
           <p className="ck-lede">
-            Enter your SHS background and WASSCE grades to see which programmes you qualify for.
+            Enter your SHS background and grades (WASSCE or Certificate II) to see which programmes you qualify for.
           </p>
         </div>
       </header>
@@ -321,6 +348,11 @@ export function EligibilityChecker({ programmes }: Props) {
                       placeholder="Select track"
                       className="ck-input"
                     />
+                    {isTVET && (
+                      <div className="mt-3">
+                        <TVETGradingNote />
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -383,6 +415,11 @@ export function EligibilityChecker({ programmes }: Props) {
                 <p className="mt-1.5 text-sm text-ink-500">
                   Enter your grade for all four core subjects.
                 </p>
+                {isTVET && (
+                  <div className="mt-3">
+                    <TVETGradingNote compact />
+                  </div>
+                )}
 
                 <div className="mt-5 space-y-3">
                   {cores.map((c, idx) => (
@@ -391,7 +428,7 @@ export function EligibilityChecker({ programmes }: Props) {
                         {c.subject}
                       </span>
                       <div className="w-full sm:w-28 sm:shrink-0">
-                        <GradeSelect value={c.grade} onChange={(v) => setCores((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], grade: v }; return cp })} />
+                        <GradeSelect value={c.grade} onChange={(v) => setCores((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], grade: v }; return cp })} isTVET={isTVET} />
                       </div>
                     </div>
                   ))}
@@ -425,6 +462,11 @@ export function EligibilityChecker({ programmes }: Props) {
                 <p className="mt-1.5 text-sm text-ink-500">
                   Pick your four elective subjects and their grades. Add more if you took extra.
                 </p>
+                {isTVET && (
+                  <div className="mt-3">
+                    <TVETGradingNote compact />
+                  </div>
+                )}
 
                 <div className="mt-5 space-y-3">
                   {electives.map((e, idx) => (
@@ -453,7 +495,7 @@ export function EligibilityChecker({ programmes }: Props) {
                       </div>
                       <div className="flex w-full gap-2 sm:w-auto">
                         <div className="flex-1 sm:w-28 sm:flex-none sm:shrink-0">
-                          <GradeSelect value={e.grade} onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], grade: v }; return cp })} />
+                          <GradeSelect value={e.grade} onChange={(v) => setElectives((prev) => { const cp = [...prev]; cp[idx] = { ...cp[idx], grade: v }; return cp })} isTVET={isTVET} />
                         </div>
                         {electives.length > 4 && (
                           <button
@@ -558,7 +600,7 @@ export function EligibilityChecker({ programmes }: Props) {
                         <div className="mt-3 flex flex-wrap gap-1.5">
                           {specificResult.missingCores.map((m) => <span key={m} className="ck-chip ck-chip-warn">Missing: {m}</span>)}
                           {specificResult.missingGroups.map((g) => <span key={g.label} className="ck-chip ck-chip-warn">Missing: {g.label}</span>)}
-                          {specificResult.failedGradeSubjects.slice(0, 3).map((f) => <span key={f.subject} className="ck-chip ck-chip-error">{f.subject}: {f.grade} — need C6</span>)}
+                          {specificResult.failedGradeSubjects.slice(0, 3).map((f) => <span key={f.subject} className="ck-chip ck-chip-error">{f.subject}: {displayGrade(f.grade)} — need {specificProgramme.eligibilityRule?.minGrade ?? "C6"}</span>)}
                           {specificResult.failedGradeSubjects.length > 3 && (
                             <span className="ck-chip ck-chip-error">+{specificResult.failedGradeSubjects.length - 3} more below grade</span>
                           )}

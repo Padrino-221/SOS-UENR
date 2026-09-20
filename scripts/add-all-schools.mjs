@@ -166,11 +166,12 @@ const rules = {
   }),
   "diploma-statistics": rule("DIPLOMA", ["English Language", "Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [
       { any: 1, from: ["Elective Mathematics", "Business Mathematics"], label: "Elective Mathematics or Business Mathematics" },
     ],
-    note: "Diploma: 5 subjects total (3 cores + 2 electives) at A1-C6.",
+    note: "Diploma: 5 subjects total (3 cores + 2 electives) at Passes (D7 or better).",
   }),
   "bsc-biological-science": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
     electiveCount: 3,
@@ -204,6 +205,8 @@ const rules = {
     ],
   }),
   "diploma-computer-science": rule("DIPLOMA", ["English Language", "Mathematics", "Integrated Science"], {
+    coreAlternative: "Social Studies",
+    minGrade: "D7",
     electiveCount: 2,
     electiveGroups: [
       { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
