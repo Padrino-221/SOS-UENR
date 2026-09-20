@@ -547,7 +547,6 @@ export function EligibilityChecker({ programmes }: Props) {
                       <span className={`ck-badge ${specificResult.tier === "ELIGIBLE" ? "ck-badge-success" : "ck-badge-neutral"}`}>
                         {specificResult.tier === "ELIGIBLE" ? "Eligible" : "Not eligible"}
                       </span>
-                      <span className="ml-auto text-ink-500">{specificResult.score}% match</span>
                     </div>
                     <div className="ck-card-body">
                       <h3 className="font-display text-lg leading-tight break-words text-ink-900">{specificProgramme.name}</h3>
@@ -628,13 +627,10 @@ export function EligibilityChecker({ programmes }: Props) {
                     <div className="grid gap-3 sm:grid-cols-2">
                       {visiblePickList.map(({ programme, result }) => (
                         <article key={programme.slug} className="ck-result ck-result-eligible flex flex-col">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="ck-badge ck-badge-success"><CheckCircle size={10} weight="duotone" /> Eligible</span>
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">{programme.level.toLowerCase()}</span>
-                              {result.requiresExam && <span className="ck-badge ck-badge-exam">Exam</span>}
-                            </div>
-                            <span className="shrink-0 text-xs font-bold text-ink-400">{result.score}%</span>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="ck-badge ck-badge-success"><CheckCircle size={10} weight="duotone" /> Eligible</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">{programme.level.toLowerCase()}</span>
+                            {result.requiresExam && <span className="ck-badge ck-badge-exam">Exam</span>}
                           </div>
                           <h3 className="mt-1.5 text-sm font-bold leading-tight break-words text-ink-900">{programme.name}</h3>
                           <p className="mt-0.5 text-xs text-ink-500">{programme.department?.school}</p>
