@@ -72,6 +72,7 @@ export const TRACK_ELECTIVES: Record<SHSTrack, readonly string[]> = {
     "ICT",
     "Ghanaian Language",
     "Music",
+    "West African Traditional Religion",
   ],
   VISUAL_ARTS: [
     "General Knowledge in Art",
@@ -183,6 +184,7 @@ export const ELECTIVE_SUBJECTS = [
   "Management in Living",
   "Clothing and Textiles",
   "Foods and Nutrition",
+  "West African Traditional Religion",
 ] as const
 
 // All subjects shown in selectors — cores first then electives
@@ -226,6 +228,8 @@ const ALIAS_MAP: Record<string, string> = {
   "economics": "Economics",
   "arabic": "Arabic",
   "ghanaian language": "Ghanaian Language",
+  "west african traditional religion": "West African Traditional Religion",
+  "watr": "West African Traditional Religion",
   "general knowledge in art": "General Knowledge in Art",
   "graphic design": "Graphic Design",
   "picture making": "Picture Making",
@@ -249,6 +253,7 @@ const ALIAS_MAP: Record<string, string> = {
   "applied electricity": "Applied Electricity",
   "auto mechanics": "Auto Mechanics",
   "building construction": "Building Construction",
+  "building technology": "Building Construction",
   "electronics": "Electronics and Computer Hardware",
   "electronics and computer hardware": "Electronics and Computer Hardware",
   "practical/project": "Practical/Project",

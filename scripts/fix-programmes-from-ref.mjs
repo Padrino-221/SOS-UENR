@@ -181,10 +181,29 @@ const programmes = [
   { slug: "bsc-environmental-resources-management", name: "BSc Environmental Resources Management and Sustainability", code: "ERM", level: "DEGREE", duration: "4 Years", deptSlug: "environmental-resources-management", school: "School of Natural Resources" },
 ]
 
-// ── Eligibility rules from the reference ──
-function rule(level, cores, { coreAlternative = null, minGrade = "C6", electiveCount = 3, electiveGroups = [], requiresExam = false, note = null } = {}) {
-  return { level, cores, coreAlternative, minGrade, electiveCount, electiveGroups, requiresExam, note }
+// ── Eligibility rules from Ref/2026_2027_UENR_Admission_Requirements.md ──
+function rule(level, cores, { coreAlternative = null, minGrade = "C6", electiveCount = 3, electiveGroups = [], electiveGroupAlternatives = null, requiresExam = false, note = null } = {}) {
+  const r = { level, cores, coreAlternative, minGrade, electiveCount, electiveGroups, requiresExam, note }
+  if (electiveGroupAlternatives) r.electiveGroupAlternatives = electiveGroupAlternatives
+  return r
 }
+
+// Canonical SHS elective lists (must match src/lib/subjects.ts)
+const SCIENCE = ["Elective Mathematics", "Biology", "Chemistry", "Physics", "Geography", "General Agriculture", "ICT", "French", "Music"]
+const ARTS = ["Christian Religious Studies", "Islamic Religious Studies", "Literature in English", "History", "Government", "Geography", "Economics", "French", "Arabic", "Elective Mathematics", "ICT", "Ghanaian Language", "Music", "West African Traditional Religion"]
+const HOME_ECONOMICS = ["Management in Living", "Clothing and Textiles", "Foods and Nutrition", "General Knowledge in Art", "Textiles", "Biology", "Chemistry", "Physics", "Elective Mathematics", "ICT", "Economics", "French", "Music"]
+const BUSINESS = ["Business Management", "Financial Accounting", "Cost Accounting", "Economics", "Elective Mathematics", "ICT", "French", "Music", "Typewriting", "Clerical Office Duties", "Literature in English"]
+const VISUAL_ARTS = ["General Knowledge in Art", "Graphic Design", "Picture Making", "Basketry", "Ceramics", "Jewellery", "Leatherwork", "Sculpture", "Textiles", "Biology", "Chemistry", "Physics", "Elective Mathematics", "Economics", "Literature in English", "ICT", "French", "Music"]
+const uniq = (a) => [...new Set(a)]
+
+// Science + Agricultural + Home Economics + General Arts (Nursing)
+const NURSING_ELECTIVES = uniq([...SCIENCE, ...HOME_ECONOMICS, ...ARTS])
+// Science + Agricultural + Business + General Arts + Home Economics + Visual Arts
+const BROAD_ELECTIVES = uniq([...SCIENCE, ...ARTS, ...HOME_ECONOMICS, ...BUSINESS, ...VISUAL_ARTS])
+// Business + Sciences (Accounting base option)
+const BUSINESS_SCIENCE = uniq([...BUSINESS, ...SCIENCE])
+// General Arts + General Agriculture + Business + Science (Sustainable Land Management)
+const LAND_MGMT_ELECTIVES = uniq([...ARTS, ...BUSINESS, ...SCIENCE])
 
 const rules = {
   // ── Diploma Programmes ──
@@ -203,27 +222,39 @@ const rules = {
   "diploma-geoinformation-science": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 2,
-    electiveGroups: [],
+    electiveGroups: [
+      { any: 2, from: ["Chemistry", "Physics", "Biology", "General Agriculture", "Elective Mathematics", "Geography", "Economics", "History", "Government", "ICT", "Building Construction"], label: "2 electives from Chemistry, Physics, Biology/General Agriculture/Forestry, Elective Math, Geography, Economics, History, Government, ICT, Building Technology" },
+    ],
     note: "Diploma: 3 cores + 2 electives from Chemistry, Physics, Biology/General Agriculture/Forestry, Elective Math, Geography, Economics, History, Government, ICT, Building Technology.",
   }),
   "diploma-geomatics": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 2,
-    electiveGroups: [],
-    note: "Diploma: 3 cores + 2 electives from Science (Chemistry, Physics, Biology/General Agriculture/Forestry) or General Arts (Elective Math, Geography + 1 from History, Government, Economics).",
+    electiveGroups: [
+      { any: 2, from: ["Chemistry", "Physics", "Biology", "General Agriculture"], label: "2 Science electives (Chemistry, Physics, Biology, General Agriculture/Forestry)" },
+    ],
+    electiveGroupAlternatives: [
+      [
+        { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+        { any: 1, from: ["Geography"], label: "Geography" },
+      ],
+    ],
+    note: "Diploma: 3 cores + 2 electives in Science (Chemistry, Physics, Biology/General Agriculture/Forestry) or General Arts (Elective Math + Geography).",
   }),
   "diploma-statistics": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 2,
     electiveGroups: [
-      { any: 1, from: ["Elective Mathematics", "Financial Accounting"], label: "Elective Mathematics or Financial Accounting" },
+      { any: 1, from: ["Elective Mathematics", "Financial Accounting"], label: "Elective Mathematics or Business Mathematics" },
     ],
     note: "Diploma: 5 subjects total (3 cores + 2 electives) at A1-C6.",
   }),
   "diploma-computer-science": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
+    coreAlternative: "Social Studies",
     electiveCount: 2,
     electiveGroups: [
       { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+      { any: 1, from: ["Chemistry", "Physics", "Applied Electricity", "ICT", "Geography", "Biology", "General Agriculture"], label: "1 from Chemistry, Physics/Applied Electricity, ICT, Computing, Geography, Biology, General Agriculture" },
     ],
     note: "Diploma: 3 cores + Elective Math + 1 from Chemistry, Physics/Applied Electricity, ICT, Computing, Geography, Biology, General Agriculture.",
   }),
@@ -232,91 +263,125 @@ const rules = {
   "bsc-agriculture": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Biology", "Chemistry"], label: "Biology or Chemistry" },
-      { any: 1, from: ["General Agriculture", "Forestry"], label: "General Agriculture or Forestry" },
+      { any: 1, from: ["Chemistry"], label: "Chemistry" },
+      { any: 1, from: ["Biology", "General Agriculture"], label: "Biology or General Agriculture/Forestry" },
       { any: 1, from: ["Physics", "Elective Mathematics"], label: "Physics or Elective Mathematics" },
     ],
     note: "Option 1: Biology, Chemistry, Physics/Elective Math. Option 2: General Agriculture/Forestry, Chemistry, Physics/Elective Math.",
   }),
   "bsc-agribusiness": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
-    electiveGroups: [],
-    note: "Any 3 electives from Science, General Agriculture, Business, General Arts, Home Economics, or Visual Arts.",
+    electiveGroups: [
+      { any: 3, from: BROAD_ELECTIVES, label: "3 electives from Science, General Agriculture, Business, General Arts, Home Economics or Visual Arts" },
+    ],
+    note: "Credit passes in 3 cores + 3 electives from Science, General Agriculture, Business, General Arts, Home Economics, or Visual Arts.",
   }),
   "bsc-agricultural-and-resource-economics": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "Any 3 electives from General Science, Agricultural Science, General Arts, Visual Arts, Business, or Home Economics.",
+    electiveGroups: [
+      { any: 3, from: BROAD_ELECTIVES, label: "3 electives from Science, Agricultural Science, General Arts, Visual Arts, Business, or Home Economics" },
+    ],
+    note: "Credit passes in 3 cores + 3 electives from General Science, Agricultural Science, General Arts, Visual Arts, Business, or Home Economics.",
   }),
   "bsc-food-technology": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Elective Math/Physics, Chemistry, Biology, General Agriculture, Animal/Crop Husbandry, Horticulture, Fisheries, Forestry, Food & Nutrition.",
+    electiveGroups: [
+      { any: 3, from: ["Elective Mathematics", "Physics", "Chemistry", "Biology", "General Agriculture", "Foods and Nutrition"], label: "3 electives from Elective Math/Physics, Chemistry, Biology, General Agriculture, Animal/Crop Husbandry, Horticulture, Fisheries, Forestry, Food & Nutrition" },
+    ],
+    note: "Credit passes in 3 cores + 3 electives from Elective Math/Physics, Chemistry, Biology, General Agriculture, Animal/Crop Husbandry, Horticulture, Fisheries, Forestry, Food & Nutrition.",
   }),
 
   // ── School of Geosciences ──
   "bsc-applied-meteorology-and-climate-science": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Chemistry", "Physics"], label: "Chemistry or Physics" },
-      { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
-      { any: 1, from: ["Biology", "General Agriculture", "Forestry"], label: "Biology / General Agriculture / Forestry" },
+      { any: 3, from: ["Chemistry", "Physics", "Elective Mathematics", "Biology", "General Agriculture"], label: "3 electives from Chemistry, Physics, Elective Math, Biology/General Agriculture/Forestry" },
     ],
   }),
   "bsc-climate-change-and-sustainable-development": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Chemistry, Physics, Biology/General Agriculture/Forestry, Elective Math, Geography, Economics, History, Government.",
+    electiveGroups: [
+      { any: 3, from: ["Chemistry", "Physics", "Biology", "General Agriculture", "Elective Mathematics", "Geography", "Economics", "History", "Government"], label: "3 electives from Chemistry, Physics, Biology/General Agriculture/Forestry, Elective Math, Geography, Economics, History, Government" },
+    ],
   }),
   "bsc-geo-environmental-science": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Physics", "Chemistry"], label: "Physics or Chemistry" },
-      { any: 1, from: ["Biology", "Geography"], label: "Biology or Geography" },
-      { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+      { any: 3, from: ["Physics", "Chemistry", "Biology", "Geography", "Elective Mathematics"], label: "3 electives from Physics, Chemistry, Biology, Geography, Elective Math" },
     ],
   }),
   "bsc-geoinformation-science": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "Science: 3 electives from Chemistry, Physics, Elective Math, Biology/General Agriculture/Forestry, Geography. General Arts: Geography + 2 from History, Government, Economics.",
+    electiveGroups: [
+      { any: 3, from: ["Chemistry", "Physics", "Elective Mathematics", "Biology", "General Agriculture", "Geography"], label: "Science: 3 electives from Chemistry, Physics, Elective Math, Biology/General Agriculture/Forestry, Geography" },
+    ],
+    electiveGroupAlternatives: [
+      [
+        { any: 1, from: ["Geography"], label: "General Arts: Geography" },
+        { any: 2, from: ["History", "Government", "Economics"], label: "2 from History, Government, Economics" },
+      ],
+    ],
+    note: "Science background: 3 electives from Chemistry, Physics, Elective Math, Biology/General Agriculture/Forestry, Geography. General Arts background: Geography + 2 from History, Government, Economics.",
   }),
   "bsc-geomatics": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
     electiveGroups: [
       { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+      { any: 2, from: ["Physics", "Chemistry", "Biology", "General Agriculture", "Geography"], label: "2 Science electives (Physics, Chemistry, Biology, General Agriculture/Forestry, Geography)" },
     ],
-    note: "Science: Elective Math + 2 Science electives. General Arts: Elective Math + Geography + 1 from History, Government, Economics.",
+    electiveGroupAlternatives: [
+      [
+        { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+        { any: 1, from: ["Geography"], label: "Geography" },
+        { any: 1, from: ["History", "Government", "Economics"], label: "1 from History, Government, Economics" },
+      ],
+    ],
+    note: "Science: Elective Math + 2 Science electives (Physics, Chemistry, Biology/General Agriculture/Forestry, Geography). General Arts: Elective Math + Geography + 1 from History, Government, Economics.",
   }),
   "bsc-planning-and-sustainability": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Geography, Economics, Elective Math, Government, History, Accounting, Business Management, Costing.",
+    electiveGroups: [
+      { any: 3, from: ["Geography", "Economics", "Elective Mathematics", "Government", "History", "Financial Accounting", "Business Management", "Cost Accounting"], label: "3 electives from Geography, Economics, Elective Math, Government, History, Accounting, Business Management, Costing" },
+    ],
   }),
 
   // ── School of Arts and Social Sciences ──
   "bsc-accounting": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Business, Sciences, General Arts (with Elective Math or Economics), or Home Economics (with Elective Math or Economics).",
+    electiveGroups: [
+      { any: 3, from: BUSINESS_SCIENCE, label: "3 electives from Business or Sciences" },
+    ],
+    electiveGroupAlternatives: [
+      [
+        { any: 1, from: ["Elective Mathematics", "Economics"], label: "Elective Mathematics or Economics" },
+        { any: 2, from: ARTS, label: "2 more General Arts electives" },
+      ],
+      [
+        { any: 1, from: ["Elective Mathematics", "Economics"], label: "Elective Mathematics or Economics" },
+        { any: 2, from: HOME_ECONOMICS, label: "2 more Home Economics electives" },
+      ],
+    ],
+    note: "3 electives from Business or Sciences; or General Arts / Home Economics including Elective Math or Economics.",
   }),
   "bsc-economics": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Science, General Arts, Home Economics, Business, Agriculture, or Visual Arts.",
+    electiveGroups: [
+      { any: 3, from: BROAD_ELECTIVES, label: "3 electives from Science, General Arts, Home Economics, Business, Agriculture, or Visual Arts" },
+    ],
   }),
   "bsc-resource-enterprise-and-entrepreneurship": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Science, General Arts, Home Economics, Business, Agriculture, or Visual Arts.",
+    electiveGroups: [
+      { any: 3, from: BROAD_ELECTIVES, label: "3 electives from Science, General Arts, Home Economics, Business, Agriculture, or Visual Arts" },
+    ],
   }),
 
   // ── School of Engineering ──
@@ -391,8 +456,9 @@ const rules = {
   "bsc-sustainable-land-management": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from General Arts, General Agriculture, Business, or Science.",
+    electiveGroups: [
+      { any: 3, from: LAND_MGMT_ELECTIVES, label: "3 electives from General Arts, General Agriculture, Business, or Science" },
+    ],
   }),
   "bsc-development-minerals-mining": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
@@ -424,7 +490,9 @@ const rules = {
   "bsc-resource-and-development-planning": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
+    electiveGroups: [
+      { any: 3, from: ["Geography", "Economics", "Elective Mathematics", "Government", "History", "Christian Religious Studies", "Islamic Religious Studies", "Literature in English", "West African Traditional Religion", "Financial Accounting", "Cost Accounting", "Business Management", "Clerical Office Duties", "Typewriting"], label: "3 electives from the listed subjects" },
+    ],
     note: "3 electives from Geography, Economics, Elective Math, Government, History, CRS, IRS, Literature-in-English, West African Traditional Religion, Financial Accounting, Cost Accounting, Business Management, Clerical Office Duties, Typewriting.",
   }),
 
@@ -432,9 +500,7 @@ const rules = {
   "bsc-aquaculture-and-aquatic-resources": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Biology", "General Agriculture", "Forestry", "Fisheries"], label: "Biology / General Agriculture / Forestry / Fisheries" },
-      { any: 1, from: ["Geography", "Economics"], label: "Geography or Economics" },
-      { any: 1, from: ["Chemistry", "Physics", "Elective Mathematics"], label: "Chemistry / Physics / Elective Mathematics" },
+      { any: 3, from: ["Biology", "General Agriculture", "Geography", "Economics", "Chemistry", "Physics", "Elective Mathematics"], label: "3 electives from Biology/General Agriculture/Forestry/Fisheries, Geography/Economics, Chemistry, Physics, Mathematics" },
     ],
   }),
   "bsc-fire-safety-and-disaster-management": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
@@ -446,44 +512,44 @@ const rules = {
   "bsc-hospitality-management": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Science, General Arts, Home Economics, Business, Agriculture, Visual Arts.",
+    electiveGroups: [
+      { any: 3, from: BROAD_ELECTIVES, label: "3 electives from Science, General Arts, Home Economics, Business, Agriculture, Visual Arts" },
+    ],
   }),
   "bsc-natural-resources-management": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Chemistry", "Physics"], label: "Chemistry or Physics" },
-      { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
-      { any: 1, from: ["Biology", "General Agriculture", "Forestry"], label: "Biology / General Agriculture / Forestry" },
+      { any: 3, from: ["Chemistry", "Physics", "Elective Mathematics", "Biology", "General Agriculture"], label: "3 electives from Chemistry, Physics, Elective Math, Biology/Agriculture/Forestry" },
     ],
     note: "Options: Ecotourism, Fisheries & Aquaculture, Forest Resources Management, Land Reclamation & Restoration, Social Forestry. Home Economics requires Biology/Chemistry.",
   }),
   "bsc-environmental-resources-management": rule("DEGREE", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
-    electiveGroups: [],
-    note: "3 electives from Elective Math, Physics, Chemistry, Biology, General Agriculture, Economics, Geography, Government, Business Management.",
+    electiveGroups: [
+      { any: 3, from: ["Elective Mathematics", "Physics", "Chemistry", "Biology", "General Agriculture", "Economics", "Geography", "Government", "Business Management"], label: "3 electives from Elective Math, Physics, Chemistry, Biology, General Agriculture, Economics, Geography, Government, Business Management" },
+    ],
   }),
 
-  // ── School of Sciences (unchanged) ──
+  // ── School of Sciences ──
   "bsc-actuarial-science": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+      { any: 1, from: ["Elective Mathematics", "Further Mathematics", "Business Mathematics"], label: "Elective Mathematics / Further Mathematics / Business Mathematics" },
     ],
-    note: "Any 3 electives from General Science, Business or Arts including the required maths option.",
+    note: "Any 3 electives including the required maths option.",
   }),
   "bsc-mathematics": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+      { any: 1, from: ["Elective Mathematics", "Further Mathematics"], label: "Elective Mathematics / Further Mathematics" },
     ],
   }),
   "bsc-statistics": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
     electiveCount: 3,
     electiveGroups: [
-      { any: 1, from: ["Elective Mathematics"], label: "Elective Mathematics" },
+      { any: 1, from: ["Elective Mathematics", "Further Mathematics"], label: "Elective Mathematics / Further Mathematics" },
     ],
   }),
   "bsc-biological-science": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
@@ -491,7 +557,7 @@ const rules = {
     electiveGroups: [
       { any: 1, from: ["Chemistry"], label: "Chemistry" },
       { any: 1, from: ["Elective Mathematics", "Physics"], label: "Elective Mathematics or Physics" },
-      { any: 1, from: ["Biology", "General Agriculture", "Forestry"], label: "Biology / General Agriculture / Forestry" },
+      { any: 1, from: ["Biology", "General Agriculture"], label: "Biology / General Agriculture / Forestry" },
     ],
   }),
   "bsc-biochemistry": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
@@ -499,7 +565,7 @@ const rules = {
     electiveGroups: [
       { any: 1, from: ["Chemistry"], label: "Chemistry" },
       { any: 1, from: ["Biology"], label: "Biology" },
-      { any: 1, from: ["Physics", "Applied Electricity", "Elective Mathematics", "General Agriculture", "Forestry"], label: "Physics / Applied Electricity / Elective Mathematics / General Agriculture / Forestry" },
+      { any: 1, from: ["Physics", "Applied Electricity", "Elective Mathematics", "General Agriculture"], label: "Physics / Applied Electricity / Elective Mathematics / General Agriculture / Forestry" },
     ],
   }),
   "bsc-chemistry": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
@@ -535,16 +601,18 @@ const rules = {
     electiveGroups: [
       { any: 1, from: ["Chemistry"], label: "Chemistry" },
       { any: 1, from: ["Elective Mathematics", "Physics"], label: "Elective Mathematics or Physics" },
-      { any: 1, from: ["Biology", "General Agriculture", "Forestry"], label: "Biology / General Agriculture / Forestry" },
+      { any: 1, from: ["Biology", "General Agriculture"], label: "Biology / General Agriculture / Forestry" },
     ],
     requiresExam: true,
     note: "Qualified applicants write an entrance exam and attend an interview.",
   }),
   "bsc-nursing": rule("DEGREE", ["English Language", "Mathematics", "Integrated Science"], {
     electiveCount: 3,
-    electiveGroups: [],
+    electiveGroups: [
+      { any: 3, from: NURSING_ELECTIVES, label: "3 electives from Science, Agricultural, Home Economics or General Arts options" },
+    ],
     requiresExam: true,
-    note: "Electives from Science, Agriculture, Home Economics or General Arts — any 3 passed at C6 qualifies, but you will also sit an entrance exam.",
+    note: "Electives from Science, Agricultural, Home Economics or General Arts options. Entrance exam and interview required.",
   }),
 }
 
@@ -607,18 +675,17 @@ async function main() {
   console.log("\n── Programmes ──")
   for (const p of programmes) {
     const deptId = deptMap[p.deptSlug] ?? null
-    const summary = `${p.name} programme at the University of Energy and Natural Resources.`
     try {
       const existing = await prisma.programme.findUnique({ where: { slug: p.slug } })
       if (existing) {
         await prisma.programme.update({
           where: { slug: p.slug },
-          data: { name: p.name, code: p.code, level: p.level, mode: "Regular", duration: p.duration, departmentId: deptId, summary },
+          data: { name: p.name, level: p.level, mode: "Regular", duration: p.duration, departmentId: deptId },
         })
         console.log(`  ✓ Updated: ${p.name}`)
       } else {
         await prisma.programme.create({
-          data: { slug: p.slug, name: p.name, code: p.code, level: p.level, mode: "Regular", duration: p.duration, departmentId: deptId, summary, published: true },
+          data: { slug: p.slug, name: p.name, level: p.level, mode: "Regular", duration: p.duration, departmentId: deptId, summary: `${p.name} programme at the University of Energy and Natural Resources.`, published: true },
         })
         console.log(`  ✓ Created: ${p.name}`)
       }

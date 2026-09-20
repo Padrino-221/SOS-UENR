@@ -36,6 +36,9 @@ export type EligibilityRule = {
   electiveCount: number
   /** Specific elective constraints — remaining slots are "any elective" */
   electiveGroups: ElectiveGroup[]
+  /** OR-alternatives: each entry is a full alternative set of elective groups —
+   *  satisfying the base set OR any alternative fulfils the elective requirement */
+  electiveGroupAlternatives?: ElectiveGroup[][]
   /** If true, even if eligible, show exam note */
   requiresExam?: boolean
   /** Optional cut-off aggregate (sum 6 best) — null = no cut-off */
@@ -71,6 +74,62 @@ function findResultForSubject(
 
 function subjectMatchesAny(result: SubjectResult, options: string[]): boolean {
   return options.some((opt) => normalizeSubject(result.subject) === normalizeSubject(opt))
+}
+
+type GroupSetOutcome = {
+  missing: { label: string; options: string[] }[]
+  extraMissing: number
+  satisfied: boolean
+}
+
+function evaluateGroupSet(
+  groups: ElectiveGroup[],
+  rule: EligibilityRule,
+  passedElectives: SubjectResult[],
+  electivePool: SubjectResult[],
+): GroupSetOutcome {
+  const missing: { label: string; options: string[] }[] = []
+  const usedIndices = new Set<number>()
+  let matchedAll = true
+
+  for (const group of groups) {
+    let satisfied = 0
+    for (let need = 0; need < group.any; need++) {
+      const idx = passedElectives.findIndex(
+        (r, i) => !usedIndices.has(i) && subjectMatchesAny(r, group.from),
+      )
+      if (idx !== -1) {
+        usedIndices.add(idx)
+        satisfied++
+      }
+    }
+    if (satisfied < group.any) {
+      matchedAll = false
+      // Only suppress the "missing" report when failed grades account for the
+      // whole shortfall — otherwise the subject is genuinely absent.
+      const failedEntries = electivePool.filter(
+        (r) => subjectMatchesAny(r, group.from) && !gradeOk(r.grade, rule.minGrade),
+      ).length
+      if (satisfied + failedEntries < group.any) {
+        missing.push({
+          label: group.label || group.from.join(" / "),
+          options: group.from,
+        })
+      }
+    }
+  }
+
+  const groupsAnyTotal = groups.reduce((sum, g) => sum + g.any, 0)
+  const remainingNeeded = rule.electiveCount - groupsAnyTotal
+  let extraMissing = 0
+  if (remainingNeeded > 0) {
+    const remainingAvailable = passedElectives.length - usedIndices.size
+    if (remainingAvailable < remainingNeeded) {
+      extraMissing = remainingNeeded - remainingAvailable
+    }
+  }
+
+  return { missing, extraMissing, satisfied: matchedAll && extraMissing === 0 }
 }
 
 function calculateAggregate(results: SubjectResult[]): number | null {
@@ -179,47 +238,28 @@ export function evaluateProgramme(
   // Filter pool to only passed subjects with required min grade for counting toward requirements
   const passedElectives = electivePool.filter((r) => gradeOk(r.grade, rule.minGrade))
 
-  const missingGroups: { label: string; options: string[] }[] = []
-  const usedIndices = new Set<number>()
-
-  for (const group of rule.electiveGroups) {
-    let satisfied = 0
-    for (let need = 0; need < group.any; need++) {
-      const idx = passedElectives.findIndex(
-        (r, i) => !usedIndices.has(i) && subjectMatchesAny(r, group.from),
-      )
-      if (idx !== -1) {
-        usedIndices.add(idx)
-        satisfied++
-      }
+  // Elective requirement: the base group set, or any alternative set for
+  // programmes with "Science option OR Arts option" style requirements.
+  const groupSets: ElectiveGroup[][] =
+    rule.electiveGroupAlternatives && rule.electiveGroupAlternatives.length > 0
+      ? [rule.electiveGroups, ...rule.electiveGroupAlternatives]
+      : [rule.electiveGroups]
+  const outcomes = groupSets.map((g) => evaluateGroupSet(g, rule, passedElectives, electivePool))
+  let chosenOutcome = outcomes[0]
+  for (const o of outcomes) {
+    if (o.satisfied) {
+      chosenOutcome = o
+      break
     }
-    if (satisfied < group.any) {
-      // Check if user entered any of these subjects but with a failing grade
-      const enteredButFailed = electivePool.some(
-        (r) => subjectMatchesAny(r, group.from) && !gradeOk(r.grade, rule.minGrade),
-      )
-      if (!enteredButFailed) {
-        missingGroups.push({
-          label: group.label || group.from.join(" / "),
-          options: group.from,
-        })
-      }
+    if (o.missing.length + o.extraMissing < chosenOutcome.missing.length + chosenOutcome.extraMissing) {
+      chosenOutcome = o
     }
   }
+  const missingGroups = chosenOutcome.missing
+  const extraMissing = chosenOutcome.extraMissing
 
   // Combine core and elective failures for the result
   const failedGradeSubjects = [...failedCoreGrades, ...failedElectiveGrades]
-
-  // Remaining elective slots: total - groups satisfied count
-  const groupsAnyTotal = rule.electiveGroups.reduce((sum, g) => sum + g.any, 0)
-  const remainingNeeded = rule.electiveCount - groupsAnyTotal
-  let extraMissing = 0
-  if (remainingNeeded > 0) {
-    const remainingAvailable = passedElectives.length - usedIndices.size
-    if (remainingAvailable < remainingNeeded) {
-      extraMissing = remainingNeeded - remainingAvailable
-    }
-  }
 
   // Total subjects needed check (for diploma vs degree)
   const totalNeeded = rule.level === "DIPLOMA" ? 5 : 6
@@ -228,9 +268,8 @@ export function evaluateProgramme(
 
   const aggregate = calculateAggregate(results)
   const hasCoreProblems = missingCores.length > 0 || failedCoreGrades.length > 0
-  const hasElectiveProblems = missingGroups.length > 0 || extraMissing > 0
 
-  let eligible = !hasCoreProblems && !hasElectiveProblems && !notEnoughTotal
+  let eligible = !hasCoreProblems && chosenOutcome.satisfied && !notEnoughTotal
   // If aggregate cut-off exists, check it
   if (eligible && rule.aggregateCutOff && aggregate !== null) {
     if (aggregate > rule.aggregateCutOff) eligible = false
