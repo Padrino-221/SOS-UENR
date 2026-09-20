@@ -12,7 +12,7 @@ import {
   Star,
   Trophy,
 } from '@phosphor-icons/react'
-import { WASSCE_GRADES, TVET_REMARK_GRADES, TVET_REMARK_ROWS, GRADE_POINTS, normalizeSubject, isTVETTrack, displayGrade, type Grade, type SHSTrack, SHS_TRACKS, getElectivesForTrack } from '@/lib/subjects'
+import { WASSCE_GRADES, TVET_REMARK_GRADES, GRADE_POINTS, normalizeSubject, isTVETTrack, displayGrade, type Grade, type SHSTrack, SHS_TRACKS, getElectivesForTrack } from '@/lib/subjects'
 import { evaluateProgramme, rankProgrammes, getTopRecommendation, type ProgrammeForCheck, type SubjectResult, type EligibilityRule } from '@/lib/eligibility'
 import { SelectDropdown } from '@/components/ui/select-dropdown'
 
@@ -51,28 +51,6 @@ function GradeSelect({ value, onChange, isTVET }: { value: string; onChange: (v:
       placeholder="Grade"
       className="ck-input"
     />
-  )
-}
-
-function TVETGradingNote({ compact = false }: { compact?: boolean }) {
-  return (
-    <div className="ck-note ck-note-info">
-      <p className="text-[11px] font-bold uppercase tracking-wide">Certificate II revised grading</p>
-      {compact ? (
-        <p className="mt-1">Distinction to Fail — Pass is a pass, Lower Credit and above count as credit.</p>
-      ) : (
-        <>
-          <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-            {TVET_REMARK_ROWS.map(({ remark, ranges }) => (
-              <span key={remark} className="rounded border border-ink-100 bg-white px-1.5 py-1 text-[11px] leading-tight">
-                <b>{remark}</b> <span className="opacity-70">({ranges})</span>
-              </span>
-            ))}
-          </div>
-          <p className="mt-2 text-xs opacity-90">Pass is a pass; Lower Credit and above count as credit for programme requirements.</p>
-        </>
-      )}
-    </div>
   )
 }
 
@@ -348,11 +326,6 @@ export function EligibilityChecker({ programmes }: Props) {
                       placeholder="Select track"
                       className="ck-input"
                     />
-                    {isTVET && (
-                      <div className="mt-3">
-                        <TVETGradingNote />
-                      </div>
-                    )}
                   </div>
 
                   <div>
@@ -415,11 +388,6 @@ export function EligibilityChecker({ programmes }: Props) {
                 <p className="mt-1.5 text-sm text-ink-500">
                   Enter your grade for all four core subjects.
                 </p>
-                {isTVET && (
-                  <div className="mt-3">
-                    <TVETGradingNote compact />
-                  </div>
-                )}
 
                 <div className="mt-5 space-y-3">
                   {cores.map((c, idx) => (
@@ -462,11 +430,6 @@ export function EligibilityChecker({ programmes }: Props) {
                 <p className="mt-1.5 text-sm text-ink-500">
                   Pick your four elective subjects and their grades. Add more if you took extra.
                 </p>
-                {isTVET && (
-                  <div className="mt-3">
-                    <TVETGradingNote compact />
-                  </div>
-                )}
 
                 <div className="mt-5 space-y-3">
                   {electives.map((e, idx) => (
