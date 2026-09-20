@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import {
   ArrowClockwise,
@@ -570,11 +569,8 @@ export function EligibilityChecker({ programmes }: Props) {
                         </div>
                       )}
                       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                        <Link href={`/programmes/${specificProgramme.slug}`} className="ck-btn ck-btn-primary ck-btn-sm w-full sm:w-auto">
-                          View programme <ArrowRight size={12} weight="duotone" />
-                        </Link>
                         {specificResult.tier === "ELIGIBLE" && (
-                          <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-secondary ck-btn-sm w-full sm:w-auto">
+                          <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-primary ck-btn-sm w-full sm:w-auto">
                             Apply
                           </a>
                         )}
@@ -606,10 +602,7 @@ export function EligibilityChecker({ programmes }: Props) {
                         </p>
                       )}
                       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                        <Link href={`/programmes/${topRecommendation.programme.slug}`} className="ck-btn ck-btn-primary ck-btn-sm w-full sm:w-auto">
-                          View programme <ArrowRight size={12} weight="duotone" />
-                        </Link>
-                        <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-secondary ck-btn-sm w-full sm:w-auto">
+                        <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-primary ck-btn-sm w-full sm:w-auto">
                           Apply
                         </a>
                       </div>
@@ -641,8 +634,7 @@ export function EligibilityChecker({ programmes }: Props) {
                           <p className="mt-0.5 text-xs text-ink-500">{programme.department?.school}</p>
                           <p className="mt-1 line-clamp-2 text-xs text-ink-600">{result.details}</p>
                           <div className="mt-auto flex flex-col gap-1.5 pt-3 sm:flex-row">
-                            <Link href={`/programmes/${programme.slug}`} className="ck-btn ck-btn-primary ck-btn-xs w-full sm:w-auto">View</Link>
-                            <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-secondary ck-btn-xs w-full sm:w-auto">Apply</a>
+                            <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-primary ck-btn-xs w-full sm:w-auto">Apply</a>
                           </div>
                         </article>
                       ))}
