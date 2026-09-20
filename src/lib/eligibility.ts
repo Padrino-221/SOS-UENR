@@ -87,6 +87,7 @@ function evaluateGroupSet(
   rule: EligibilityRule,
   passedElectives: SubjectResult[],
   electivePool: SubjectResult[],
+  countFailedAsCovered = true,
 ): GroupSetOutcome {
   const missing: { label: string; options: string[] }[] = []
   const usedIndices = new Set<number>()
@@ -110,7 +111,7 @@ function evaluateGroupSet(
       const failedEntries = electivePool.filter(
         (r) => subjectMatchesAny(r, group.from) && !gradeOk(r.grade, rule.minGrade),
       ).length
-      if (satisfied + failedEntries < group.any) {
+      if (!countFailedAsCovered || satisfied + failedEntries < group.any) {
         missing.push({
           label: group.label || group.from.join(" / "),
           options: group.from,
@@ -130,6 +131,30 @@ function evaluateGroupSet(
   }
 
   return { missing, extraMissing, satisfied: matchedAll && extraMissing === 0 }
+}
+
+function shortfallOf(outcome: GroupSetOutcome): number {
+  return outcome.missing.length + outcome.extraMissing
+}
+
+/** Picks the best (least shortfall) OR-alternative group set. */
+function bestGroupSetOutcome(
+  groupSets: ElectiveGroup[][],
+  rule: EligibilityRule,
+  passedElectives: SubjectResult[],
+  electivePool: SubjectResult[],
+  countFailedAsCovered = true,
+): GroupSetOutcome {
+  const outcomes = groupSets.map((g) => evaluateGroupSet(g, rule, passedElectives, electivePool, countFailedAsCovered))
+  let chosen = outcomes[0]
+  for (const o of outcomes) {
+    if (o.satisfied) {
+      chosen = o
+      break
+    }
+    if (shortfallOf(o) < shortfallOf(chosen)) chosen = o
+  }
+  return chosen
 }
 
 function calculateAggregate(results: SubjectResult[]): number | null {
@@ -227,14 +252,6 @@ export function evaluateProgramme(
   if (rule.coreAlternative) coreNorms.add(normalizeSubject(rule.coreAlternative))
   const electivePool = results.filter((r) => !coreNorms.has(normalizeSubject(r.subject)))
 
-  // Track electives with failing grades (entered but below min)
-  const failedElectiveGrades: { subject: string; grade: Grade }[] = []
-  for (const r of electivePool) {
-    if (!gradeOk(r.grade, rule.minGrade)) {
-      failedElectiveGrades.push({ subject: r.subject, grade: r.grade })
-    }
-  }
-
   // Filter pool to only passed subjects with required min grade for counting toward requirements
   const passedElectives = electivePool.filter((r) => gradeOk(r.grade, rule.minGrade))
 
@@ -244,19 +261,28 @@ export function evaluateProgramme(
     rule.electiveGroupAlternatives && rule.electiveGroupAlternatives.length > 0
       ? [rule.electiveGroups, ...rule.electiveGroupAlternatives]
       : [rule.electiveGroups]
-  const outcomes = groupSets.map((g) => evaluateGroupSet(g, rule, passedElectives, electivePool))
-  let chosenOutcome = outcomes[0]
-  for (const o of outcomes) {
-    if (o.satisfied) {
-      chosenOutcome = o
-      break
-    }
-    if (o.missing.length + o.extraMissing < chosenOutcome.missing.length + chosenOutcome.extraMissing) {
-      chosenOutcome = o
-    }
-  }
+  const chosenOutcome = bestGroupSetOutcome(groupSets, rule, passedElectives, electivePool)
   const missingGroups = chosenOutcome.missing
   const extraMissing = chosenOutcome.extraMissing
+
+  // Track electives with failing grades (entered but below min).
+  // Only report the ones that are load-bearing: upgrading that subject must
+  // shrink the elective shortfall, otherwise it's an extra the student entered
+  // beyond what the programme needs (e.g. D7 Physics when Elective Math already
+  // satisfies the Physics/Elective Math group).
+  const failedElectiveGrades: { subject: string; grade: Grade }[] = []
+  for (const r of electivePool) {
+    if (!gradeOk(r.grade, rule.minGrade)) {
+      // Compare against outcomes that DON'T count failed grades as covering the
+      // shortfall, so a low grade is only reported as a blocker when upgrading
+      // it would genuinely close remaining requirement gaps.
+      const before = shortfallOf(bestGroupSetOutcome(groupSets, rule, passedElectives, electivePool, false))
+      const after = shortfallOf(
+        bestGroupSetOutcome(groupSets, rule, [...passedElectives, r], electivePool, false),
+      )
+      if (after < before) failedElectiveGrades.push({ subject: r.subject, grade: r.grade })
+    }
+  }
 
   // Combine core and elective failures for the result
   const failedGradeSubjects = [...failedCoreGrades, ...failedElectiveGrades]
