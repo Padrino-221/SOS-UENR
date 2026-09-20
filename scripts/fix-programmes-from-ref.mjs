@@ -6,6 +6,7 @@
  */
 
 import { PrismaClient } from "@prisma/client"
+import { fileURLToPath } from "node:url"
 
 const prisma = new PrismaClient()
 
@@ -205,7 +206,7 @@ const BUSINESS_SCIENCE = uniq([...BUSINESS, ...SCIENCE])
 // General Arts + General Agriculture + Business + Science (Sustainable Land Management)
 const LAND_MGMT_ELECTIVES = uniq([...ARTS, ...BUSINESS, ...SCIENCE])
 
-const rules = {
+export const rules = {
   // ── Diploma Programmes ──
   "diploma-fire-safety": rule("DIPLOMA", ["English Language", "Core Mathematics", "Integrated Science"], {
     coreAlternative: "Social Studies",
@@ -715,6 +716,12 @@ async function main() {
   console.log(`  With rules:  ${withRules}`)
 }
 
-main()
-  .catch((e) => { console.error(e); process.exit(1) })
-  .finally(async () => { await prisma.$disconnect() })
+const isDirectRun = process.argv[1]
+  ? fileURLToPath(import.meta.url).replace(/\\/g, "/") === process.argv[1].replace(/\\/g, "/")
+  : false
+
+if (isDirectRun) {
+  main()
+    .catch((e) => { console.error(e); process.exit(1) })
+    .finally(async () => { await prisma.$disconnect() })
+}

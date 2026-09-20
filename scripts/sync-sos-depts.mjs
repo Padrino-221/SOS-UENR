@@ -271,6 +271,14 @@ const programmes = [
     mode: 'Regular / Weekend',
     ordering: 3,
   },
+  {
+    slug: 'bsc-statistics',
+    deptSlug: 'mathematics-and-statistics',
+    name: 'BSc Statistics',
+    level: 'DEGREE',
+    mode: 'Regular / Weekend',
+    ordering: 4,
+  },
 
   // 6. Medical Laboratory Science
   {
@@ -294,7 +302,7 @@ const programmes = [
 ]
 
 // Programmes that no longer exist in the SoS offering
-const removeSlugs = ['bsc-statistics', 'mphil-applied-mathematics', 'phd-computer-science']
+const removeSlugs = ['mphil-applied-mathematics', 'phd-computer-science']
 
 async function main() {
   const deptIdBySlug = {}
