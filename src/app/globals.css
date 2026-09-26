@@ -502,12 +502,12 @@
 .ck-badge-success::before {
   background: #10b981;
 }
-.ck-badge-neutral {
-  background: var(--color-ink-50);
-  color: var(--color-ink-600);
+.ck-badge-error {
+  background: #fef2f2;
+  color: #991b1b;
 }
-.ck-badge-neutral::before {
-  background: var(--color-ink-400);
+.ck-badge-error::before {
+  background: #dc2626;
 }
 .ck-badge-exam {
   background: var(--color-ink-900);
@@ -709,9 +709,10 @@
   border-bottom-color: #a7f3d0;
   color: #065f46;
 }
-.ck-card-head-neutral {
-  background: var(--color-ink-50);
-  color: var(--color-ink-600);
+.ck-card-head-error {
+  background: #fef2f2;
+  border-bottom-color: #fecaca;
+  color: #991b1b;
 }
 .ck-card-head-brand {
   background: var(--color-brand-700);

@@ -8,11 +8,9 @@ import {
   CheckCircle,
   PencilSimple,
   Sparkle,
-  Star,
-  Trophy,
 } from '@phosphor-icons/react'
 import { WASSCE_GRADES, TVET_REMARK_GRADES, GRADE_POINTS, normalizeSubject, isTVETTrack, displayGrade, type Grade, type SHSTrack, SHS_TRACKS, getElectivesForTrack } from '@/lib/subjects'
-import { evaluateProgramme, rankProgrammes, getTopRecommendation, type ProgrammeForCheck, type SubjectResult, type EligibilityRule } from '@/lib/eligibility'
+import { evaluateProgramme, rankProgrammes, type ProgrammeForCheck, type SubjectResult, type EligibilityRule } from '@/lib/eligibility'
 import { SelectDropdown } from '@/components/ui/select-dropdown'
 
 type Props = {
@@ -130,7 +128,7 @@ function StepRail({
 
       <div className="ck-rail-foot">
         <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-ink-500">
-          {mode === 'best' ? 'Best fit' : 'Specific programme'}
+          {mode === 'best' ? 'All programmes' : 'Specific programme'}
         </p>
         {mode === 'specific' && programmeName && (
           <p className="mt-1.5 text-xs font-medium leading-snug text-ink-700">{programmeName}</p>
@@ -233,30 +231,16 @@ export function EligibilityChecker({ programmes }: Props) {
     return { eligible, total: ranked.length }
   }, [ranked, submitted])
 
-  const topRecommendation = useMemo(() => {
-    if (!submitted || mode !== "best") return null
-    let pool = eligibleProgrammes
-    if (levelFilter !== "ALL") pool = pool.filter((p) => p.level === levelFilter)
-    const withParsed = pool.map((p) => ({
-      ...p,
-      eligibilityRule: (p.eligibilityRule as EligibilityRule | null) ?? null,
-    }))
-    return getTopRecommendation(results, withParsed as ProgrammeForCheck[])
-  }, [submitted, results, eligibleProgrammes, levelFilter, mode])
-
   const specificProgramme = useMemo(() => eligibleProgrammes.find((p) => p.slug === selectedProgrammeSlug) ?? null, [eligibleProgrammes, selectedProgrammeSlug])
   const specificResult = useMemo(() => {
     if (!submitted || mode !== "specific" || !specificProgramme) return null
     return evaluateProgramme(results, (specificProgramme.eligibilityRule as EligibilityRule | null) ?? null, specificProgramme as ProgrammeForCheck)
   }, [submitted, mode, specificProgramme, results])
 
-  // Top pick is shown in its own highlight card; the list holds the rest.
-  const otherPicks = useMemo(
-    () => filtered.filter((r) => r.programme.slug !== topRecommendation?.programme.slug),
-    [filtered, topRecommendation],
-  )
-  const visiblePickList = otherPicks.slice(0, visiblePicks)
-  const hasMorePicks = otherPicks.length > visiblePicks
+  // Eligible-programme cards; the system checks eligibility, not recommendations.
+  const eligiblePicks = filtered
+  const visiblePickList = eligiblePicks.slice(0, visiblePicks)
+  const hasMorePicks = eligiblePicks.length > visiblePicks
 
   const resetAll = () => {
     setStep(0)
@@ -345,8 +329,8 @@ export function EligibilityChecker({ programmes }: Props) {
                         aria-pressed={mode === "best"}
                         className={`ck-choice ${mode === "best" ? "is-active" : ""}`}
                       >
-                        <span className="ck-choice-title">Find best fit</span>
-                        <span className="ck-choice-hint">Rank everything you qualify for</span>
+                        <span className="ck-choice-title">Check all programmes</span>
+                        <span className="ck-choice-hint">See every programme you qualify for</span>
                       </button>
                     </div>
                   </div>
@@ -546,9 +530,9 @@ export function EligibilityChecker({ programmes }: Props) {
 
                 {/* Specific result */}
                 {mode === "specific" && specificProgramme && specificResult && (
-                  <article className={`ck-card ck-card-flush ${specificResult.tier === "ELIGIBLE" ? "border-emerald-200" : ""}`}>
-                    <div className={`ck-card-head ${specificResult.tier === "ELIGIBLE" ? "ck-card-head-success" : "ck-card-head-neutral"}`}>
-                      <span className={`ck-badge ${specificResult.tier === "ELIGIBLE" ? "ck-badge-success" : "ck-badge-neutral"}`}>
+                  <article className={`ck-card ck-card-flush ${specificResult.tier === "ELIGIBLE" ? "border-emerald-200" : "border-red-200"}`}>
+                    <div className={`ck-card-head ${specificResult.tier === "ELIGIBLE" ? "ck-card-head-success" : "ck-card-head-error"}`}>
+                      <span className={`ck-badge ${specificResult.tier === "ELIGIBLE" ? "ck-badge-success" : "ck-badge-error"}`}>
                         {specificResult.tier === "ELIGIBLE" ? "Eligible" : "Not eligible"}
                       </span>
                     </div>
@@ -579,81 +563,53 @@ export function EligibilityChecker({ programmes }: Props) {
                   </article>
                 )}
 
-                {/* Top recommendation */}
-                {mode === "best" && topRecommendation && (
-                  <article className="ck-card ck-card-flush border-brand-200">
-                    <div className="ck-card-head ck-card-head-brand">
-                      <Trophy size={13} weight="duotone" />
-                      <span>Top pick</span>
-                      <span className="ml-auto inline-flex items-center gap-1 bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                        <Star size={10} weight="duotone" /> Strong
-                      </span>
-                    </div>
-                    <div className="ck-card-body">
-                      <h3 className="font-display text-lg leading-tight break-words text-ink-900">{topRecommendation.programme.name}</h3>
-                      <p className="mt-1 text-xs font-bold uppercase tracking-widest text-brand-600">
-                        {topRecommendation.programme.level.toLowerCase()} {topRecommendation.programme.department?.school ? `· ${topRecommendation.programme.department.school}` : ""}
-                      </p>
-                      <p className="mt-3 text-sm text-ink-700">{topRecommendation.reason}</p>
-                      {topRecommendation.alternatives.length > 0 && (
-                        <p className="mt-2 truncate text-xs text-ink-400">
-                          Also eligible: {topRecommendation.alternatives.slice(0, 2).map((a) => a.programme.name).join(" · ")}
-                          {topRecommendation.alternatives.length > 2 ? ` +${topRecommendation.alternatives.length - 2} more` : ""}
-                        </p>
-                      )}
-                      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                        <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-primary ck-btn-sm w-full sm:w-auto">
-                          Apply
-                        </a>
-                      </div>
-                    </div>
-                  </article>
-                )}
-
-                {mode === "best" && submitted && !topRecommendation && (
-                  <p className="ck-note ck-note-warn">
-                    No programmes match these grades yet — edit your grades to try again.
-                  </p>
-                )}
-
-                {/* More picks */}
-                {mode === "best" && otherPicks.length > 0 && (
+                {/* Eligible programmes — shown for "Check all", and for a specific
+                    programme that the student does NOT qualify for. */}
+                {(mode === "best" || (mode === "specific" && specificResult && specificResult.tier !== "ELIGIBLE")) && (
                   <div>
                     <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-500">
-                      More picks
+                      {mode === "specific" ? "Programmes you qualify for" : "Eligible programmes"}
                     </h3>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {visiblePickList.map(({ programme, result }) => (
-                        <article key={programme.slug} className="ck-result ck-result-eligible flex flex-col">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="ck-badge ck-badge-success"><CheckCircle size={10} weight="duotone" /> Eligible</span>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">{programme.level.toLowerCase()}</span>
-                            {result.requiresExam && <span className="ck-badge ck-badge-exam">Exam</span>}
-                          </div>
-                          <h3 className="mt-1.5 text-sm font-bold leading-tight break-words text-ink-900">{programme.name}</h3>
-                          <p className="mt-0.5 text-xs text-ink-500">{programme.department?.school}</p>
-                          <p className="mt-1 line-clamp-2 text-xs text-ink-600">{result.details}</p>
-                          <div className="mt-auto flex flex-col gap-1.5 pt-3 sm:flex-row">
-                            <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-primary ck-btn-xs w-full sm:w-auto">Apply</a>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 flex flex-col items-center gap-2">
-                      <p className="text-xs text-ink-400">
-                        Showing {Math.min(visiblePicks, otherPicks.length)} of {otherPicks.length} more picks
+                    {eligiblePicks.length > 0 ? (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {visiblePickList.map(({ programme, result }) => (
+                          <article key={programme.slug} className="ck-result ck-result-eligible flex flex-col">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="ck-badge ck-badge-success"><CheckCircle size={10} weight="duotone" /> Eligible</span>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">{programme.level.toLowerCase()}</span>
+                              {result.requiresExam && <span className="ck-badge ck-badge-exam">Exam</span>}
+                            </div>
+                            <h3 className="mt-1.5 text-sm font-bold leading-tight break-words text-ink-900">{programme.name}</h3>
+                            <p className="mt-0.5 text-xs text-ink-500">{programme.department?.school}</p>
+                            <p className="mt-1 line-clamp-2 text-xs text-ink-600">{result.details}</p>
+                            <div className="mt-auto flex flex-col gap-1.5 pt-3 sm:flex-row">
+                              <a href="https://admissions.uenr.edu.gh/applicant-login" target="_blank" rel="noreferrer" className="ck-btn ck-btn-primary ck-btn-xs w-full sm:w-auto">Apply</a>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="ck-note ck-note-warn">
+                        No programmes match these grades yet — edit your grades to try again.
                       </p>
-                      {hasMorePicks && (
-                        <button
-                          type="button"
-                          onClick={() => setVisiblePicks((n) => n + 5)}
-                          className="ck-btn ck-btn-secondary w-full sm:w-auto"
-                        >
-                          Show more picks <ArrowRight size={14} weight="duotone" />
-                        </button>
-                      )}
-                    </div>
+                    )}
+
+                    {eligiblePicks.length > 0 && (
+                      <div className="mt-4 flex flex-col items-center gap-2">
+                        <p className="text-xs text-ink-400">
+                          Showing {Math.min(visiblePicks, eligiblePicks.length)} of {eligiblePicks.length} programme{eligiblePicks.length === 1 ? "" : "s"}
+                        </p>
+                        {hasMorePicks && (
+                          <button
+                            type="button"
+                            onClick={() => setVisiblePicks((n) => n + 5)}
+                            className="ck-btn ck-btn-secondary w-full sm:w-auto"
+                          >
+                            Show more programmes <ArrowRight size={14} weight="duotone" />
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 
